@@ -14,4 +14,4 @@ ggplot() +
   theme_void() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
-ggsave("../Figures/Smilodon_fatalis.png")
+ggsave("../Figures/Smilodon_fatalis.png", width = 10, height = 6)
