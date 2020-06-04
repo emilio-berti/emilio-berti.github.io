@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Emilio Berti Homepage</title>
+	</head>
+	<body>
+		<h1> To cascade or to not cascade - trophic downgrading of plant Earth </h1>
+		<!-- wp:paragraph -->
+		<p>In the 19-th century, sea otters were completely extirpated from Central California by fur hunters. After otters disappeared, kelp - aquatic plants that were abundant in the area - also vanished. The two species had no direct interaction, and the reasons why kelp disappeared could not be explained. Today we know why this happened.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:heading -->
+		<h2><strong>Lotka-Volterra models</strong></h2>
+		<!-- /wp:heading -->
+
+		<!-- wp:paragraph -->
+		<p>Most undergraduate students in theoretical ecology encounter, inevitably, a community system composed of species predating on each other. These models are, in general, referred to as Lotka-Volterra systems and are governed by equations that were developed by Lotka and applied to animal populations by Volterra almost 100 years ago. The basic idea of Lotka-Volterra models is that prey density is regulated by predator density, and vice versa. The rate at which predators attack, kill, and consume their prey, called the functional response, determines the way consumers and resources interact. Here, we explore the simplest Lotka-Volterra model - a three species system with a resource, a primary consumer, and a secondary consumer - with the following assumptions:</p>
+		<!-- /wp:paragraph -->
+		
+		<!-- wp:list {"ordered":true} -->
+		<ol><li>the resource is the only species that can have a sustainable population without the others, and it is therefore the base of the community</li><li>the resource species is eaten by a primary consumer, the primary consumer is eaten by a secondary consumer, but the secondary consumer and the basal resource do not interact</li><li>all consumer-resource interactions are governed by a functional response that cannot increase unlimited, but it is capped at maximum level</li><li>all species are subjected to natural mortality.</li></ol>
+		<!-- /wp:list -->
+
+		<!-- wp:paragraph -->
+		<p>This model, despite its simplicity, can reproduce what happened in Central California 200 years ago. First however, we have to add another piece to the puzzle, the missing species that links otters (secondary consumers) to kelp (resource): sea urchins. Sea urchins are the primary consumers, they graze on kelp, causing kelp abundances to decrease, and are predated by sea otters. To illustrate the kelp-urchin-otter system, I simulated the model for 1,000 time steps, which can be, for example, the number of days. The attack rate - that is, the rate at which consumers eat resources -&nbsp; can be changed between low and high values and the secondary consumer species can be added and removed from the model.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph {"align":"center"} -->
+		<p class="has-text-align-center"><a href="https://popecology.shinyapps.io/Lotka_Volterra/">Lotka-Volterra <b>Shiny app</b></a></p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>Varying the attack rate has consequences for how the model reach an equilibrium - a very interesting topic that we will cover another time. For now, we will focus on what happens if we add or remove the secondary consumer. With the secondary consumer present in the system, the number of primary consumers greatly decreases and the number of resources increases. The effect of the secondary consumer on the density of the resource is not direct - as they do not interact directly - but mediated by the intermediate species, the primary consumer. Because the secondary consumer keeps primary consumer density low, the resource is less subjected to predation and can grow to higher densities. Every time the number of primary consumers increases, secondary consumers also grow and limit primary consumer's densities and its pressure on resources. As the secondary consumer is higher in the trophic chain, ecologists call this regulation of lower trophic levels operated by higher trophic levels <strong>top-down control</strong>.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:heading -->
+		<h2><strong>Trophic downgrading of planet Earth</strong></h2>
+		<!-- /wp:heading -->
+
+		<!-- wp:paragraph -->
+		<p>We saw that adding the secondary consumer reduces the number of primary consumers and increase the density of the resource. Alternatively, we can say that removing the secondary consumer causes resource density to decrease, a process called a <strong>trophic cascade</strong>. As the primary consumer is released from top-down control, it can grow until resources are available, sometimes crashing resources' populations and changing the structure of ecosystems. This is what happened in Central California: after sea otters were hunted down, sea urchins, which are predated by sea otters, were released from top-down control and consumed kelp uncontrolled. Kelp populations rapidly decreased and the ecosystem maintained by underwater kelp forests collapsed.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>The sea kelp-urchin-otter trophic cascade is a textbook example. But how common are trophic cascades in nature? Even if there is still no consensus, it is likely that trophic cascades have happened in many parts of the world as humans caused extinctions of many top consumers, leading to a general <strong>trophic downgrading</strong> of planet Earth. Especially if we look further back in time to a more natural period, the trophic downgrading looks alarming: most of the large predators that dominated ecosystems - lions, tigers, and saber-toothed cats once lived throughout Europe and the Americas - wentextinct after human arrival and consumers of lower trophic levels have been released from top-down control.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>Top-down control is not the only force structuring ecosystems, but it is one of the most fragile. Large consumers, that are the main source of top-down control, are particularly sensitive to human pressure and have been extirpated from their natural habitats. Today, protection of large consumers’ populations is a conservation priority and their reintroduction in ecosystems is part of a larger effort to restore top-down control in ecosystems. How this is going to play out depends on how much we are willing to accept large consumers back in ecosystems.</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:separator {"className":"is-style-default"} -->
+		<hr class="wp-block-separator is-style-default"/>
+		<!-- /wp:separator -->
+
+		<!-- wp:paragraph -->
+		<p>This first post and the blog itself started from an idea conceived during the PhD course organized by the <a href="https://projects.au.dk/mega/">MegaPast2Future</a> group at Aarhus University. I sincerely thank the organizers for their suggestions and guidance in developing the format of this blog further.</p>
+		<!-- /wp:paragraph -->
+
+	</body>
+</html>

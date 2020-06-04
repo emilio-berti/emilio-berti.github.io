@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Emilio Berti Homepage</title>
+	</head>
+	<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
+	<body>
+		<!-- wp:paragraph -->
+<h1>1, 2, 4, chaos!</h1>
+<p>There is a population that obeys a relatively simple model. Only one parameter is free to change. We are not expecting much from the model; we may think that its simplicity makes the model almost boring. However, by tuning the parameter, the population can behave in very odd ways. At first, this may puzzle us. Then, the complexity of the behaviour astonishes us. Finally we are left speechless by the elegance and harmony emerging from this simple model. This is the model studied by May (1976), one of the best papers I have ever read.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>A simple population model</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>May (1976) starts with a model describing the growth of a population. Individuals of this population compete for resources and population growth slows down for increasing population density until it stops at a value called "carrying capacity". When we write it down in an equation (the only one found in this post), the model looks like this:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"align":"center","fontSize":"normal"} -->
+<div lang="latex"> N_{t+1} = A \cdot N_t \left(1 - N_t \right) </div>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>where $latex N_t&amp;s=2$ is the number of individual of the population at time <em>t</em>, <em>A</em> the free parameter determining the rate of increase of the population, and 1 is the carrying capacity, set to 1 for simplicity. A convenient way to visualise the above logistic equation is to plot the number of individuals at time <em>t + 1</em> against the number of individuals at time <em>t</em>. If these are the same, then the population reaches a stable equilibrium with time: the number of individuals of the population does not change. The striking question that May (1976) asked was: how does varying the free parameter <em>A</em>, that is the population growth rate, affect the long-term equilibrium of the population?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Stable points, cycles, and much more </h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Take few minutes to play with the <a href="https://popecology.shinyapps.io/logistic_bifurcations/"><b>Shiny app</b>shinyapp</a> I made for this post. The top panel is the plot of the population number at time <em>t + 1</em> depending on population size at time <em>t</em> (solid black line). When the number of individuals at time <em>t + 1</em> is equal to the number at time <em>t</em> (dashed line), the population is at equilibrium. Starting from an initial population number that can be set between 0 and 0.5, we can draw the trajectory of the population through time (solid blue line). The bottom panel shows the trajectory of the population in the long-term, how the population behaves given we have waited long enough for it to stabilise, represented by the y-axis. On the x-axis we find the population growth rate <em>A</em>, which ranges from 0 to 4. This plot can be read as follows: for a given value of <em>A</em> (x-axis), the number of individuals at equilibrium will be <em>N</em> (y-axis). Remember <em>N</em> is a fraction of the carrying capacity, which is the maximum population number that can be achieved. I will explain the colours of this panel later on.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First of all, we notice that the population is not viable for values of <em>A</em> &lt; 1.00. There is actually a stable point, but this is zero individuals (blue solid line in top panel goes to zero and <em>N</em> in the bottom panel is zero). This is called a trivial solution: if there are no individuals, the population, which practically does not exist, is stable. For values of <em>A</em> between 1.00 and 3.00 the population reaches a stable equilibrium: the blue solid line in the top panel reaches a fixed point and <em>N</em> in the bottom panel has one value that increases for increasing <em>A</em>. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Interesting things start to happen if <em>A</em> is increased above 3.00. At the beginning, the trajectory in the top panel fails to reach a stable point and keeps going around, while <em>N</em> in the bottom panel has two values for one <em>A</em> (notice the colour is a brighter shade of purple). This means that the populations is constantly alternating between two numbers of individuals. This is called a <strong>cycle</strong> of period 2. If we keep increasing <em>A</em>, the population enters a cycle of period 4 (<em>A </em> = 3.45, even brighter shade of purple), then a cycle of 8 (<em>A </em> = 3.55, marine blue), and so on. If you are familiar with the power of 2, you may have noticed that these bifurcations always double the period of the previous cycle: 1 (one stable fixed <em>N</em>), 2, 4, 8. Because we are smart people, we predict the next cycles would be of period 16 (light green), 32 (yellow), etc... You can check to see we are actually right. The values of <em>A</em> at which the behaviour of the population changes (for example from a cycle 2 to a cycle 4) are called <strong>bifurcations</strong>, points where the qualitative dynamics of the population change. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>We also notice something else: it takes an increase of 0.45 of <em>A</em> to double the first cycle from  period 2 to 4, but only an increase of 0.10 to double a cycle of period 4 to one of period 8. Bifurcations to cycles with higher period occur in a shorter range of <em>A</em>.  Doubling cycles after periods of 32 takes an increase so small that displaying the bifurcation in the simple graph I made is not possible. The value of <em>A</em> for which the doubling of the cycles' period occurs for infinitesimal increments has the superbly intriguing name of <em>point of accumulation</em> <em>of the cascade of harmonics</em>. This very complex (and fascinating; it leads to fractals) topic needs to wait for another time, as it diverges from the point of this post. I did however add a special colour to the bottom panel: the red colour shows when the population does not follow a cycle any more, but just takes apparently random values of <em>N</em> without settling down on a stable point (starting from <em>A = </em>3.57). I remember when I read May (1976), at this point I told myself: what the heck is going on here? Where did my cycles go? What is this strange behaviour of the population? I thought I understood how it worked!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Chaos</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We saw that at <em>A</em> = 3.00 the population starts to oscillate between periodic values of <em>N</em>. Increasing the value of <em>A</em> doubles the period of the oscillations. Approaching the values <em>A</em> = 3.57, the period of the cycles is double by minimal increases of <em>A</em>. At <em>A</em> = 3.57 cycles disappear and the number of individuals in the population (<em>N</em>) cannot be predicted any more, but <em>N</em> assumes values that seem to be completely random. This is the <strong>onset of</strong> <strong>chaos</strong>. Chaos doesn't mean the population fluctuates randomly, but simply that we cannot predict very well where it will be at the next steps.  By increasing the values of <em>A</em>, we started from a stable, fixed point, went through cycles of increasing order, and eventually we found a chaotic behaviour. This might seem the end of the story, but <span style="text-decoration:underline;">it isn't</span>. If we keep increasing <em>A</em>, we encounter another cycle at <em>A</em> = 3.83, but this type of period 3, that is the population oscillates between three number of individuals. For higher <em>A</em>s, cycles of period multiple of 3 appear (3, 6, 9, 12, ...). We encountered a region of cycles with period multiple of 3. The range of <em>A</em> containing cycles with period multiple of 3 is quite small (approximately 0.02); at <em>A</em> = 3.86 we found again a region of chaotic behaviour. Guess what we will find after this chaotic region if we keep increasing <em>A</em>? A region with cycle of period 4! And then chaos, followed by a region of cycles by period 5. This game can go forever.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Increasing <em>A</em> determines a qualitative change in the behaviour of the population. For low <em>A</em>s, the population is not viable.  By increasing <em>A</em> the population reaches a stable, fixed point. Then, after <em>A</em> = 3.00 we enter a region where the population alternate cycles of increasing period multiplicity to chaotic behaviour. <strong>After cycles follow chaos, and after chaos follow cycles.</strong> This stops only at <em>A</em> &gt; 4.00, at which the population is not viable any more. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Harmony</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>May's (1976) conclusion is that even a relatively simple model as the one described in equation 1 hides a very complex behaviour and that scientists need to be exposed to this complexity early on during their education. This point has become of paramount importance, as new evidence show that natural populations have complex and non-predictable dynamics (Clark &amp; Luis, 2019). How can we study populations if we don't have the tools to understand their complex behaviour? After more than 40 years, steps towards this early education to complex dynamics need still to be taken in basic ecological courses. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I believe exposure to this complexity is also important for non-academics to deeply understand nature and the World around us. For many decades we have been thinking about nature as a fixed portrait governed by stabilising forces. By understanding that this picture is just a snapshot in a more complex, heterogeneous landscape, we will accept changes with a more open mind-set. Changes, especially when not predictable, are scary. However, they can hide a beautiful, unexpected harmony if we are able to understand them.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>References</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>May, R. M. (1976). Simple mathematical models with very complicated dynamics. <em>Nature</em>, <em>261</em>(5560), 459-467.<br>Clark, T. J., &amp; Luis, A. D. (2019). Nonlinear population dynamics are ubiquitous in animals. <em>Nature Ecology &amp; Evolution</em>, 1-7.</p>
+<!-- /wp:paragraph -->
+	</body>
+</html>
