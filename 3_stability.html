@@ -4,6 +4,7 @@
 		<title>Emilio Berti Homepage</title>
 	</head>
 	<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
+	<script type="text/javascript"> LatexIT.add('p',true); </script>
 	<body>
 
 		<h1> Stability of ecological networks </h1>
@@ -16,16 +17,18 @@
 			There are many ways to investigate whether an ecosystem is stable or not. For instance, we could simulate all interactions among species and project the populations into the future. This approach is however limiting and time-consuming for ecosystems with many species, e.g. several thousands, and it is also very sensitive to how the interactions are parametrized. When May's paper came out in 1972, computational limitations hinder such approach. May resorted thus to another approach, a branch of mathematics called <b>stability theory</b> that had been developed for several decades. In particular, this theory predict that when mathematical quantities called "eigenvalues" are all negative, then the ecosystem is stable. May generated <b>random ecosystems with random interactions</b>, which allowed him to derive an equation to calculate the eigenvalues of the ecosystems using theorems from <b>random matrix theory</b>.
 		</p>
 
-		<!-- <div lang="latex"> 
-			N_{t+1} = A \cdot N_t \left(1 - N_t \right) 
-		</div> -->
-
 		<p>
-			May found that for increasing complexity, i.e. number of species and interactions, random systems are more likely to be unstable. To visualize this pattern I made a <a href = "https://popecology.shinyapps.io/fw_stability/" target = "_blank"> <b>Shiny app</b> </a> to play with. You can choose the <b>number of species</b> and the <b><i>connectance</i></b> of the ecosystem, which is the fraction of realized interactions over all possible links. You can also specify the <b>self-interaction strength</b>, which is the strength with which a species regulates itself, and <b>&#961</b>, the overall pairwise correlation for the interactions between two species; I will explain these two quantities shortly. An ecosystems is then randomly generated and dislayed as a network and a matrix, with colors showing the strength of the interactions. The two other figures are alternative ways to visualize if the ecosystem is stable or not. The figure with points (often resembling a Klingon battleship) show the eigenvalues of the system, while the figure with lines show a time series of the populations. The ecosystem is stable if and only if all eigenvalue points are on the left of the vertical dashed line and all lines reach and stay at zero <a target="_self" href="#footnote-2">[2]</a>.
+			May found that for increasing complexity, i.e. number of species and interactions, random systems are more likely to be unstable. To visualize this pattern I made a <a href = "https://popecology.shinyapps.io/fw_stability/" target = "_blank"> <b>Shiny app</b> </a> to play with. You can choose the <b>number of species</b> and the <b>connectance</b> of the ecosystem, which is the fraction of realized interactions over all possible links. You can also specify the <b>self-interaction strength</b>, which is the strength with which a species regulates itself, and <b>&#961</b>, the overall pairwise correlation for the interactions between two species; I will explain these two quantities shortly. An ecosystems is then randomly generated and dislayed as a network and a matrix, with colors showing the strength of the interactions. The two other figures are alternative ways to visualize if the ecosystem is stable or not. The figure with points (often resembling a Klingon battleship) show the eigenvalues of the system, while the figure with lines show a time series of the populations. The ecosystem is stable if and only if all eigenvalue points are on the left of the vertical dashed line and all lines reach and stay at zero <a target="_self" href="#footnote-2">[2]</a>.
 		</p>
 
 		<p>
-			It is hard to understand the impact of May's results, but at the time the study came out the general consensus was that complexity stablizes ecosystems. 
+			Specifically, May found that the system is very likely to be unstable when:
+		</p>
+		<div style="width:600px; margin:0 auto;" lang="latex">
+			\sigma \sqrt{SC} > -d
+		</div>
+		<p>
+			where &sigma; is the standard deviation of the interaction strength (here = 1), <i>S</i> is the number of species, <i>C</i> the connectance, and <i>the selfinteraction strength</i>. Ecologically, this means that complex <b>random</b> ecosystems, i.e. with a great number of interactions (<i>SC</i>), are more unstable than simple ones. At the time May's work was published, this result came unexpected, as the mainstream consensus among ecologists was that complex ecosystems should be more stable, and generated a debate sill alive after almost 50 years.
 		</p>
 
 		<p>
