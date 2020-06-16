@@ -3,8 +3,8 @@
 	<head>
 		<title>Emilio Berti Homepage</title>
 	</head>
-	<script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
-	<script type="text/javascript"> LatexIT.add('p',true); </script>
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 	<body>
 
 		<h1> Stability of ecological networks </h1>
@@ -24,9 +24,9 @@
 		<p>
 			Specifically, May found that the system is very likely to be unstable when:
 		</p>
-		<div style="width:600px; margin:0 auto;" lang="latex">
+		$$
 			\sigma \sqrt{SC} > -d
-		</div>
+		$$
 		<p>
 			where &sigma; is the standard deviation of the interaction strength (here = 1), <i>S</i> is the number of species, <i>C</i> the connectance, and <i>the selfinteraction strength</i>. Ecologically, this means that complex <b>random</b> ecosystems, i.e. with a great number of interactions (<i>SC</i>), are more unstable than simple ones. At the time May's work was published, this result came unexpected, as the mainstream consensus among ecologists was that complex ecosystems should be more stable, and generated a debate sill alive after almost 50 years.
 		</p>
