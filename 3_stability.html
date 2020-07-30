@@ -7,20 +7,19 @@
 	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 	<body>
 
-		<h1> Stability of ecological networks </h1>
+		<h1> Ecosystems, complexity, and stability </h1>
 		<p>
-			Since May's milestone paper <a target="_self" href="#footnote-1">[1]</a>, ecologists have tried to understand what drive the stability of ecosystems. May's results was that complex ecosystems with many species should be generally unstable. Yet, why do we found so many species in nature? Why do we observe complex ecosystems in real life?
+			Ecologists have tried to understand what drive the stability of ecosystems for many decades. For long time, ecologists believed that complex ecosystems, i.e. with many interacting species strongly controlling each others, were exceptionally stable. This idea came from the observation that real ecosystems are extremely complex and that such complexity should be necessary for ecosystems to persist through time and for us to observe them. Yet, few evidence of this theory existed. In 1972, May <a target="_self" href="#footnote-1">[1]</a> published a revolutionary paper, which contradicted this idea and showed that, if anything, complexity is a destabilizing force in ecosystems and that the more complex an ecosystem, the more likely for it to be unstable and disappear. Yet, observation tells us that such complex ecosystems exist and that they persist through time. Hence, why do we observe such complex ecosystems in nature? This is the core question of the <b>complexity&ndash;stability</b> debate.
+		</p>
+		<h2> What do we mean by stability ? </h2>
+		<p>
+			There are many definitions of stability and many ways to investigate whether an ecosystem is stable or not. For the sake of this blogpost, stability is defined here as the property of a system to return, after an external perturbation, to its original state <a target="_self" href="#footnote-2">[2]</a>. For instance, this is the same definition of stability used by May <a target="_self" href="#footnote-1">[1]</a>. To investigate the relationship between complexity and stability, May resorted to two mathematical approaches, <b>stability theory</b> and <b>random matrix theory</b>, that had been developed for several decades. In particular, stability theory predicts that when mathematical quantities called "eigenvalues" &ndash; mythical and magical entities venerated by modellers &ndash; are all negative, then the ecosystem is stable. On the other hand, random matrix theory makes possible to predict the eigenvalues of the system, given some assumptions and limitations <a target="_self" href="#footnote-3">[3]</a>. Combining these two mathematical fields, May was thus able to understand the relation between ecosystems complexity and their stability. In particular, May studied how <b>random ecosystems</b> with random interactions behaved under increasing complexity.
 		</p>
 
-		<h2> How to study stability </h2>
 		<p>
-			There are many ways to investigate whether an ecosystem is stable or not. For instance, we could simulate all interactions among species and project the populations into the future. This approach is however limiting and time-consuming for ecosystems with many species, e.g. several thousands, and it is also very sensitive to how the interactions are parametrized. When May's paper came out in 1972, computational limitations hinder such approach. May resorted thus to another approach, a branch of mathematics called <b>stability theory</b> that had been developed for several decades. In particular, this theory predict that when mathematical quantities called "eigenvalues" are all negative, then the ecosystem is stable. May generated <b>random ecosystems with random interactions</b>, which allowed him to derive an equation to calculate the eigenvalues of the ecosystems using theorems from <b>random matrix theory</b>.
+			May found that for increasing complexity, i.e. increasing number of species and interactions, random systems are more likely to be unstable. To visualize this pattern I made a <a href = "https://popecology.shinyapps.io/fw_stability/" target = "_blank"> <b>Shiny app</b> </a> to play with. You can choose the <b>number of species</b> and the <b>connectance</b> of the ecosystem, which is the fraction of realized interactions over all possible links. You can also specify <b>&#961</b>, the overall pairwise correlation for the interactions between two species, and the <b>self-interaction strength</b>, which is the strength with which a species regulates itself; I will explain these two quantities shortly. An ecosystems is then randomly generated and displayed as a network and a matrix, with colors showing the strength of the interactions. I also added the possibility to switch from a pure random network model to *niche* model, which has a more realistic ecological structure than a purely random network. The two bottom figures are alternative ways to visualize if the ecosystem is stable or not. The figure with points (often resembling a Klingon battleship) show the eigenvalues of the system, while the figure with lines show a time series of the populations. The ecosystem is stable if and only if all eigenvalue points are on the left of the vertical dashed line and all lines reach and stay at zero <a target="_self" href="#footnote-4">[4]</a>.
 		</p>
-
-		<p>
-			May found that for increasing complexity, i.e. number of species and interactions, random systems are more likely to be unstable. To visualize this pattern I made a <a href = "https://popecology.shinyapps.io/fw_stability/" target = "_blank"> <b>Shiny app</b> </a> to play with. You can choose the <b>number of species</b> and the <b>connectance</b> of the ecosystem, which is the fraction of realized interactions over all possible links. You can also specify the <b>self-interaction strength</b>, which is the strength with which a species regulates itself, and <b>&#961</b>, the overall pairwise correlation for the interactions between two species; I will explain these two quantities shortly. An ecosystems is then randomly generated and dislayed as a network and a matrix, with colors showing the strength of the interactions. The two other figures are alternative ways to visualize if the ecosystem is stable or not. The figure with points (often resembling a Klingon battleship) show the eigenvalues of the system, while the figure with lines show a time series of the populations. The ecosystem is stable if and only if all eigenvalue points are on the left of the vertical dashed line and all lines reach and stay at zero <a target="_self" href="#footnote-2">[2]</a>.
-		</p>
-
+		<h2> Stable or not ? </h2>
 		<p>
 			Specifically, May found that the system is very likely to be unstable when:
 		</p>
@@ -32,13 +31,19 @@
 		</p>
 
 		<p>
+			An important caveat of May's study is that ecological networks are randomly generated. At the time 
+		</p>
+
+		<p>
 			Human beigns are obsessed with the idea of stability. Aleksandr Lyapunov, one of the pioneer of stability theory, 
 		</p>
 
 	<hr class="wp-block-separator is-style-default"/>
 
 	<p id="footnote-1">[1] May, R. M. 1972. Will a large complex system be stable? Nature, 238: 413-414.</p>
-	<p id="footnote-2">[2] Zero is in this case the population equilibrium; if a population reaches and stays at zero it means that the net number of individuals is not changing over time.</p>
+	<p id="footnote-2">[2] Or so close to it that is practically indistinguishable from it.</p>
+	<p id="footnote-3">[3] This because eigenvalues are mystical creatures, equipped with such evanescence that they are hard to grasp and even glimpse.
+	<p id="footnote-4">[4] Zero is in this case the population equilibrium; if a population reaches and stays at zero it means that the net number of individuals is not changing over time.</p>
 
 	</body>
 </html>
