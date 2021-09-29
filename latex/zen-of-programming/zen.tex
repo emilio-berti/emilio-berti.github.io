@@ -202,7 +202,7 @@ I did this because I wanted to obtain a UTM coordinate reference system from a l
 \section{Readable code}
 If a code runs, good. If a code that runs is readable, great. Rarely, a good, functioning code is written at the first attempt. Often, code written some time before need to be changed. If code is not readable, changes are difficult to implement. Therefore the question: how can we write readable code? 
 
-To researchers I suggest to write code as they write a manuscript for a scientific paper. Divide the code in sections as you would do with paragraphs. You may have, for example, a section to import all data, another to wrangle it, another to perform statistical analyses, etc... Treat each section as a paragraph. If a paragraph is very long, treat it as appendix material: put it in another script and call it where you need it.
+There is a lot of emphasis in academia to learn how to write scientific papers for journals. To researchers I suggest to write code as they write a manuscript for a scientific paper. Divide the code in sections as you would do with paragraphs. You may have, for example, a section to import all data, another to wrangle it, another to perform statistical analyses, etc... Treat each section as a paragraph. If a paragraph is very long, treat it as appendix material: put it in another script and call it where you need it.
 
 \begin{enumerate}
     \item Never save your workspace as \textit{.RData}. If you need to save a \textit{.RData} or \textit{rds} data, explicitly save it. 
@@ -216,23 +216,98 @@ To researchers I suggest to write code as they write a manuscript for a scientif
 \chapter{bash}
 \lstset{language=bash}
 
-\section{aliases}
-When I started to need more sophisticated routines to run, I did what I would have done as if I was programming in \textit{R}: I wrote a bash script and I called it, similar to a \texttt{source()} command in \textit{R}. Sometimes this is the best way to do it, especially when arguments should be passed to script, but it often not the only or more elegant way to do it. For example, I wrote the following \textit{GIServer.sh} script to connect to two servers with two IPs that were accessed passing an argument to the script (\texttt{\$1}):
+Bash is a Unix shell that provides command line user interface to the GNU/Linux operating system. Bash is one the main reason I prefer Linux over Windows. It comes with a pre-defined set of commands useful for job control and file and directory utilities. For instance, Bash makes it easy to locate files in the whole hard drive. For instance, the command to find a file containing the string \textit{LICENSE} in its name is:
 
-\lstinputlisting{GIServer.sh}
+\begin{lstlisting}
+$ find . -maxdepth 2 -name '*LICENSE*'
 
-When I run \texttt{bash GIServer.sh 4}, a connection to the Windows server 4 was open in a window 2,400 $\times$ 1,300. Because I was working on several monitors at that time, and being lazy as I am, I originally wrote this with two extra arguments that would define the resolution of the window to be open. Then, I got tired of typing two extra arguments every time (I am lazy indeed) and I removed them, defining the resolution to be fixed at 2,400 $\times$ 1,300 that worked well for my main monitor. At this point, do I really need a script to do this?
-
-The answer is 'no'. I need an \textit{alias}. Aliases are variables that are assigned with a bash command and that can be accessed directly from the bash terminal. Basically, they are shortcuts to custom commands renamed as we want, and therefore easy to remember. An alias should be written in the \textit{.bashrc} file, which is loaded at the user log-in. For example, I could replace the \textit{GIServer.sh} script by writing two single lines in \textit{.bashrc}:
-\begin{lstlisting}[showstringspaces=false]
-alias gis4='rdesktop -d domain -g 2400x1300 -u emilioberti 00.00.0.000'
-alias gis1='rdesktop -d domain -g 2400x1300 -u emilioberti 00.00.0.001'
+./django-polls/LICENSE
+./keras/LICENSE
+./freetube/LICENSES.chromium.html
+./freetube/LICENSE.electron.txt
+./julia-1.5.2/LICENSE.md
+./Downloads/LICENSES.chromium.html
+./Downloads/LICENSE.electron.txt
 \end{lstlisting}
 
-At my next log-in (or sourcing \textit{.bashrc} again: \texttt{source ~/.bashrc}) I can just run \texttt{gis4} in the bash and get the same result as if I ran \texttt{bash GIServer.sh 4}.
+the option \texttt{-maxdepth 2} limits the search within two children directories of the current location.
 
-Not always a bash script can be (or should be) substituted with an alias. However, when the bash script is for a simple task that it is supposed to be called frequently, using an alias instead of a script can be a good idea. In general, if the program does not need input arguments and you can write the code in one or few lines, writing an alias instead of bash script can be a good idea.
+A comprehensive list of all useful commands is not in the scope of this guide, but the ones I use most often are:
 
-\chapter{\LaTeX}
+\begin{itemize}
+   \item[] \texttt{echo} prints strings on the terminal screen
+   \item[] \texttt{cd} changes directory
+   \item[] \texttt{pwd} prints the absolute path of the current directory
+   \item[] \texttt{mkdir} creates a directory
+   \item[] \texttt{touch} creates a file
+   \item[] \texttt{nano} starts the \textit{nano} text editor in the terminal 
+   \item[] \texttt{rm} removes files or directories
+   \item[] \texttt{ls} lists contents of the current directory
+   \item[] \texttt{grep} shows only files or strings containing a specific pattern
+   \item[] \texttt{cp} copies an existing files or directory to a new location
+   \item[] \texttt{mv} moves an existing files or directory to a new location
+   \item[] \texttt{tree} shows the directory tree of the current location
+   \item[] \texttt{ssh} connects via secure shell to remote machines
+   \item[] \texttt{history} shows the last commands run in Bash
+   \item[] \texttt{cat} prints out a single file or concatenate several ones
+   \item[] \texttt{head} prints the first lines of a file
+   \item[] \texttt{tail} prints the last lines of a file
+   \item[] \texttt{more} prints a file in the terminal with navigation control
+   \item[] \texttt{tr} removes or subtitute characters in a string or a file
+   \item[] \texttt{cut} separates a string or file according to a character and retrieve only specific columns
+   \item[] \texttt{chmod} administrates reading, writing, and executing priviledges of files
+   \item[] \texttt{ps} shows running processes
+   \item[] \texttt{kill} terminates processes
+   \item[] \texttt{git} for git version control
+   \item[] \texttt{zip/unzip} zips or unzips files
+   \item[] \texttt{wget} downloads stuff from internet
+   \item[] \texttt{curl} downloads stuff from internet
+   \item[] \texttt{man} shows the manual of a command
+\end{itemize}
+
+Pressing \texttt{Ctrl + r} starts a reverse search of the recently-used command.
+Command can be piped using \texttt{|}, where the output returned by the left expression is used as input by the right expression. For example \lstinline[columns=fixed]{ls | grep *.pdf} will show only the files in the current directory that have \textit{pdf} extension. This can be used to perform tasks that otherwise will require manual labour in a straightforward way. For intance, it happends quite often that we have multiple \textit{csv} files that we want to concatenate (bind them row-wise) into one file. This can be done in other programming languages as \textit{R} or \textit{python}, but it is much easier (and faster) to do it in Bash:
+
+\begin{lstlisting}
+find . -maxdepth 1  -name '*.csv' -print0 | xargs -0 cat > onefile.csv
+\end{lstlisting}
+
+The operator \texttt{>} redirect the output to \textit{onefile.csv}, where the content of all csv files will be stored. At this point you may notice that the above code, when \texttt{-maxdepth 1} changes to other numers will not only concatenate files within the current directory, but also in all children directories depending on the number specified. The code above may look complicated, but once you get used to Bash it comes naturally to your mind, much before thinking of an alternative solution in \textit{R}.
+
+It may not be clear from this simple list why Bash is so powerful or what can be achieved by using it. But it is indeed the best companion to perform automated pipelines in a secure and scalable way. Bash is substantially an environment where it is possible to code in a programming language that is useful to perform operations on files or strings and to control processes and their flow. You can also add custom functionality specifying aliases (more about this below) and functions, most notably in the \textit{~/.bashrc} file that is sourced when a Bash terminal is open. As an example consider the following function that I added to the \textit{~/.bashrc} file:
+
+\begin{lstlisting}
+uppercase() {
+   echo $1 | tr  '[:lower:]' '[:upper:]'
+   echo $1 | tr  '[:lower:]' '[:upper:]' | xclip -sel clip
+}
+$ uppercase 'hello world!'
+HELLO WORLD!
+\end{lstlisting}
+
+In Bash, \textit{\$n} (where \textit{n} is a number) means that that is an argument passed to the function. In the above code, the \texttt{uppercase()} function prints the passed argument (a string) and pass it (using \texttt{|}) to \texttt{tr} to replace lowercase characters with uppercase ones. The third line does the same thing but copies the output one the clipboard, so I can paste it using \textit{Ctrl + v}.
+
+\section{aliases}
+Aliases renames existing command (or pipes of them) in one word that you find more familiar. For instance, I can never rememebr, so I added this to the \textit{~/.bashrc}:
+
+\begin{lstlisting}
+alias clip="xclip -selection c"
+\end{lstlisting}
+
+Instead of writing \lstinline[columns=fixed]{xclip -selection c}, I can now only write \lstinline[columns=fixed]{clip}, which will implicitly performs the same thing.\\
+
+You can also write scripts that can be called in Bash. I wrote a script to get general information about the food additives \textit{E\#\#\#} from wikipedia. That's the code in the \textit{wiki.sh} file:
+
+\lstinputlisting{wiki.sh}
+
+This script can be called in bash running \lstinline[columns=fixed]{$ bash wiki.sh} or by giving it running priviledges:
+
+\begin{lstlisting}
+$ chmod +x wiki.sh
+$ ./wiki.sh E150
+E150, Caramel color , , https://en.wikipedia.org/wiki/E150
+$ ./wiki.sh E214
+E214, Ethylparaben , antifungal, https://en.wikipedia.org/wiki/E214
+\end{lstlisting}
 
 \end{document}

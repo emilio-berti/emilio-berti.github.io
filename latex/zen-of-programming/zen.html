@@ -1,0 +1,211 @@
+<h1 id="introduction">Introduction</h1>
+<p>I have been told that my programming skills are above average. Often, I am asked to develop or debug code and to explain why I coded scripts in the way I did. I realized that I follow a combination of personal rules-of-thumb, rules-of-thumb of other people who code better than me, and style guides from notorious people (e.g. <a href="https://style.tidyverse.org/">Wickham tidyverse guide style</a>) or big companies (e.g. <a href="https://google.github.io/styleguide/Rguide.html">Google’s R Style Guide</a>); they are doing better than me, and copying their style is probably a good idea.</p>
+<p>In this booklet, I want to show some tips and tricks I follow routinely and to explain why I do some things in a certain way. I am sure better and more comprehensive guides already exist, but maybe not for people with ecological background, which is often fragmentary regarding coding.</p>
+<h2 id="general-tips">General tips</h2>
+<p>These are my <em>laws</em> that I always try to follow. In some cases I violate some of them, e.g. in early-development or testing dozens of statistical models without clue of the underlying data. However, a final, releasable code should always follow all these laws. If I will release a code that does not follow one of these laws, I will be ashamed of myself – except in the case I want to prove a point on them. It is important to stress that these laws apply specifically to the scientific research environment and are not representative of how to properly code in other settings.</p>
+<ol>
+<li><p>Data input, manipulation, and output must be explicit.</p></li>
+<li><p>Do not overflow the (global) environment. Really guys, we are ecologists, be nice to the environment.</p></li>
+<li><p>Do not nest more than three loops/conditional statements. If you did, rewrite everything from scratch.</p></li>
+<li><p>If you’re gonna do it twice, write a function for it.</p></li>
+</ol>
+<p>These laws are fancy and general enough to be mis-understood. Let’s expand on them.</p>
+<h3 id="how-not-to-work-with-files">How (not) to work with files</h3>
+<p>Nowadays, most of the analyses require large computations divided into steps. Intermediate output can be stored into files, which then can be used for downstream computations. A common mistake is to work with these intermediate files using point-and-click methods, often copy-pasting their content into scripts. This is an extremely bad practice for many reasons. First, there is no trace of what it has been done and from where the text in the script is coming from. Second, text editors often use special characters, e.g. linebreaks, that are not compatible within a script or among operating systems. Thirds, the potential for automation is severely reduced; for intsance, if you work with hundreds of files, the point-an-click steps need to be re-performed manually every time. Finally, the code is less readable, especially in the case the <em>csv</em> containing many rows.</p>
+<p>A easy way to avoid all of this is to read the file in the code using reading functions, e.g. in <code>read.csv()</code>, <code>read_csv()</code>, or <code>fread</code> in <em>R</em>. This may seem basic, but it happens more than what I would like to admit.</p>
+<h3 id="global-environment-overflow">Global environment overflow</h3>
+<p>I have seen many times a phenomenon that I call environment overflow, i.e. the (re)initialization of variables contained in a dataframe without deleting old copies. For example, a column (<em>x</em>) in a dataframe (<em>df</em>) can be extracted and passed to a new variable: <code>x &lt;- df$x</code>. I consider this a bad practice because: first, it does not provide any new information; second, it created duplicates in the environment; and finally, it creates confusion for everyone (for instance, what’s the difference between <em>x</em> and <em>d$x</em>?).</p>
+<p>I have seen this used particularly when performing statistical tests or modelling. All main functions related to these accept a <em>data</em> argument, i.e. the dataframe where the variables are stored. So, why not to use directly this argument and avoid overflowing the workig environment? For instance, it is preferable to write</p>
+<pre data-showstringspaces="false"><code>m &lt;- lm(y ~ x, data = df)</code></pre>
+<p>instead of</p>
+<pre data-showstringspaces="false"><code>x &lt;- df$x
+y &lt;- df$y
+m &lt;- lm(y ~ x)</code></pre>
+<p>which takes more space and is less clear (where <em>x</em> and <em>y</em> are coming from), especially when there are multiple dataframes with the same variable names (is it <em>x</em> from <em>df1</em> or from <em>df2</em>?). Despite not overflowing directly the environment, also the <code>attach(df)</code> function in <em>R</em> generates similar confusions and should thus be avoided.</p>
+<h3 id="nesting-forif-chunks">Nesting for/if chunks</h3>
+<p>Let’s take a look at the following code comparing values from three vectors. Values are compared and then the relationships between them are reported.</p>
+<pre data-showstringspaces="false"><code>x &lt;- rnorm(100) #100 random normally distributed values
+y &lt;- rnorm(100)
+z &lt;- rnorm(100)
+ans &lt;- rep(NA, 100) #initialize answer
+for (i in seq_along(x)) {
+   if (x[i] &gt; 0) {
+      if (y[i] &lt; z[i]) {
+         if (y[i] &lt; x[i]) {
+            ans[i] &lt;- &quot;x &gt; 0, x &gt; y, y &lt; z&quot;
+         } else {
+            ans[i] &lt;- &quot;x &gt; 0, x &lt; y, y &lt; z&quot;
+         }
+      } else {
+         ans[i] &lt;- &quot;x &gt; 0, y &gt; z&quot;
+      }
+   } else {
+      ans[i] &lt;- &quot;x &lt; 0&quot;
+   }
+}
+
+ans[1:10]
+
+ [1] &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;               &quot;x &gt; 0, y &gt; z&quot;       
+ [4] &quot;x &lt; 0&quot;               &quot;x &gt; 0, x &gt; y, y &lt; z&quot; &quot;x &lt; 0&quot;              
+ [7] &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;              
+[10] &quot;x &gt; 0, y &gt; z&quot;   </code></pre>
+<p>The code above runs ok, performs the task it needs to do, but it can barely be read and understood. I can assure you that this is because there are four nested for/if statements. If you remove them, not only the code will be much readable, but, at least in <em>R</em>, it will also run faster. Let’s try to rewrite it:</p>
+<pre data-showstringspaces="false"><code>ans[x &gt; 0 &amp; x &gt; y &amp; y &lt; z] &lt;- &quot;x &gt; 0, x &gt; y, y &lt; z&quot;
+ans[x &gt; 0 &amp; x &lt; y &amp; y &lt; z] &lt;- &quot;x &gt; 0, x &lt; y, y &lt; z&quot;
+ans[x &gt; 0 &amp; y &gt; z] &lt;- &quot;x &gt; 0, y &gt; z&quot;
+ans[x &lt; 0] &lt;- &quot;x &lt; 0&quot;
+
+ans[1:10]
+
+ [1] &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;               &quot;x &gt; 0, y &gt; z&quot;       
+ [4] &quot;x &lt; 0&quot;               &quot;x &gt; 0, x &gt; y, y &lt; z&quot; &quot;x &lt; 0&quot;              
+ [7] &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;               &quot;x &lt; 0&quot;              
+[10] &quot;x &gt; 0, y &gt; z&quot;   </code></pre>
+<p>It sure isn’t pretty and it can still be improved, but just by removing the nested statements and using <em>R</em> native vectorized operator <code>&amp;</code> we achieve the same task using four instead of 15 messy, unreadable lines. Also remember that in <em>R</em> vectorized operations are always the preferred native way of doing things, whereas for/if chuncks are quite slow and unefficient; we hit two birds with the same stone here.</p>
+<h3 id="use-functions-for-transferable-manageable-code">Use functions for transferable, manageable code</h3>
+<p>Functions are you’re biggest friends when you need to re-do the same tasks multiple times. In <em>R</em> functions are declated as:</p>
+<pre data-showstringspaces="false"><code>my_fun &lt;- function(arg1, arg2, ...) {
+   # something to compute
+   # . . . 
+   # something to return
+}</code></pre>
+<p>where <em>my_fun</em> is the name of your function and <em>arg1</em> and <em>arg2</em> the arguments of the function. A simple function is the power of a number:</p>
+<pre data-showstringspaces="false"><code>squared &lt;- function(x) { #x is the number you want the power of
+  ans &lt;- x ** 2 #compute
+  return(ans) #return
+}
+
+squared(2)
+
+[1] 4</code></pre>
+<p>This function is quite useless, but it is useful to play with such useless functions to get a grasp on them. A more complex function can be to get the power of a number with random exponent between one and 10:</p>
+<pre data-showstringspaces="false"><code># compute the power *n* of a number,
+# with *n* being randomly sampled between 1 and 10.
+random_squared &lt;- function(x) {
+  root &lt;- runif(1, 0.1, 1) * 10
+  root &lt;- round(root)
+  ans &lt;- x ** root
+  message(&quot;The random exponent is: &quot;, root)
+  return(ans)
+}
+
+random_squared(1:5)
+
+The random exponent is: 5
+[1]    1   32  243 1024 3125</code></pre>
+<p>In <em>R</em> it is not necessary to return something and <code>return(x)</code> is the same as <code>x</code>. I learnt coding in <em>C</em>, where returns must be specified, and I prefer to explicitly write it. I couldn’t find a negative consequence of explicitly returning the output, so I do it because it is more clear what it is returned.</p>
+<p>Just to give an idea of how useful functions can be, let’s take a look at a still relatively one I have used:</p>
+<pre data-showstringspaces="false"><code>#&#39; @title get correct UTM crs for the study area
+#&#39; @param df data.frame with &quot;lon&quot;, &quot;lat&quot; coordinates.
+#&#39; @return crs in format &quot;CRS&quot; (sp package).
+utm_crs &lt;- function(df) {
+  if (!&quot;lon&quot; %in% colnames(df) | !&quot;lat&quot; %in% colnames(df)) {
+    stop(&quot;Missing &#39;lon&#39; or &#39;lat&#39; column&quot;)
+  }
+  lon &lt;- df[, &quot;lon&quot;]
+  range_lon &lt;- range(lon)
+  avg_lon &lt;- mean(range_lon)
+  lat &lt;- df[, &quot;lat&quot;]
+  range_lat &lt;- range(lat)
+  avg_lat &lt;- mean(range_lat)
+  utm &lt;- floor((avg_lon + 180) / 6) + 1
+  epsg &lt;- 32600 + utm
+  if (avg_lat &lt; 0) {
+    epsg &lt;- epsg + 100
+  }
+  ans &lt;- raster::crs(paste0(&quot;EPSG:&quot;, epsg))
+  return(ans)
+}
+</code></pre>
+<p>I did this because I wanted to obtain a UTM coordinate reference system from a lon-lat degree one. It is something that you can do every time you need it, but in this way I just write a separate file with this function that I call where needed, without the need to copy-paste wildly. Also, if there is a mistake in the function (e.g. I should add 120 instead of 100 at line 17), I need to change this only once instead of several times in several scripts, with the risk that I forget to change it in all occurences, leading to error in the code.</p>
+<h1 id="r">R</h1>
+<h2 id="readable-code">Readable code</h2>
+<p>If a code runs, good. If a code that runs is readable, great. Rarely, a good, functioning code is written at the first attempt. Often, code written some time before need to be changed. If code is not readable, changes are difficult to implement. Therefore the question: how can we write readable code?</p>
+<p>There is a lot of emphasis in academia to learn how to write scientific papers for journals. To researchers I suggest to write code as they write a manuscript for a scientific paper. Divide the code in sections as you would do with paragraphs. You may have, for example, a section to import all data, another to wrangle it, another to perform statistical analyses, etc... Treat each section as a paragraph. If a paragraph is very long, treat it as appendix material: put it in another script and call it where you need it.</p>
+<ol>
+<li><p>Never save your workspace as <em>.RData</em>. If you need to save a <em>.RData</em> or <em>rds</em> data, explicitly save it.</p></li>
+<li><p>Do not overflow the global environment</p></li>
+</ol>
+<h3 id="saving-workspace-image-as-.rdata">Saving workspace image as <em>.RData</em></h3>
+<h1 id="python">python</h1>
+<h1 id="bash">bash</h1>
+<p>Bash is a Unix shell that provides command line user interface to the GNU/Linux operating system. Bash is one the main reason I prefer Linux over Windows. It comes with a pre-defined set of commands useful for job control and file and directory utilities. For instance, Bash makes it easy to locate files in the whole hard drive. For instance, the command to find a file containing the string <em>LICENSE</em> in its name is:</p>
+<pre><code>$ find . -maxdepth 2 -name &#39;*LICENSE*&#39;
+
+./django-polls/LICENSE
+./keras/LICENSE
+./freetube/LICENSES.chromium.html
+./freetube/LICENSE.electron.txt
+./julia-1.5.2/LICENSE.md
+./Downloads/LICENSES.chromium.html
+./Downloads/LICENSE.electron.txt</code></pre>
+<p>the option <code>-maxdepth 2</code> limits the search within two children directories of the current location.</p>
+<p>A comprehensive list of all useful commands is not in the scope of this guide, but the ones I use most often are:</p>
+<ul>
+<li><p><code>echo</code> prints strings on the terminal screen</p></li>
+<li><p><code>cd</code> changes directory</p></li>
+<li><p><code>pwd</code> prints the absolute path of the current directory</p></li>
+<li><p><code>mkdir</code> creates a directory</p></li>
+<li><p><code>touch</code> creates a file</p></li>
+<li><p><code>nano</code> starts the <em>nano</em> text editor in the terminal</p></li>
+<li><p><code>rm</code> removes files or directories</p></li>
+<li><p><code>ls</code> lists contents of the current directory</p></li>
+<li><p><code>grep</code> shows only files or strings containing a specific pattern</p></li>
+<li><p><code>cp</code> copies an existing files or directory to a new location</p></li>
+<li><p><code>mv</code> moves an existing files or directory to a new location</p></li>
+<li><p><code>tree</code> shows the directory tree of the current location</p></li>
+<li><p><code>ssh</code> connects via secure shell to remote machines</p></li>
+<li><p><code>history</code> shows the last commands run in Bash</p></li>
+<li><p><code>cat</code> prints out a single file or concatenate several ones</p></li>
+<li><p><code>head</code> prints the first lines of a file</p></li>
+<li><p><code>tail</code> prints the last lines of a file</p></li>
+<li><p><code>more</code> prints a file in the terminal with navigation control</p></li>
+<li><p><code>tr</code> removes or subtitute characters in a string or a file</p></li>
+<li><p><code>cut</code> separates a string or file according to a character and retrieve only specific columns</p></li>
+<li><p><code>chmod</code> administrates reading, writing, and executing priviledges of files</p></li>
+<li><p><code>ps</code> shows running processes</p></li>
+<li><p><code>kill</code> terminates processes</p></li>
+<li><p><code>git</code> for git version control</p></li>
+<li><p><code>zip/unzip</code> zips or unzips files</p></li>
+<li><p><code>wget</code> downloads stuff from internet</p></li>
+<li><p><code>curl</code> downloads stuff from internet</p></li>
+<li><p><code>man</code> shows the manual of a command</p></li>
+</ul>
+<p>Pressing <code>Ctrl + r</code> starts a reverse search of the recently-used command. Command can be piped using <code>|</code>, where the output returned by the left expression is used as input by the right expression. For example <code>ls | grep *.pdf</code> will show only the files in the current directory that have <em>pdf</em> extension. This can be used to perform tasks that otherwise will require manual labour in a straightforward way. For intance, it happends quite often that we have multiple <em>csv</em> files that we want to concatenate (bind them row-wise) into one file. This can be done in other programming languages as <em>R</em> or <em>python</em>, but it is much easier (and faster) to do it in Bash:</p>
+<pre><code>find . -maxdepth 1  -name &#39;*.csv&#39; -print0 | xargs -0 cat &gt; onefile.csv</code></pre>
+<p>The operator <code>&gt;</code> redirect the output to <em>onefile.csv</em>, where the content of all csv files will be stored. At this point you may notice that the above code, when <code>-maxdepth 1</code> changes to other numers will not only concatenate files within the current directory, but also in all children directories depending on the number specified. The code above may look complicated, but once you get used to Bash it comes naturally to your mind, much before thinking of an alternative solution in <em>R</em>.</p>
+<p>It may not be clear from this simple list why Bash is so powerful or what can be achieved by using it. But it is indeed the best companion to perform automated pipelines in a secure and scalable way. Bash is substantially an environment where it is possible to code in a programming language that is useful to perform operations on files or strings and to control processes and their flow. You can also add custom functionality specifying aliases (more about this below) and functions, most notably in the <em> /.bashrc</em> file that is sourced when a Bash terminal is open. As an example consider the following function that I added to the <em> /.bashrc</em> file:</p>
+<pre><code>uppercase() {
+   echo $1 | tr  &#39;[:lower:]&#39; &#39;[:upper:]&#39;
+   echo $1 | tr  &#39;[:lower:]&#39; &#39;[:upper:]&#39; | xclip -sel clip
+}
+$ uppercase &#39;hello world!&#39;
+HELLO WORLD!</code></pre>
+<p>In Bash, <em>$n</em> (where <em>n</em> is a number) means that that is an argument passed to the function. In the above code, the <code>uppercase()</code> function prints the passed argument (a string) and pass it (using <code>|</code>) to <code>tr</code> to replace lowercase characters with uppercase ones. The third line does the same thing but copies the output one the clipboard, so I can paste it using <em>Ctrl + v</em>.</p>
+<h2 id="aliases">aliases</h2>
+<p>Aliases renames existing command (or pipes of them) in one word that you find more familiar. For instance, I can never rememebr, so I added this to the <em> /.bashrc</em>:</p>
+<pre><code>alias clip=&quot;xclip -selection c&quot;</code></pre>
+<p>Instead of writing <code>xclip -selection c</code>, I can now only write <code>clip</code>, which will implicitly performs the same thing.<br />
+You can also write scripts that can be called in Bash. I wrote a script to get general information about the food additives <em>E###</em> from wikipedia. That’s the code in the <em>wiki.sh</em> file:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="co">#!/bin/bash</span></a>
+<a class="sourceLine" id="cb13-2" title="2"></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="va">url=</span>https://en.wikipedia.org/wiki/<span class="va">$1</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="va">file=</span>/tmp/wiki.html</a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="va">usagehtml=</span>/tmp/tmp_use.html</a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="va">usagetxt=</span>/tmp/tmp_use.txt</a>
+<a class="sourceLine" id="cb13-7" title="7"></a>
+<a class="sourceLine" id="cb13-8" title="8"><span class="ex">curl</span> -s <span class="va">$url</span> -o <span class="va">$file</span> <span class="co">#download wikipage into temporary folder</span></a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="va">name=$(</span><span class="fu">grep</span> -i <span class="st">&#39;&lt;title&gt;&#39;</span> <span class="va">$file</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&#39;&gt;&#39;</span> -f 2 <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&#39;&lt;&#39;</span> -f 1 <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&#39;-&#39;</span> -f 1<span class="va">)</span></a>
+<a class="sourceLine" id="cb13-10" title="10"><span class="fu">grep</span> <span class="st">&#39;used as&#39;</span> <span class="va">$file</span> <span class="kw">|</span> <span class="fu">grep</span> food <span class="op">&gt;</span> <span class="va">$usagehtml</span></a>
+<a class="sourceLine" id="cb13-11" title="11"><span class="ex">pandoc</span> <span class="va">$usagehtml</span> -o <span class="va">$usagetxt</span> <span class="co">#use pandoc to convert html to txt</span></a>
+<a class="sourceLine" id="cb13-12" title="12"><span class="va">usage=$(</span><span class="fu">grep</span> <span class="st">&#39;used as&#39;</span> <span class="va">$usagetxt</span> <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&#39;[&#39;</span> -f 2 <span class="kw">|</span> <span class="fu">cut</span> -d <span class="st">&#39;]&#39;</span> -f 1<span class="va">)</span></a>
+<a class="sourceLine" id="cb13-13" title="13"></a>
+<a class="sourceLine" id="cb13-14" title="14"><span class="fu">rm</span> <span class="va">$file</span> <span class="va">$usagehtml</span> <span class="va">$usagetxt</span> <span class="co">#remove temporary files</span></a>
+<a class="sourceLine" id="cb13-15" title="15"><span class="bu">echo</span> <span class="va">$1</span>, <span class="va">$name</span>, <span class="va">$usage</span>, <span class="va">$url</span> <span class="co">#display results</span></a></code></pre></div>
+<p>This script can be called in bash running <code>$ bash wiki.sh</code> or by giving it running priviledges:</p>
+<pre><code>$ chmod +x wiki.sh
+$ ./wiki.sh E150
+E150, Caramel color , , https://en.wikipedia.org/wiki/E150
+$ ./wiki.sh E214
+E214, Ethylparaben , antifungal, https://en.wikipedia.org/wiki/E214</code></pre>
