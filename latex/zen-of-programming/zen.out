@@ -6,7 +6,13 @@
 \BOOKMARK [2][-]{subsection.1.1.4}{Use functions for transferable, manageable code}{section.1.1}% 6
 \BOOKMARK [0][-]{chapter.2}{R}{}% 7
 \BOOKMARK [1][-]{section.2.1}{Readable code}{chapter.2}% 8
-\BOOKMARK [2][-]{subsection.2.1.1}{Saving workspace image as .RData}{section.2.1}% 9
-\BOOKMARK [0][-]{chapter.3}{python}{}% 10
-\BOOKMARK [0][-]{chapter.4}{bash}{}% 11
-\BOOKMARK [1][-]{section.4.1}{aliases}{chapter.4}% 12
+\BOOKMARK [0][-]{chapter.3}{python}{}% 9
+\BOOKMARK [0][-]{chapter.4}{Bash}{}% 10
+\BOOKMARK [1][-]{section.4.1}{aliases}{chapter.4}% 11
+\BOOKMARK [1][-]{section.4.2}{Bash scripts}{chapter.4}% 12
+\BOOKMARK [0][-]{chapter.5}{Web servers}{}% 13
+\BOOKMARK [1][-]{section.5.1}{Apache2}{chapter.5}% 14
+\BOOKMARK [0][-]{chapter.6}{Spatial analysis}{}% 15
+\BOOKMARK [1][-]{subsection.6.0.1}{R packages}{chapter.6}% 16
+\BOOKMARK [2][-]{subsection.6.0.2}{python packages}{subsection.6.0.1}% 17
+\BOOKMARK [2][-]{subsection.6.0.3}{Coordinate Reference System \(CRS\)}{subsection.6.0.1}% 18

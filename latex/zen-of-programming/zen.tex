@@ -5,6 +5,13 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage[dvipsnames]{xcolor}
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=teal,
+}
+
 \lstset{
     language=R,
     numbers=left,
@@ -12,7 +19,7 @@
     numberstyle=\tiny\color{Gray},
     commentstyle=\color{Gray},
     stringstyle=\color{MidnightBlue},
-    keywordstyle=\color{BrickRed},
+    keywordstyle=\color{black},
     numberstyle=\tiny\color{Gray},
     literate={~} {$\sim$}{1}
 }
@@ -29,13 +36,13 @@
 
 \chapter{Introduction}
 
-I have been told that my programming skills are above average. Often, I am asked to develop or debug code and to explain why I coded scripts in the way I did. I realized that I follow a combination of personal rules-of-thumb, rules-of-thumb of other people who code better than me, and style guides from notorious people (e.g. \href{https://style.tidyverse.org/}{Wickham tidyverse guide style}) or big companies (e.g. \href{https://google.github.io/styleguide/Rguide.html}{Google’s R Style Guide}); they are doing better than me, and copying their style is probably a good idea. 
+I have been told that my programming skills are above average. Often, I am asked to develop or debug code and to explain why I coded scripts in the way I did. I realized that I follow a combination of personal rules-of-thumbs, rules-of-thumbs of other people who code better than me, and style guides from notorious people (e.g. \href{https://style.tidyverse.org/}{Wickham tidyverse guide style}) or big companies (e.g. \href{https://google.github.io/styleguide/Rguide.html}{Google’s R Style Guide}); they are doing better than me, and copying their style is probably a good idea. 
 
-In this booklet, I want to show some tips and tricks I follow routinely and to explain why I do some things in a certain way. I am sure better and more comprehensive guides already exist, but maybe not for people with ecological background, which is often fragmentary regarding coding.
+In this guide, I want to show some tips and tricks I follow routinely and to explain why I do some things in a certain way. I am sure better and more comprehensive guides already exist, but maybe not for people with ecological background, which is often fragmentary regarding coding.
 
 \section{General tips}
 
-These are my \textit{laws} that I always try to follow. In some cases I violate some of them, e.g. in early-development or testing dozens of statistical models without clue of the underlying data. However, a final, releasable code should always follow all these laws. If I will release a code that does not follow one of these laws, I will be ashamed of myself -- except in the case I want to prove a point on them. It is important to stress that these laws apply specifically to the scientific research environment and are not representative of how to properly code in other settings.
+These are my \textit{laws} that I always try to follow. In some cases I violate some of them, e.g. in early-development or testing dozens of statistical models without clue of the underlying data. However, a final, releasable code should always follow all these laws. If I will release a code that does not follow one of these laws, I will be ashamed of myself -- except in the case I want to prove a point on them. It is important to stress that these laws apply specifically to the scientific research environment and are not representative of how to properly code in other settings. The laws are:
 
 \begin{enumerate}
     \item Data input, manipulation, and output must be explicit.
@@ -48,15 +55,15 @@ These laws are fancy and general enough to be mis-understood. Let's expand on th
 
 \subsection{How (not) to work with files}
 
-Nowadays, most of the analyses require large computations divided into steps. Intermediate output can be stored into files, which then can be used for downstream computations. A common mistake is to work with these intermediate files using point-and-click methods, often copy-pasting their content into scripts. This is an extremely bad practice for many reasons. First, there is no trace of what it has been done and from where the text in the script is coming from. Second, text editors often use special characters, e.g. linebreaks, that are not compatible within a script or among operating systems. Thirds, the potential for automation is severely reduced; for intsance, if you work with hundreds of files, the point-an-click steps need to be re-performed manually every time. Finally, the code is less readable, especially in the case the \textit{csv} containing many rows. 
+Nowadays, most of the analyses require large computations divided into steps. Intermediate output can be stored into files, which then can be used for downstream computations. A common mistake is to work with these intermediate files using point-and-click methods, often copy-pasting their content into scripts. This is an extremely bad practice for many reasons. First, there is no trace of what it has been done and from where the text in the script is coming from. Second, text editors often use special characters, e.g. linebreaks, that are not compatible within a script or among operating systems. Thirds, the potential for automation is severely reduced; for intsance, if you work with hundreds of files, the point-an-click steps need to be re-performed manually every time. Finally, the code is less readable, especially in the case the \textit{csv} contains many rows. 
 
-A easy way to avoid all of this is to read the file in the code using reading functions, e.g. in \texttt{read.csv()}, \texttt{read\_csv()}, or \texttt{fread} in \textit{R}. This may seem basic, but it happens more than what I would like to admit.
+An easy way to avoid all of this is to read the file in the code using reading functions, e.g. \texttt{read.csv()}, \texttt{read\_csv()}, or \texttt{fread()} in \textit{R}. This may seem basic, but it happens more than what I would like to admit.
 
 \subsection{Global environment overflow}
 
 I have seen many times a phenomenon that I call environment overflow, i.e. the (re)initialization of variables contained in a dataframe without deleting old copies. For example, a column (\textit{x}) in a dataframe (\textit{df}) can be extracted and passed to a new variable: \lstinline[columns=fixed]{x <- df$x}. I consider this a bad practice because: first, it does not provide any new information; second, it created duplicates in the environment; and finally, it creates confusion for everyone (for instance, what's the difference between \textit{x} and \textit{d\$x}?).
 
-I have seen this used particularly when performing statistical tests or modelling. All main functions related to these accept a \textit{data} argument, i.e. the dataframe where the variables are stored. So, why not to use directly this argument and avoid overflowing the workig environment? For instance, it is preferable to write
+I have seen this used particularly when performing statistical tests or modelling. All main functions related to these tasks accept a \textit{data} argument, i.e. the dataframe where the variables are stored. So, why not to use directly this argument and avoid overflowing the working environment? For instance, it is preferable to write
 
 \begin{lstlisting}[showstringspaces=false]
 m <- lm(y ~ x, data = df)
@@ -70,7 +77,7 @@ y <- df$y
 m <- lm(y ~ x)
 \end{lstlisting}
 
-which takes more space and is less clear (where \textit{x} and \textit{y} are coming from), especially when there are multiple dataframes with the same variable names (is it \textit{x} from \textit{df1} or from \textit{df2}?). Despite not overflowing directly the environment, also the \texttt{attach(df)} function in \textit{R} generates similar confusions and should thus be avoided.
+which takes more space and is less clear (where are \textit{x} and \textit{y} coming from?), especially when \texttt{lm()} is called many lines after the first two or when there are multiple dataframes with the same variable names (is it \textit{x} from \textit{df1} or from \textit{df2}?). Despite not overflowing directly the environment, also the \texttt{attach()} function in \textit{R} generates similar confusions and should thus be avoided.
 
 \subsection{Nesting for/if chunks}
 Let's take a look at the following code comparing values from three vectors. Values are compared and then the relationships between them are reported.
@@ -120,7 +127,7 @@ ans[1:10]
 [10] "x > 0, y > z"   
 \end{lstlisting}
 
-It sure isn't pretty and it can still be improved, but just by removing the nested statements and using \textit{R} native vectorized operator \texttt{\&} we achieve the same task using four instead of 15 messy, unreadable lines. Also remember that in \textit{R} vectorized operations are always the preferred native way of doing things, whereas for/if chuncks are quite slow and unefficient; we hit two birds with the same stone here.
+It sure isn't pretty and it can still be improved, but just by removing the nested statements and using \textit{R} native vectorized operator \texttt{\&} we achieve the same task using four instead of 15 messy, unreadable lines. Also, remember that in \textit{R} vectorized operations are always the preferred native way of doing things, whereas for/if chuncks are quite slow and unefficient; we hit two birds with the same stone here.
 
 \subsection{Use functions for transferable, manageable code}
 
@@ -168,7 +175,7 @@ The random exponent is: 5
 
 In \textit{R} it is not necessary to return something and \texttt{return(x)} is the same as \texttt{x}. I learnt coding in \textit{C}, where returns must be specified, and I prefer to explicitly write it. I couldn't find a negative consequence of explicitly returning the output, so I do it because it is more clear what it is returned.
 
-Just to give an idea of how useful functions can be, let's take a look at a still relatively one I have used:
+Just to give an idea of how useful functions can be, let's take a look at one I have used:
 
 \begin{lstlisting}[showstringspaces=false]
 #' @title get correct UTM crs for the study area
@@ -195,28 +202,27 @@ utm_crs <- function(df) {
 
 \end{lstlisting}
 
-I did this because I wanted to obtain a UTM coordinate reference system from a lon-lat degree one. It is something that you can do every time you need it, but in this way I just write a separate file with this function that I call where needed, without the need to copy-paste wildly. Also, if there is a mistake in the function (e.g. I should add 120 instead of 100 at line 17), I need to change this only once instead of several times in several scripts, with the risk that I forget to change it in all occurences, leading to error in the code.
+I did this because I wanted to obtain a UTM coordinate reference system from a lon-lat degree one. It is something that you can write down every time you need it, but by declaring the function I can call it where needed, without the need to copy-paste wildly. Also, if there is a mistake in the function (e.g. I should add 120 instead of 100 at line 17), I need to change this only once instead of several times in several scripts, with the risk that I forget to change it in all occurences, leading to error in the code.
 
 \chapter{R}
 
 \section{Readable code}
 If a code runs, good. If a code that runs is readable, great. Rarely, a good, functioning code is written at the first attempt. Often, code written some time before need to be changed. If code is not readable, changes are difficult to implement. Therefore the question: how can we write readable code? 
 
-There is a lot of emphasis in academia to learn how to write scientific papers for journals. To researchers I suggest to write code as they write a manuscript for a scientific paper. Divide the code in sections as you would do with paragraphs. You may have, for example, a section to import all data, another to wrangle it, another to perform statistical analyses, etc... Treat each section as a paragraph. If a paragraph is very long, treat it as appendix material: put it in another script and call it where you need it.
+There is a lot of emphasis in academia on learning how to write scientific papers for journals, but not on how to write proper code. To researchers, I suggest to write code as they would write a manuscript for a scientific paper. Divide the whole code into manageable stand-alone scripts that fit a purpose, e.g. data preparation (Introduction), analysis (Results), and visualization (Discussion). Divide each script in chunks as you would do with paragraphs, e.g. a first chunk to load the data, another one to explore it and apply necessary transformations, another one to save the transformed data into a new file. Treat each script and chunk as you would do with a manuscript section and paragraph: if a chunk is very long, split it (make a new paragraph); if a script is too long, split it into two (make a new section); if a chunk is not necessary for the main analysis, make a stand-alone script for it (move it to the appendix).
+
+Some principles that I came up specifically for \textit{R}:
 
 \begin{enumerate}
-    \item Never save your workspace as \textit{.RData}. If you need to save a \textit{.RData} or \textit{rds} data, explicitly save it. 
-    \item Do not overflow the global environment
+    \item Never let RStudio to save your workspace as \textit{.RData}. If you want to save a \textit{.RData} or \textit{rds} data, save it explicitly. No data should be saved without users explicitly asking for it.
 \end{enumerate}
-
-\subsection{Saving workspace image as \textit{.RData}}
 
 \chapter{python}
 
-\chapter{bash}
+\chapter{Bash}
 \lstset{language=bash}
 
-Bash is a Unix shell that provides command line user interface to the GNU/Linux operating system. Bash is one the main reason I prefer Linux over Windows. It comes with a pre-defined set of commands useful for job control and file and directory utilities. For instance, Bash makes it easy to locate files in the whole hard drive. For instance, the command to find a file containing the string \textit{LICENSE} in its name is:
+Bash is a Unix shell that provides command line user interface to the GNU/Linux operating system. Bash is one of the main reasons I prefer Linux over Windows. It comes with a pre-defined set of commands useful for job control and file and directory utilities. For instance, Bash \texttt{find} makes it easy to locate files in the whole hard drive. The command to find a file containing the string \textit{LICENSE} in its name is:
 
 \begin{lstlisting}
 $ find . -maxdepth 2 -name '*LICENSE*'
@@ -265,14 +271,15 @@ A comprehensive list of all useful commands is not in the scope of this guide, b
    \item[] \texttt{man} shows the manual of a command
 \end{itemize}
 
-Pressing \texttt{Ctrl + r} starts a reverse search of the recently-used command.
-Command can be piped using \texttt{|}, where the output returned by the left expression is used as input by the right expression. For example \lstinline[columns=fixed]{ls | grep *.pdf} will show only the files in the current directory that have \textit{pdf} extension. This can be used to perform tasks that otherwise will require manual labour in a straightforward way. For intance, it happends quite often that we have multiple \textit{csv} files that we want to concatenate (bind them row-wise) into one file. This can be done in other programming languages as \textit{R} or \textit{python}, but it is much easier (and faster) to do it in Bash:
+Pressing \texttt{Ctrl + r} starts a reverse search of the recently-used commands.
+
+Command can be piped using \texttt{|}, where the output returned by the left expression is used as input by the right expression. For example, \lstinline[columns=fixed]{ls | grep *.pdf} will show only the files in the current directory that have \textit{pdf} extension. This can be used to perform tasks that otherwise will require manual labour in a straightforward way. For intance, it happends quite often that we have multiple \textit{csv} files that we want to concatenate (bind them row-wise) into one file. This can be done in other programming languages as \textit{R} or \textit{python}, but it is much easier (and faster) to do it in Bash:
 
 \begin{lstlisting}
 find . -maxdepth 1  -name '*.csv' -print0 | xargs -0 cat > onefile.csv
 \end{lstlisting}
 
-The operator \texttt{>} redirect the output to \textit{onefile.csv}, where the content of all csv files will be stored. At this point you may notice that the above code, when \texttt{-maxdepth 1} changes to other numers will not only concatenate files within the current directory, but also in all children directories depending on the number specified. The code above may look complicated, but once you get used to Bash it comes naturally to your mind, much before thinking of an alternative solution in \textit{R}.
+The operator \texttt{>} redirect the output to \textit{onefile.csv}, where the content of all csv files will be stored. At this point you may have noticed that the above code, when \texttt{-maxdepth 1} changes to other numers, will not only concatenate files within the current directory, but also in all children directories depending on the number specified. This is an example of an extremely tedious task that is made extremely easy in Bash. The code above may look complicated, but once you get used to Bash it comes naturally to your mind, much before thinking of an alternative solution in \textit{R} (you will need to use at least the three functions \texttt{list.files()}, \texttt{read.csv()}, and \texttt{rbind()}).
 
 It may not be clear from this simple list why Bash is so powerful or what can be achieved by using it. But it is indeed the best companion to perform automated pipelines in a secure and scalable way. Bash is substantially an environment where it is possible to code in a programming language that is useful to perform operations on files or strings and to control processes and their flow. You can also add custom functionality specifying aliases (more about this below) and functions, most notably in the \textit{~/.bashrc} file that is sourced when a Bash terminal is open. As an example consider the following function that I added to the \textit{~/.bashrc} file:
 
@@ -281,7 +288,9 @@ uppercase() {
    echo $1 | tr  '[:lower:]' '[:upper:]'
    echo $1 | tr  '[:lower:]' '[:upper:]' | xclip -sel clip
 }
+
 $ uppercase 'hello world!'
+
 HELLO WORLD!
 \end{lstlisting}
 
@@ -296,11 +305,13 @@ alias clip="xclip -selection c"
 
 Instead of writing \lstinline[columns=fixed]{xclip -selection c}, I can now only write \lstinline[columns=fixed]{clip}, which will implicitly performs the same thing.\\
 
-You can also write scripts that can be called in Bash. I wrote a script to get general information about the food additives \textit{E\#\#\#} from wikipedia. That's the code in the \textit{wiki.sh} file:
+\section{Bash scripts}
+
+You can also write scripts that can be called in Bash. As an example, below is a script I wrote to get general information about the food additives \textit{E\#\#\#} from wikipedia:
 
 \lstinputlisting{wiki.sh}
 
-This script can be called in bash running \lstinline[columns=fixed]{$ bash wiki.sh} or by giving it running priviledges:
+I saved the script in a file called \textit{wiki.sh} file, which can be called in bash running \lstinline[columns=fixed]{$ bash wiki.sh} or by giving it running priviledges:
 
 \begin{lstlisting}
 $ chmod +x wiki.sh
@@ -309,5 +320,87 @@ E150, Caramel color , , https://en.wikipedia.org/wiki/E150
 $ ./wiki.sh E214
 E214, Ethylparaben , antifungal, https://en.wikipedia.org/wiki/E214
 \end{lstlisting}
+
+The line \lstinline[columns=fixed]{#!/bin/bash} tells Bash which program to use to run the script, in this case Bash itself. If you want to run a \textit{python} script \textit{script.py} directly from Bash you can either do it by \lstinline[columns=fixed]{$ python script.py} or by substituting \lstinline[columns=fixed]{#!/bin/bash} with \lstinline[columns=fixed]{#!/bin/python}, giving it running priviledges and run it with \lstinline[columns=fixed]{$ ./script.py}.
+
+Linux has a native way to schedule jobs, e.g. running a script. One of the most popular are \textit{cron} and \textit{crontab}. I'll not give further details here, but \textit{crontab} provides an easy interface to schedule periodic jobs, e.g. uploading data to a remote location, running check-ups and updates, etc.
+
+\chapter{Web servers}
+
+\section{Apache2}
+
+Apache2 is a popular web server software to host a website. To install apache2 in Ubuntu:
+
+\begin{lstlisting}
+$ sudo apt update
+$ sudo apt install apache2
+\end{lstlisting}
+
+Sites are stored in the \textit{/var/www} folder.
+
+\begin{lstlisting}
+$ sudo mkdir /var/www/gci
+$ sudo nano /var/www/gci/index.html #write your html site
+$ cd /etc/apache2/sites-available/
+$ sudo cp 000-default.conf gci.conf
+$ sudo nano gci.conf
+####### in nano add ###################
+# ServerAdmin emilio.berti90@gmail.com
+# DocumentRoot /var/www/gci/
+# ServerName gci.example.com
+#######################################
+$ sudo a2ensite gci.conf
+$ service apache2 reload
+# sudo nano /etc/hosts
+####### in nano add ###########
+# 127.0.1.1    gci.example.com
+####### in nano add ###########
+\end{lstlisting}
+
+\chapter{Spatial analysis}
+
+The most basic ideas of spatial analysis are \textbf{rasters} and \textbf{geometries}. A raster is a basically a matrix to which it has been associated several meta-data, defining for instance its geographic projection, resolution, etc. For most purposes, you should think to a raster as a pixel image with ancillary data to map it into a real place on Earth. Rasters can be stacked, similarly to multi-dimensional matrices (tensors); in R, these are called \textit{RasterStack} (or bricks, I never understood the difference). To be stackable, rasters need to have the same geographic projection, resolution, and extent. Each raster in a stack is called a \textit{layer} (sometimes also feature, especially in machine learning). Geometries are vector representations of spatial features. For example, a line is represented by a vector with origin, end, and module and are thus ``scale-free''. Rasters and geometries were developed for a common goal (mapping spatial features), but contrained by two different phylosophies, i.e. the necessity to map pixel-like features or continuous ones. If you are familiar with PDF file format, you should know that PDF encode, when possible, all information as vector geometries and, when it cannot, as pixel rasters. That's why you can zoom indefinitely in some PDFs and they still maintain the original resolution, but in others the image becomes blurry; you just hit the resolution limit of that pixel raster.
+
+\section{R packages}
+The world of spatial analysis is huge and scary. There are many packages to work with spatial stuff. In R, the most notable are \textbf{raster} (to be superseeded by the much faster \textbf{terra}) for raster analysis and \textbf{sp} for vector analysis. You need to install \textbf{gdal} (abstraction library) and \textbf{geos} (geometric representation) to use them (and \textbf{rgdal} and \textbf{rgeos} as well). Make sure you install all relevant libraries and packages, as some coordiante reference systems (more about this below) are contained only in one of them.
+I personally like also the \textbf{sf} package, a tidyverse substitute for \textit{sp}. It is a more high-level interface to spatial geometries and it is thus easier to use than \textit{sp}; it works great in conjuction with \textit{dplyr} and, if you're using tidyverse, I strongly recommend to use \textit{sf}. For low-level stuff, \textit{sp} is probably more flexible and perhaps faster.
+
+\section{python packages}
+Will write this, for now: \textbf{shapely}, \textbf{fiona}, \textbf{GeoJSON}, and \textbf{GeoPandas}. Python is great to build pipelines, websites and visualizations. I cannot stress how much flexible and scalable python is in this regard.
+
+\section{Coordinate Reference System (CRS)}
+Rasters and geometries need a CRS to properly map their features in space. 
+CRS tells us how to interpet pixels and vector in a precise spatial context.
+You can think to a CRS as ticks of xy axes of a scatterplot; without the ticks, we can see the points, but we have no information about how to interpet them. 
+A CRS also defines the measurement unit, with the most commonly used being arc-degrees and meters.
+
+CRS are commonly expressed as the \textit{EPSG} code and by their \textit{proj4string} expression. For most purposes, EPSG codes and proj4string are equivalent; EPSG (which stands for European Petroleum Survey Group) codes are IDs that refer to a specific proj4string. I find it easier to remember a four/five digit EPSG code than a complex proj4string, but that's me. Proj4string is, however, more explicit in its definition. A proj4string typically has many parameters, stored together as a string. For example:
+
+\begin{itemize}
+    \item[+] init, an EPSG code (e.g. \texttt{+init=epsg:4326})
+    \item[+] proj, the projection used (e.g. \texttt{+proj=merc})
+    \item[+] ellps, the ellipsoid model of Earth (e.g. \texttt{+ellps=WGS84})
+    \item[+] units, the measurement units (e.g. \texttt{+units=m})
+\end{itemize}
+
+A list of all parameters can be found at \href{https://proj.org/operations/projections/tpers.html?highlight=lat\_0#parameters}{https://proj.org/} It is important to understand that all EPSG codes and proj4strings are community standards, i.e. definition of spatial coordinates that are useful for specific purposes. Nothing forbids you to define a custom proj4string, but, if it is really useful, it is probably already in the GDAL archive.
+
+The website \href{https://epsg.io/}{https://epsg.io/} contains all information you need to know about a particular CRS and how to convert it to another one. 
+In R, you can get a list of all installed CRS with \textit{rgdal::make\_EPSG()}, which returns a data.frame with, among the others, the EPSG code and the proj4string of projection. 
+As this is a data.frame, you can also search for a specific CRS. For instance, if you want only projections that include the string \textit{berlin}, you can achieve it with the following code:
+
+\begin{lstlisting}
+library(rgdal)
+crs <- make_EPSG() #this has 6609 rows for me
+berlin <- crs[grep('berlin', crs$note, ignore.case = TRUE),
+              c("code", "prj4")] #only one for me
+\end{lstlisting}
+\textit{berlin} is the CRS called Soldener Berlin \textit{EPSG:3068}, with proj4 \texttt{+proj=cass +lat\_0=52.4186482777778 +lon\_0=13.6272036666667 +x\_0=40000 +y\_0=10000 +ellps=bessel +units=m +no\_defs +type=crs}: \href{https://epsg.io/3068}{https://epsg.io/3068}. 
+From the proj4string is clear that the unit of measurment is meters, a Bessel ellipsoid id used to approximate Earth surface, and the origin is at a longitude of 13.63 and latitude of 52.42. 
+I was not aware of what a Bessel ellipsoid was, but a quick search susggests this is used for national surveys (which makes sense here for Germany) and that it will be replaced in the next decades by modern ellipsoids of satellite geodesy. 
+This hints to a good point: standards change, so keep in mind that analyses made years ago may need to be adjusted for today's standards.
+
+\section{Spatial analysis in R 101}
+\subsection{Reproject rasters and geoemtries}
 
 \end{document}

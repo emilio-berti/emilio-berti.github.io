@@ -6,7 +6,13 @@
 \contentsline {subsection}{\numberline {1.1.4}Use functions for transferable, manageable code}{8}{subsection.1.1.4}%
 \contentsline {chapter}{\numberline {2}R}{11}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Readable code}{11}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Saving workspace image as \textit {.RData}}{11}{subsection.2.1.1}%
 \contentsline {chapter}{\numberline {3}python}{13}{chapter.3}%
-\contentsline {chapter}{\numberline {4}bash}{15}{chapter.4}%
+\contentsline {chapter}{\numberline {4}Bash}{15}{chapter.4}%
 \contentsline {section}{\numberline {4.1}aliases}{17}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Bash scripts}{17}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Web servers}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Apache2}{19}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Spatial analysis}{21}{chapter.6}%
+\contentsline {subsection}{\numberline {6.0.1}R packages}{21}{subsection.6.0.1}%
+\contentsline {subsection}{\numberline {6.0.2}python packages}{21}{subsection.6.0.2}%
+\contentsline {subsection}{\numberline {6.0.3}Coordinate Reference System (CRS)}{22}{subsection.6.0.3}%

@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.5.3)  15 OCT 2021 08:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.5.3)  15 OCT 2021 09:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**cv.tex
-(./cv.tex
+**cv-ita.tex
+(./cv-ita.tex
 LaTeX2e <2020-02-02> patch level 2
 L3 programming layer <2020-02-14> (./resume.cls
 Document Class: resume 2010/07/10 v0.9 Resume class
@@ -239,8 +239,8 @@ File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count190
 \l__pdf_internal_box=\box47
 )
-(./cv.aux)
-\openout1 = `cv.aux'.
+(./cv-ita.aux)
+\openout1 = `cv-ita.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
 LaTeX Font Info:    ... okay on input line 23.
@@ -333,9 +333,9 @@ LaTeX Info: Redefining \ref on input line 23.
 LaTeX Info: Redefining \pageref on input line 23.
 LaTeX Info: Redefining \nameref on input line 23.
 
-(./cv.out) (./cv.out)
+(./cv-ita.out) (./cv-ita.out)
 \@outlinefile=\write3
-\openout3 = `cv.out'.
+\openout3 = `cv-ita.out'.
 
 <Emilio.jpg, id=4, 656.4525pt x 636.3775pt>
 File: Emilio.jpg Graphic file (type jpg)
@@ -354,56 +354,64 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 23.
 
-Underfull \hbox (badness 10000) in paragraph at lines 54--71
+Underfull \hbox (badness 10000) in paragraph at lines 52--69
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 54--71
+Underfull \hbox (badness 10000) in paragraph at lines 52--69
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 54--71
+Underfull \hbox (badness 10000) in paragraph at lines 52--69
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--69
 
  []
 
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./Emilio.jpg>] [2]
-Overfull \hbox (18.85835pt too wide) in paragraph at lines 136--149
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./Emilio.jpg>]
+
+Package hyperref Warning: Suppressing empty link on input line 124.
+
+
+Overfull \hbox (18.85835pt too wide) in paragraph at lines 128--141
 []$[]$ $[]$ 
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 151.
-[3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 151.
- (./cv.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 151.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 151.
-Package rerunfilecheck Info: File `cv.out' has not changed.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 143.
+[2]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 143.
+ (./cv-ita.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 143.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 143.
+Package rerunfilecheck Info: File `cv-ita.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 6543 strings out of 483183
- 97375 string characters out of 5966293
- 367946 words of memory out of 5000000
- 21456 multiletter control sequences out of 15000+600000
+ 6545 strings out of 483183
+ 97461 string characters out of 5966293
+ 367957 words of memory out of 5000000
+ 21459 multiletter control sequences out of 15000+600000
  536979 words of font info for 39 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 41i,5n,37p,868b,379s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,5n,37p,872b,380s stack positions out of 5000i,500n,10000p,200000b,80000s
  </home/eb97ziwi/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.
 600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on cv.pdf (3 pages, 374879 bytes).
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on cv-ita.pdf (2 pages, 366171 bytes).
 PDF statistics:
- 62 PDF objects out of 1000 (max. 8388607)
- 47 compressed objects within 1 object stream
- 4 named destinations out of 1000 (max. 500000)
+ 54 PDF objects out of 1000 (max. 8388607)
+ 41 compressed objects within 1 object stream
+ 3 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
