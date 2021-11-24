@@ -13,6 +13,8 @@
 \contentsline {chapter}{\numberline {5}Web servers}{19}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Apache2}{19}{section.5.1}%
 \contentsline {chapter}{\numberline {6}Spatial analysis}{21}{chapter.6}%
-\contentsline {subsection}{\numberline {6.0.1}R packages}{21}{subsection.6.0.1}%
-\contentsline {subsection}{\numberline {6.0.2}python packages}{21}{subsection.6.0.2}%
-\contentsline {subsection}{\numberline {6.0.3}Coordinate Reference System (CRS)}{22}{subsection.6.0.3}%
+\contentsline {section}{\numberline {6.1}R packages}{21}{section.6.1}%
+\contentsline {section}{\numberline {6.2}python packages}{22}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Coordinate Reference System (CRS)}{22}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Spatial analysis in R 101}{23}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Reproject rasters and geometries}{23}{subsection.6.4.1}%

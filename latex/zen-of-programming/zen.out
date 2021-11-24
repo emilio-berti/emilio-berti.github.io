@@ -13,6 +13,8 @@
 \BOOKMARK [0][-]{chapter.5}{Web servers}{}% 13
 \BOOKMARK [1][-]{section.5.1}{Apache2}{chapter.5}% 14
 \BOOKMARK [0][-]{chapter.6}{Spatial analysis}{}% 15
-\BOOKMARK [1][-]{subsection.6.0.1}{R packages}{chapter.6}% 16
-\BOOKMARK [2][-]{subsection.6.0.2}{python packages}{subsection.6.0.1}% 17
-\BOOKMARK [2][-]{subsection.6.0.3}{Coordinate Reference System \(CRS\)}{subsection.6.0.1}% 18
+\BOOKMARK [1][-]{section.6.1}{R packages}{chapter.6}% 16
+\BOOKMARK [1][-]{section.6.2}{python packages}{chapter.6}% 17
+\BOOKMARK [1][-]{section.6.3}{Coordinate Reference System \(CRS\)}{chapter.6}% 18
+\BOOKMARK [1][-]{section.6.4}{Spatial analysis in R 101}{chapter.6}% 19
+\BOOKMARK [2][-]{subsection.6.4.1}{Reproject rasters and geometries}{section.6.4}% 20

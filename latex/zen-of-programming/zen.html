@@ -106,6 +106,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#r-packages">R packages</a></li>
 <li><a href="#python-packages">python packages</a></li>
 <li><a href="#coordinate-reference-system-crs">Coordinate Reference System (CRS)</a></li>
+<li><a href="#spatial-analysis-in-r-101">Spatial analysis in R 101</a><ul>
+<li><a href="#reproject-rasters-and-geometries">Reproject rasters and geometries</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </nav>
@@ -350,11 +353,11 @@ $ service apache2 reload
 ####### in nano add ###########</code></pre>
 <h1 id="spatial-analysis">Spatial analysis</h1>
 <p>The most basic ideas of spatial analysis are <strong>rasters</strong> and <strong>geometries</strong>. A raster is a basically a matrix to which it has been associated several meta-data, defining for instance its geographic projection, resolution, etc. For most purposes, you should think to a raster as a pixel image with ancillary data to map it into a real place on Earth. Rasters can be stacked, similarly to multi-dimensional matrices (tensors); in R, these are called <em>RasterStack</em> (or bricks, I never understood the difference). To be stackable, rasters need to have the same geographic projection, resolution, and extent. Each raster in a stack is called a <em>layer</em> (sometimes also feature, especially in machine learning). Geometries are vector representations of spatial features. For example, a line is represented by a vector with origin, end, and module and are thus “scale-free”. Rasters and geometries were developed for a common goal (mapping spatial features), but contrained by two different phylosophies, i.e. the necessity to map pixel-like features or continuous ones. If you are familiar with PDF file format, you should know that PDF encode, when possible, all information as vector geometries and, when it cannot, as pixel rasters. That’s why you can zoom indefinitely in some PDFs and they still maintain the original resolution, but in others the image becomes blurry; you just hit the resolution limit of that pixel raster.</p>
-<h3 id="r-packages">R packages</h3>
+<h2 id="r-packages">R packages</h2>
 <p>The world of spatial analysis is huge and scary. There are many packages to work with spatial stuff. In R, the most notable are <strong>raster</strong> (to be superseeded by the much faster <strong>terra</strong>) for raster analysis and <strong>sp</strong> for vector analysis. You need to install <strong>gdal</strong> (abstraction library) and <strong>geos</strong> (geometric representation) to use them (and <strong>rgdal</strong> and <strong>rgeos</strong> as well). Make sure you install all relevant libraries and packages, as some coordiante reference systems (more about this below) are contained only in one of them. I personally like also the <strong>sf</strong> package, a tidyverse substitute for <em>sp</em>. It is a more high-level interface to spatial geometries and it is thus easier to use than <em>sp</em>; it works great in conjuction with <em>dplyr</em> and, if you’re using tidyverse, I strongly recommend to use <em>sf</em>. For low-level stuff, <em>sp</em> is probably more flexible and perhaps faster.</p>
-<h3 id="python-packages">python packages</h3>
+<h2 id="python-packages">python packages</h2>
 <p>Will write this, for now: <strong>shapely</strong>, <strong>fiona</strong>, <strong>GeoJSON</strong>, and <strong>GeoPandas</strong>. Python is great to build pipelines, websites and visualizations. I cannot stress how much flexible and scalable python is in this regard.</p>
-<h3 id="coordinate-reference-system-crs">Coordinate Reference System (CRS)</h3>
+<h2 id="coordinate-reference-system-crs">Coordinate Reference System (CRS)</h2>
 <p>Rasters and geometries need a CRS to properly map their features in space. CRS tells us how to interpet pixels and vector in a precise spatial context. You can think to a CRS as ticks of xy axes of a scatterplot; without the ticks, we can see the points, but we have no information about how to interpet them. A CRS also defines the measurement unit, with the most commonly used being arc-degrees and meters.</p>
 <p>CRS are commonly expressed as the <em>EPSG</em> code and by their <em>proj4string</em> expression. For most purposes, EPSG codes and proj4string are equivalent; EPSG (which stands for European Petroleum Survey Group) codes are IDs that refer to a specific proj4string. I find it easier to remember a four/five digit EPSG code than a complex proj4string, but that’s me. Proj4string is, however, more explicit in its definition. A proj4string typically has many parameters, stored together as a string. For example:</p>
 <ul>
@@ -369,6 +372,33 @@ $ service apache2 reload
 crs &lt;- make_EPSG() #this has 6609 rows for me
 berlin &lt;- crs[grep(&#39;berlin&#39;, crs$note, ignore.case = TRUE),
               c(&quot;code&quot;, &quot;prj4&quot;)] #only one for me</code></pre>
-<p><em>berlin</em> is the CRS called Soldener Berlin <em>EPSG:3068</em>, with proj4 <code>+proj=cass +lat_0=52.4186482777778 +lon_0=13.6272036666667 +x_0=40000 +y_0=10000 +ellps=bessel +units=m +no_defs +type=crs</code>: <a href="https://epsg.io/3068">https://epsg.io/3068</a>. From the proj4string is clear that the unit of measurment is meters, a Bessel ellipsoid id used to approximate Earth surface, and the origin is at a longitude of 13.63 and latitude of 52.42. I was not aware of what a Bessel ellipsoid was, but a quick search susggests this is used for national surveys (which makes sense here for Germany) and that it will be replaced in the next decades by modern ellipsoids of satellite geodesy. This hint to a good point: standards change, so keep in mind that analyses made years ago may need to adjusted for today’s standards.</p>
+<p><em>berlin</em> is the CRS called Soldener Berlin <em>EPSG:3068</em>, with proj4 <code>+proj=cass +lat_0=52.4186482777778 +lon_0=13.6272036666667 +x_0=40000 +y_0=10000 +ellps=bessel +units=m +no_defs +type=crs</code>: <a href="https://epsg.io/3068">https://epsg.io/3068</a>. From the proj4string is clear that the unit of measurment is meters, a Bessel ellipsoid id used to approximate Earth surface, and the origin is at a longitude of 13.63 and latitude of 52.42. I was not aware of what a Bessel ellipsoid was, but a quick search susggests this is used for national surveys (which makes sense here for Germany) and that it will be replaced in the next decades by modern ellipsoids of satellite geodesy. This hints to a good point: standards change, so keep in mind that analyses made years ago may need to be adjusted for today’s standards.</p>
+<h2 id="spatial-analysis-in-r-101">Spatial analysis in R 101</h2>
+<p>The raster I use is the estimated distribution of the African lion (<em>Panthera leo</em>) as it should be today without human interferences. I obtained this raster from <a href="https://github.com/MegaPast2Future/PHYLACINE_1.2/blob/master/Data/Ranges/Present_natural/Panthera_leo.tif">PHYLACINE 1.2 database</a>.</p>
+<h3 id="reproject-rasters-and-geometries">Reproject rasters and geometries</h3>
+<p>The first thing to know when re-projecting a layer is its original CRS. The only reason a layer does not already have a CRS is in the case you created it; in that case, you should specify the CRS of the layer yourself.</p>
+<pre><code>library(raster)
+
+r &lt;- raster(&quot;lion.gri&quot;)
+crs(r)
+
+CRS arguments:
+ +proj=cea +lat_ts=30 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m
++no_defs </code></pre>
+<p>The raster is in a Cylindrical Equal Area projection (<em>cea</em>). This is a quite good projection for some spatial analyses that focus on raster cells, as cea assures that each cell has the same area (not shape). However, I find it quite ugly to plot in this crs and I want re-project it to a Mollweide projection (Figure <a href="#fig:lion1" data-reference-type="ref" data-reference="fig:lion1">[fig:lion1]</a>).</p>
+<pre><code>old_crs &lt;- proj4string(crs(r))
+
+reproj &lt;- projectRaster(r,
+                        crs = &quot;+proj=moll +datum=WGS84 +units=m +no_defs&quot;,
+                        method = &quot;ngb&quot;) #nearest-neighbour
+</code></pre>
+<p>The proj4string of the new layer is <code>"+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"</code>. I used a nearest-neighbour algorithm as this raster is binary (0 or 1) and that makes the most sense to me here.</p>
+<figure>
+<img src="lion.png" alt="Present-natural distribution of the African lion in Mollweide projection using bilinear interpolation (black) and nearest-neighbour method (red)." id="fig:lion2" /><figcaption>Present-natural distribution of the African lion in Mollweide projection using bilinear interpolation (black) and nearest-neighbour method (red).<span label="fig:lion2"></span></figcaption>
+</figure>
+<figure>
+<img src="lion2.png" alt="Present-natural distribution of the African lion in Mollweide projection using bilinear interpolation (black) and nearest-neighbour method (red)." id="fig:lion2" /><figcaption>Present-natural distribution of the African lion in Mollweide projection using bilinear interpolation (black) and nearest-neighbour method (red).<span label="fig:lion2"></span></figcaption>
+</figure>
+<p>The difference between the two layers projections are due to different CRS, but also approximations due to the algorithm chosen as method to resample the original raster. Different algorithm give different output (Figure <a href="#fig:lion2" data-reference-type="ref" data-reference="fig:lion2">6.2</a>) and you should choose which method is best for you.</p>
 </body>
 </html>

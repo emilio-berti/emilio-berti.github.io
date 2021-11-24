@@ -4,6 +4,7 @@
 \usepackage{listings}
 \usepackage[colorlinks]{hyperref}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
 
 \hypersetup{
     colorlinks=true,
@@ -401,6 +402,60 @@ I was not aware of what a Bessel ellipsoid was, but a quick search susggests thi
 This hints to a good point: standards change, so keep in mind that analyses made years ago may need to be adjusted for today's standards.
 
 \section{Spatial analysis in R 101}
-\subsection{Reproject rasters and geoemtries}
+The raster I use is the estimated distribution of the African lion (\textit{Panthera leo}) as it should be today without human interferences.
+I obtained this raster from \href{https://github.com/MegaPast2Future/PHYLACINE_1.2/blob/master/Data/Ranges/Present_natural/Panthera_leo.tif}{PHYLACINE 1.2 database}.
+
+\subsection{Reproject rasters and geometries}
+The first thing to know when re-projecting a layer is its original CRS. The only reason a layer does not already have a CRS is in the case you created it; in that case, you should specify the CRS of the layer yourself.
+
+\begin{lstlisting}
+library(raster)
+
+r <- raster("lion.gri")
+crs(r)
+
+CRS arguments:
+ +proj=cea +lat_ts=30 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m
++no_defs 
+\end{lstlisting}
+
+The raster is in a Cylindrical Equal Area projection (\textit{cea}).
+This is a quite good projection for some spatial analyses that focus on raster cells, as cea assures that each cell has the same area (not shape).
+However, I find it quite ugly to plot in this crs and I want re-project it to a Mollweide projection (Figure \ref{fig:lion1}).
+
+\begin{lstlisting}
+old_crs <- proj4string(crs(r))
+
+reproj <- projectRaster(r,
+                        crs = "+proj=moll +datum=WGS84 +units=m +no_defs",
+                        method = "ngb") #nearest-neighbour
+
+\end{lstlisting}
+The proj4string of the new layer is \texttt{"+proj=moll +lon\_0=0 +x\_0=0 +y\_0=0 +datum=WGS84 +units=m +no\_defs"}.
+I used a nearest-neighbour algorithm as this raster is binary (0 or 1) and that makes the most sense to me here.
+
+
+\begin{figure}
+\begin{minipage}[b]{0.45\linewidth}
+\begin{center}
+\includegraphics[width=\textwidth]{lion.png}
+\caption{Present-natural distribution of the African lion in Berhman CEA projection (black) and Mollweide (red).}
+\label{fig:lion1}
+\end{center}
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+\begin{center}
+\includegraphics[width=\textwidth]{lion2.png}
+\caption{Present-natural distribution of the African lion in Mollweide projection using bilinear interpolation (black) and nearest-neighbour method (red).}
+\label{fig:lion2}
+\end{center}
+\end{minipage}
+\end{figure}
+
+
+The difference between the two layers projections are due to different CRS, but also approximations due to the algorithm chosen as method to resample the original raster. Different algorithm give different output (Figure \ref{fig:lion2}) and you should choose which method is best for you.
+
+
 
 \end{document}
