@@ -1,0 +1,534 @@
+---
+title: "Energy landscapes with enerscape"
+author: "Emilio Berti"
+date: "12/18/2020"
+output: rmdformats::material
+bibliography: biblio.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+# Introduction
+
+## General remarks
+
+The R pacakge *enerscape* computes the energy landscape based on models predicting the energy costs of transport. Two models are currently implemented, the ARC model for terrestrial, legged animals [@pontzer_unified_2016] and the equation of motion of a cyclist [@di_prampero_equation_1979]. Adding other models is relatively easy and can be done by writing a custom function in the *enerscape_internals.R* script. Currently, there is no implementation for user-specified models, but I plan to add this in the future.
+
+An extensive derivation of the ARC model can be found in @pontzer_unified_2016. Here, it is sufficient to say that the ARC model accounts for the energy spent for cross-bridge cycling, generating tension, as well as associated activation-relaxation processes that restore cellular ion gradients - mostly Ca$^{2+}$ - necessary for cross-bridge cycling. Notably, predictions of the ARC model fit very well observed data. In *enerscape*, the dataset from @pontzer_unified_2016 can be access as the variable `pontzer`.
+
+```{r load dem, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(raster)
+library(sf)
+library(enerscape)
+
+#' Function to plot the areas
+#' 
+#' @param x is a raster
+#' @param poly is a shapefile polygon
+plot_area <- function(x, poly, mask = NULL, col = NULL, void = FALSE) {
+  if (is.null(col)) {
+    plot(x, axes = !void, box = !void)
+  } else {
+    plot(x, col = col, axes = !void, box = !void)
+  }
+  if (!is.null(mask)) {
+    plot(mask, add = T, legend = FALSE,
+         col = adjustcolor("white", alpha.f = 0.5), 
+         axes = !void, 
+         box = !void)
+  }
+  plot(poly$geometry, add = TRUE)
+}
+
+#' ARC model predictions
+#'
+#' @param mass body mass of the animal (kg)
+#' @param slope incline of the terrain (degree)
+ARC <- function(mass, slope) {
+  E_ar <- 8 * mass^(-0.34)
+  E_mec <- 50 * (1 + sin((2 * slope - 74) / 180 * pi)) * mass^(-0.12)
+  E <- E_ar + E_mec
+  return(E)
+}
+
+pontzer %>% 
+  as_tibble %>% 
+  mutate(ARC = ARC(Mass, Incline)) %>% 
+  ggplot() +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  geom_point(aes(ARC, Cost.of.Transport, col = Incline)) +
+  scale_color_gradient(low = "steelblue", high = "tomato") +
+  scale_x_log10(n.breaks = 11) +
+  scale_y_log10(n.breaks = 11) +
+  xlab("ARC predicitons") +
+  ylab(expression("E"["COT"]*" (J kg"^"-1"*"m"^"-1"*")")) +
+  theme_bw()
+```
+
+## Computing energy landscapes
+
+To compute energy landscapes using *enerscape*, we need a terrain elevation raster, also called a digital elevation model (DEM). The raster should have equal resolution on both horizontal and vertical axes and a planar coordinate reference systems in meters. The following is a raster that have these characteristics.
+
+```{r requirements}
+dem <- raster("../data/dem-vignette.tif")
+res(dem)
+crs(dem)
+```
+
+We can then compute the energy landscape of the area for a general animal of 50 kg using the `enerscape()` function.
+
+```{r enerscape}
+en <- enerscape(dem, 50)
+```
+
+The output is an enerscape object, which is a list with elements:
+
+* The neighbors used to compute the transition matrix among cells, either 4 (in chess, rook's move of 1), 8 (king's move), or 16 (king's + knigth's move).
+* The body mass of the animal (kg).
+* A rasterStack with DEM, Slope, Work (cost of travel), and Conductance (1 / Work).
+* A conductance transition matrix that summarize the conductance of moving between neighboring cells.
+
+The function `en_extrapolation()` can be used to highlight where ARC predictions extrapolate from the testing data. A rasterLayer masking extrapolations for the incline is returned if available.
+
+```{r extrapolations}
+extr <- en_extrapolation(en, plot = FALSE)
+extr
+plot(dem)
+plot(extr$`Slope extrapolation`, 
+     add = TRUE, 
+     col = adjustcolor("blue", alpha.f = 0.3),
+     legend = FALSE)
+arrows(888523, 4674275, 878791, 4671549)
+```
+
+## Least-cost paths and random walks
+
+The algorithm to compute least-cost paths from the R package *gdistance* [@etten_r_2017] is implemented in the `en_lcp()` function. `en_lcp()` takes as input two points for which the least-cost path need to be evaluated [^1]. Alternatively, random points are generated if `simulate_random_points = TRUE`:
+
+[^1]: A path can also be drawn on map using `en_path()` specifying *draw = TRUE* and the number of points to draw the path, e.g. `(en, draw = TRUE, n = 10)`.
+
+```{r lcp}
+lcp <- en_lcp(en, simulate_random_points = TRUE)
+```
+
+The random walk algorithm from *gdistance* is also implemented as `en_passage()`. As this may be quite slow, I implemented another way of computing the overall connectivity between two points - or for the whole landscape - using Circuitscape and Omniscape. The initialization files for these to algorithms can be written using `circuitscape_skeleton()` and `omniscape_skeleton()`, which create *circuitscape.ini* and *omniscape.ini* to be launched from within a Julia terminal. See the next example for how to use these.
+
+# Landscape connectivity for the Marsican bear (*Ursus arctos marsicanus*) in the Sirente-Velino Regional Park
+
+Here, I assess the overall landscape connectivity for the Mariscan brown bear (*Ursus arctos marsicanus*) in the Sirente-Velino Regional Park (SVRP; [parcosirentevelino.it](http://www.parcosirentevelino.it)) in central Italy. In particular, I derive the energy landscape for the area and use it as a “resistance matrix” for animal movement, i.e. assuming that bears would move across low energy landscape trajectories in order to minimize energy costs.
+
+The required input for enerscape using the ARC model are: 
+
+* a digital elevation model (DEM) of the area of interest (m)
+* body mass of the animal (kg)
+
+I load the DEM and the park polygon data.
+
+```{r bear data}
+dem <- raster("../data/dem-vignette.tif")
+park <- st_read("../data/orso/SVRP-polygon.shp")
+m <- mask(dem, park, inverse = TRUE)
+plot_area(dem, park, m, void = TRUE)
+title("Elevation (m)")
+scalebar(10000, 
+         type = "bar", 
+         divs = 2, 
+         label = as.character(c(0, 5, 10)),
+         below = "kilometers")
+```
+
+I calculate the energy landscape for a bear of 140 kg.
+
+```{r bear-scape, eval=TRUE}
+en <- enerscape(dem, 140, "kcal")
+plot(en$rasters, axes = FALSE, box = FALSE)
+```
+
+Or plotting only the cost of travel per cell:
+
+```{r work}
+plot_area(en$rasters$Work, park, m, col = topo.colors(100), void = TRUE)
+title("Energy cost of travel (kcal)")
+```
+
+I choose two points for which to compute the least-cost path and the connectivity using [Circuitscape](https://docs.circuitscape.org/Circuitscape.jl/latest/usage/).
+
+```{r bear-circuitscape}
+p <- data.frame(x = c(877367, 882653),
+                y = c(4674192, 4677413))
+plot_area(dem, park, m, void = TRUE)
+points(p, pch = 20)
+lcp <- en_lcp(en, p[1, ], p[2, ])
+circuitscape_skeleton(en,
+                      file.path("/home",
+                                "eb97ziwi",
+                                "Proj",
+                                "enerscape-paper",
+                                "data"),
+                      p)
+```
+
+And I run Circuitscape in Julia.
+
+```{r skeleton1, eval=FALSE}
+julia> using Circuitscape
+julia> compute("/home/eb97ziwi/Proj/enerscape-paper/data/circuitscape.ini")
+```
+
+```{r circ fake, echo=FALSE}
+cat(
+  "[ Info: 2020-12-19 08:31:24 : Precision used: Double",
+  "[ Info: 2020-12-19 08:31:27 : Reading maps",
+  "[ Info: 2020-12-19 08:31:28 : Resistance/Conductance map has 186803 nodes",
+  "[ Info: 2020-12-19 08:31:36 : Solver used: AMG accelerated by CG",
+  "[ Info: 2020-12-19 08:31:36 : Graph has 186803 nodes, 2 focal points and 1 connected components",
+  "[ Info: 2020-12-19 08:31:36 : Total number of pair solves = 1",
+  "[ Info: 2020-12-19 08:31:37 : Time taken to construct preconditioner = 1.683233535 seconds",
+  "[ Info: 2020-12-19 08:31:37 : Time taken to construct local nodemap = 0.008903604 seconds",
+  "[ Info: 2020-12-19 08:31:37 : Solving pair 1 of 1",
+  "[ Info: 2020-12-19 08:31:38 : Time taken to solve linear system = 0.526888286 seconds",
+  "[ Info: 2020-12-19 08:31:39 : Time taken to write current maps = 0.559248897 seconds",
+  "[ Info: 2020-12-19 08:31:39 : Time taken to complete job = 15.111858446",
+  "3×3 Array{Float64,2}:",
+  "0.0   1.0      2.0",
+  "1.0   0.0     31.8625",
+  "2.0  31.8625   0.0",
+  sep = "\n"
+)
+```
+
+Sometimes, few cells with extremely high current/connectivity can make the output map hard to read, as most of the connectivity values are squeezed into a narrow range. To avoid this, the value of extremely high outliers can be forced to an upper limit. For example, I force outliers to the 0.999 quantile value of the connectivity and standardize the Circuitscape output between 0 and 1.
+
+```{r circ-plot}
+cs <- raster("../data/orso/circuitscape_cum_curmap.asc")
+cs <- log10(cs)
+cs <- cs - min(values(cs), na.rm = TRUE)
+cs[cs >= quantile(cs, 0.999)] <- quantile(cs, 0.999) #remove far outliers
+cs <- cs / max(values(cs), na.rm = TRUE)
+plot_area(cs, 
+          park, 
+          m, 
+          col = c("black", viridis::viridis(99)), 
+          void = TRUE)
+points(p, pch = 20, col = "black")
+contour(mask(dem, m, inverse = TRUE), 
+        add = TRUE, 
+        nlevels = 5, 
+        lt = 2,
+        lw = 1.5,
+        col = "grey80")
+lines(lcp$Path)
+title("Connectivity between locations")
+```
+
+To compute the overall landscape connectivity, I use the [Omniscape](https://docs.circuitscape.org/Omniscape.jl/stable/) algorithm, which runs Circuitscape iteratively on a moving window. I initialize the *omniscape.ini* file to be passed to Julia.
+
+```{r bear-omniscape}
+omniscape_skeleton(en,
+                   file.path("/home",
+                             "eb97ziwi",
+                             "Proj",
+                             "enerscape-paper",
+                             "data"),
+                   radius = 10)
+```
+
+And I run the Omniscape algorithm in a Julia terminal. Don't forget to specify the number of parallel threads: [https://docs.circuitscape.org/Omniscape.jl/stable/usage/#Parallel-Processing](https://docs.circuitscape.org/Omniscape.jl/stable/usage/#Parallel-Processing).
+
+```{r skeleton, eval=FALSE}
+julia> using Omniscape
+julia> run_omniscape("/home/eb97ziwi/Proj/enerscape-paper/data/omniscape.ini")
+```
+
+```{r omni fake, echo=FALSE}
+cat(
+  "Starting up Omniscape. Using 7 workers in parallel. Using double precision...",
+  "Solving moving window targets...",
+  "Progress: 100% | Time: 0:03:14",
+  "Done!",
+  "Time taken to complete job: 196.3408 seconds",
+  "Outputs written to", "/home/eb97ziwi//home/eb97ziwi/Proj/enerscape-paper/data/omniscape_2",
+  "(Union{Missing, Float64}[0.5152914765395912 0.5884433266779532 … 0.719651357069539 0.8600629588479131;",
+  "0.4834003129933446 0.6594116484239914 … 0.635221929581483 0.7110678186022065;",
+  "… ;",
+  "0.2127925084620419 0.2067469779201847 … 0.39577453680538544 0.46681040575465904;",
+  "0.17382917047741175 0.2093726458198999 … 0.31763823508216504 0.3738227777731409]", 
+  "Union{Missing, Float64}[1.0885252650071 1.136985249629082 … 1.169180462521136 1.1104937306261533;",
+  "1.053217843455199 1.0090282247541849 … 0.9301240063409788 1.1859951520336032;",
+  "… ;",
+  "1.1798282079383584 0.9871029439774996 … 0.9873244151514602 1.2432973368603717;",
+  "1.1120398150491893 1.168088759875787 … 1.0583987239714665 1.0877633126993709])",
+  sep = "\n"
+)
+```
+
+I remove outliers and standardize the Omniscape output between 0 and 1.
+
+```{r omni-plot}
+os <- raster("../data/orso/omniscape/cum_currmap.tif")
+os <- os - min(values(os), na.rm = TRUE)
+os[os >= quantile(os, 0.999)] <- quantile(os, 0.999) #remove outliers
+os <- os / max(values(os), na.rm = TRUE)
+plot_area(os, 
+          park, 
+          m, 
+          col = c("black", viridis::cividis(99)), 
+          void = TRUE)
+contour(mask(dem, m, inverse = TRUE), 
+        add = TRUE, 
+        nlevels = 5, 
+        lt = 2,
+        lw = 1.5,
+        col = "grey80")
+title("Landscape connectivity")
+```
+
+# Habitat use of feral ungulates in a Danish rewilding area
+
+Here, I assess how the energy costs of locomotion affect differently Galloway cattle and Exmoor ponies in a rewilding experiment in Denmark. Energy landscapes are used to compute the landscape connectivity of the rewilding site, which is then used to model species habitat usage. First, I load the DEM and associated layers.
+
+```{r, warning=FALSE, message=FALSE}
+library(randomForest)
+setwd("..")
+source("R/mols-set_up.R")
+setwd("R")
+park <- st_read("../data/mols/Mols.shp")
+dem <- raster("../data/mols/DK-DEM.asc") %>% 
+  crop(extent(st_buffer(park, 100)))
+crs(dem) <- crs(park)
+m <- mask(dem, park, inverse = TRUE)
+plot_area(dem, park, m, void = TRUE)
+```
+
+I compute the energy landscapes for both species and calculate the landscape connectivity using the omniscape algorithm.
+
+```{r, warning=FALSE, message=FALSE, eval=FALSE}
+en_horse <- enerscape(dem, 320, "kcal")
+omniscape_skeleton(en_horse,
+                   "/home/eb97ziwi/Proj/enerscape-paper/data/mols/omniscape_horse/",
+                   radius = 10)
+en_cow <- enerscape(dem, 550, "kcal")
+omniscape_skeleton(en_cow,
+                   "/home/eb97ziwi/Proj/enerscape-paper/data/mols/omniscape_cattle/",
+                   radius = 10)
+```
+
+```{r}
+omni_horse <- raster("../data/mols/omniscape_horse/omniscape/cum_currmap.tif")
+omni_cow <- raster("../data/mols/omniscape_cattle/omniscape/cum_currmap.tif")
+plot_area(omni_cow, park, m, col = viridis::cividis(100), void = TRUE)
+plot_area(omni_horse, park, m, col = viridis::cividis(100), void = TRUE)
+```
+
+I use landscape connectivity as an explanatory variable in a RandomForest (RF) model to predict the density of GPS records for both species, including as other explanatory variables NDVI, tree cover density, and the other species GPS record density. I skip here RF models and load directly the results of the analysis.
+
+```{r}
+horse <- read_rds("../data/horse_rf.rds")
+cattle <- read_rds("../data/mols/cattle_rf.rds")
+# inspect table of RF model
+head(horse$data)
+# retain only the best RF model
+horse <- horse$energy
+cattle <- cattle$energy
+```
+I plot the importance of predictor variables for both species.
+
+```{r}
+importance <- tibble(
+  var = c(rownames(horse$importance), rownames(cattle$importance)),
+  IncNodePurity = c(horse$importance, cattle$importance),
+  species = c(rep("Exmoor pony", 5), rep("Galloway cattle", 5))
+) %>% 
+  mutate(var = modify(var, function(x) {
+    if (grepl("GPS", x)) {
+      "Density of the other species"
+    } else {
+      x
+    }
+  }))
+
+importance %>% 
+  ggplot() +
+  geom_point(aes(reorder(var, IncNodePurity), IncNodePurity, col = species),
+             position = position_dodge(width = 0.5)) +
+  coord_flip() +
+  ggsci::scale_color_startrek(name = "") +
+  xlab("") +
+  theme_classic() +
+  theme(panel.grid.major.y = element_line(color = adjustcolor("grey20", alpha.f = 0.2),
+                                          linetype = "dashed"))
+```
+
+The variable importance plot shows that landscape connectivity (*omni*) strongly influence cattle habitat usage, but it has only limited effects on the area used by horses. Partial plots show that cattle tend to use habitats that are well-connected, i.e. that can be reached with low energy expenditures.
+
+```{r}
+horse <- read_rds("../data/mols/horse_partialplots.rds")
+cattle <- read_rds("../data/mols/cattle_partialplots.rds")
+
+res <- tibble()
+for (vars in names(horse$plot)) {
+  res <- res %>% 
+    bind_rows(mutate(horse$plot[[vars]],
+                     var = vars,
+                     species = "Exmoor pony"))
+}
+for (vars in names(cattle$plot)) {
+  res <- res %>% 
+    bind_rows(mutate(cattle$plot[[vars]],
+                     var = vars,
+                     species = "Galloway cattle"))
+}
+
+res %>% 
+  mutate(var = modify(var, function(x) {
+    if (grepl("GPS", x)) {
+      "Density of the other species"
+    } else {
+      x
+    }
+  })) %>% 
+  ggplot() +
+  aes(x, y, col = species) +
+  geom_line(size = 0.5) +
+  geom_point(shape = 21, size = 0.75, fill = "white") +
+  ggsci::scale_color_startrek(name = "") +
+  facet_wrap(~var, scales = "free") +
+  theme_classic() +
+  xlab("") +
+  ylab("Marginal effect on GPS KDE") +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(hjust = 0.5))
+```
+
+Overall, these findings highlight that energy costs of locomotion influence the habitat usage for cattle, but not for horses, in the rewilding experiment, suggesting the expected ecological effects of species to act differently accoring to topographical features of the site. 
+
+# Cyclists expenditures in the L’Eroica landscape
+
+Here, I study how body weight (kg) and cycling speed (km/h) influence the energy required by participants to cycle [L'Eroica](https://eroica.cc/en/gaiole/permanent-route) event. In particular, I derive the energy landscape for the route and sum the energy costs of all cells.
+
+I load the DEM and the route polygon data.
+
+```{r eroica-setup}
+dem <- raster("../data/eroica/eroica.tif")
+route <- st_read("../data/eroica/route.shp") %>% 
+  st_transform(crs(dem))
+r <- st_coordinates(route)[, 1:2] %>% 
+  Line() %>% 
+  Lines("Eroica")
+r <- SpatialLines(list(r))
+crs(r) <- crs(route)
+plot_area(dem, route, void = TRUE)
+scalebar(d = 10000, 
+         type = "bar", 
+         below = "kilometers",
+         label = as.character(c(0, 5000, 10000) / 1000),
+         div = 4)
+```
+
+I force the DEM on the route only.
+
+```{r force-route, eval=FALSE}
+el <- mask(dem, r) %>% 
+  crop(extent(route))
+```
+
+```{r load-forced, echo=FALSE}
+el <- raster("../data/eroica/dem_on_route.tif")
+```
+
+The energy landscape for a cyclist of 60 kg cycling at an overall speed of 30 km/h can then be computed using to use the model from [@di_prampero_equation_1979] by specifying `method = "cycling"`.
+
+```{r cyclist-scape}
+en <- enerscape(el, 60, "kcal", 4, method = "cycling", v = 30)
+```
+
+The total energy costs of cycling L'Eroica are then derived by summing the energy expenditures for the whole route.
+
+```{r cyclist-costs}
+costs <- sum(values(mask(en$rasters$Work, el)), na.rm = TRUE)
+costs
+```
+
+To get the energy costs for cyclists of different weights and for other cycling speed, I make a for loop.
+
+```{r cyclist-loop, eval=FALSE}
+library(foreach)
+res <- foreach (weight = seq(50, 100, by = 10), .combine = "rbind") %do% {
+  res <- foreach (speed = seq(10, 50, by = 5),
+                  .combine = "rbind") %dopar% {
+                    en <- enerscape(el, 
+                                    weight, 
+                                    "kcal", 
+                                    4, 
+                                    method = "cycling", 
+                                    v = speed)
+                    cbind(speed,
+                          sum(values(mask(en$rasters$Work, el)),
+                              na.rm = TRUE))
+                  }
+  cbind(weight, res)
+} %>% 
+  as_tibble()
+```
+
+```{r load-loop, echo=FALSE, message=FALSE}
+res <- read_csv("../data/cyclists-loop.csv")
+```
+
+I can then plot the energy costs for different body weight and cycling speed.
+
+```{r plot-cyclists}
+res %>% 
+  mutate(weight = as.factor(weight)) %>% 
+  ggplot() +
+  geom_line(aes(speed, V3, col = weight)) +
+  geom_violin(aes(speed, V3, group = as.factor(speed)), alpha = 0, draw_quantiles = 0.5) +
+  geom_point(aes(speed, V3, col = weight), size = 1) +
+  xlab("Speed (km / h)") +
+  ylab("Energy consumed (kcal)") +
+  scale_color_brewer("Weight (kg)", palette = "RdGy") +
+  theme_classic() +
+  theme(panel.grid.major.y = element_line(color = "grey80", size = 0.25))
+```
+
+and the difference in minimum and maximum costs at same speed, but different weight.
+
+```{r cyclist-difference}
+res %>% 
+  group_by(speed) %>% 
+  summarize(Min = min(V3),
+            Max = max(V3)) %>% 
+  mutate(Diff = Max - Min) %>% 
+  ggplot() +
+  aes(speed, Diff) +
+  geom_smooth(alpha = 0.2, col = "tomato") +
+  xlab("Speed (km / h)") +
+  ylab("Maximum energy costs\ndifference (kcal)") +
+  geom_point() +
+  theme_classic()
+```
+
+# Enerscape for very large areas
+
+Currently, the computational hard limit of enerscape is the number of cell in the area. For instance, for areas with millions of cells, which are not unusual in spatial ecology, enerscape may exceed memory usage. To avoid this, I wrote a wrapper for enerscape (`enerscape_gridded()`) that divides the area into grids and computes energy landscapes for each grid block separately. To create the grid, I wrote the function `make_grid()`, which takes as input the area and the number of horizontal and vertical blocks to split the area into. As this will introduce artifacts at the boundaries among blocks, `enerscape_gridded()` computes energy landscapes also for these boundaries. After computations are done, each block energy landscape (RasterLayer) is saved in a specified directory (default is the temporary raster directory). The function `enerscape_merge()` then merge all the blocks and the boundary strips together correcting for these artifacts.
+
+```{r gridded setup}
+library(raster)
+library(enerscape)
+dem <- getData("alt", path = tmpDir(), country = "austria")
+dem <- projectRaster(dem, crs = crs("EPSG:31255"), res = c(1000, 1000))
+en_grid <- make_grid(dem@extent, dem@crs, 5, 3)
+plot(dem)
+lines(en_grid$grid, lty = 2)
+```
+
+```{r gridded comps}
+enerscape_gridded(dem, 10, grid = en_grid) #10 kg
+en <- enerscape_merge(tmpDir(), en_grid, dem)
+plot(en, col = topo.colors(100))
+```
+
+# References
