@@ -1,0 +1,33 @@
+% !TEX root = base-r.tex
+
+\vspace{2ex}
+
+\begin{block}{tidyr}
+    \inline{pivot_wider(df, names_from = x, values_from = y )} \\ Make a long table a wide one by adding a new column for each value in x with entries the value of y. \br
+
+    \inline{pivot_longer(df, cols = ..., names_to = x, values_to = y )} \\ Make a wide table a long one by creating two new column x and y with values the column names select in \textit{cols}. \br
+
+    \textit{cols = ...} takes \textit{tidyselect} arguments.\\
+\end{block}
+
+\vspace{2ex}
+
+\begin{block}{tidyselect}
+  \inline{everything()} \\ Select all columns. \br
+  \inline{contains("...")} \\ Select all columns matching pattern "...". \br
+  \inline{starts_with("...")} \\ Select all columns starting with pattern "...". \br
+  \inline{ends_with("...")} \\ Select all columns ending with pattern "...".
+
+  \blocksubtitle{tidyselect examples}
+
+  \inline{select(df, starts_with("Average"))} \\ Select all columns that start with the string "Average".\br
+  \inline{pivot_wider(df, cols = contains("Site"))} \\ Select all columns that contain the string "Site".
+
+  \blocksubtitle{where}
+  \inline{cols = where(...)} \\ Select all columns where statement ... is TRUE. \br
+
+  \inline{select(df, where(is.numeric))} \\ Select all numeric columns.\br
+  \inline{mutate(df, across(where(is.numeric), scale))} \\ Scale all numeric columns.\br
+\end{block}
+
+\vspace{0.25ex}

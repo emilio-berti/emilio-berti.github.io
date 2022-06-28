@@ -1,0 +1,7 @@
+\frametitle{}
+\vfill
+    \begin{columns}[t]
+    \begin{column}{.9\linewidth}
+      \input{thirdcolumn}
+    \end{column}
+    \end{columns}

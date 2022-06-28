@@ -1,0 +1,30 @@
+% !TEX root = base-r.tex
+
+\vspace{2ex}
+
+\begin{block}{purrr}
+\blocksubtitle{One input}
+  \inline{map(x, function)}\\Apply a function to each element of x and return a list.\br
+  \inline{map_dbl(x, function)}\\Apply a function to each element of x and return a numeric vector.\br
+  \inline{map_chr(x, function)}\\Apply a function to each element of x and return a character vector.\br
+  \inline{map(z, round)}\\
+  \inline{map(z, \~round(.x))}\\ Round z (the two are equivalent).\br
+  The function can be passed as a function or as a formula, in which case .x refers to the first input, .y to the second, etc.
+\blocksubtitle{Two inputs}
+  \inline{map2(x, y, function)}\\Apply a function to each pair of elements x and y and return a list.\br
+  \inline{map2(x, y, ~round(.x, .y))}\\
+  Round x by y decimal digits.\br
+  The names .x and .y are conventions independent of the name of the inputs. E.g. \inline{map2(z, w, ~round(.x, .y))} is correct.
+  
+\blocksubtitle{Many inputs}
+  \inline{pmap(list(...), function)}\\Apply a function to each group on inputs ... and return a list.\br
+  \inline{pmap(list(x, y, z, w) ~ ..1 ^ ..2 + ..3 ^ ..4)}\\
+  Equivalent to $x ^ y + z ^ w$.\br
+  When there are more than two inputs (always passed as a list), then the convetion is to use ..1 for the first input, ..2 for the second, etc.\br
+
+  Both map2 and pmap can return numeric vectors instead of lists (\inline{map2_dbl()} and \inline{pmap_dbl()}) or character vectors (\inline{map2_chr()} and \inline{pmap_chr()}).\br
+
+  Other return types for purrr map families are logical vectors (\inline{map_lgl()}), integer vectors (\inline{map_int()}), and dataframes (\inline{map_df()})
+
+
+\end{block}

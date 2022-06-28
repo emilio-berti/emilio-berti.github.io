@@ -1,0 +1,62 @@
+% !TEX root = base-r.tex
+
+\begin{block}{dplyr}
+  \vskip-2ex
+  \begin{columns}[t]\hfill\hfill\hfill
+    \begin{column}{.48\linewidth}
+
+ \blocksubtitle{Modify columns}
+    \inline{mutate(df, x = ... )} \\ Create new column x.\br
+    \inline{transmute(df, x = ..., y)} \\ Create new column x and retain only columns x and y.\br
+    Use \inline{transmute()} when you want to create new columns and retain only some columns. This is equivalent to a \inline{mutate()} followed by a \inline{select()}.
+
+
+ \blocksubtitle{Select columns}
+    \inline{select(df, x, y)} \\ Select columns x and y.
+
+  \blocksubtitle{Filter rows}
+    \inline{filter(df, condition)} \\ Retain only rows based on condition.\br
+    \inline{filter(df, x > 5)}. \\ Select rows where x $>$ 5.\br
+    \inline{filter(df, x > 5, y < 3)} \\ Select rows where x $>$ 5 \textsc{and} y $<$ 3.
+    \inline{filter(df, x > 5 | y < 3)} \\ Select rows where x $>$ 5 \textsc{or} y $<$ 3.
+
+    
+  \blocksubtitle{Extract columns}
+    \inline{pull(df, x)} \\ Extract column x and return it as a vector.
+  
+  \blocksubtitle{Grouping}
+    \inline{group_by(df, x)} \\ Group observation by the grouping variable x.\br
+    Usually, the grouping variable is categorical, e.g. a string or a factor.
+  
+  \blocksubtitle{Arrange rows}
+    \inline{arrange(df, x)} \\ Arrange rows with increasing values of x.\br
+    Use the option \inline{decreasing = TRUE} to sort with decreasing values of x.
+
+    \end{column}\hfill
+    \begin{column}{.48\linewidth}
+    
+    \blocksubtitle{Summarize observations}
+    \inline{summarize(df, ...)} \\ Create a new table containing the summary statistic ...\br
+    \inline{summarize(df, Average = mean(x))}. \\ Summarize all observation to give the average value of x.\br
+    If the table is grouped, a row is returned for each group:\\
+    \inline{df \%>\% group_by(x) \%>\% summarize(Avg = mean(y))}. \\ Return average value of y for each level of x.
+    
+    \blocksubtitle{Sub-sample tables}
+      \inline{slice_head(df, n = ...)} \\ Retain only the first ... rows. \br
+      \inline{slice_tail(df, n = ...)} \\ Retain only the last ... rows. \br
+      \inline{slice_sample(df, n = ...)} \\ Retain only ... random rows.\\
+      Use the option \inline{prop = ...}, instead of n = ..., to retain a proportion of the rows.
+    
+    \blocksubtitle{Join two tables}
+      \inline{left_join(x, y, by = z)} \\ Join table x with table y according to a grouping variable z and retain only z values that occurr in x. \br
+      \inline{inner_join(x, y, by = z)} \\ Join table x with table y according to a grouping variable z and retain only z values that occurr in both x and y. \br
+      \inline{full_join(x, y, by = z)} \\ Join table x with table y according to a grouping variable z and retain all z values. \br
+
+      If the grouping variable has different name in the two tables (e.g. z and w), you must specify the comparison.\\
+      \inline{left_join(x, y, by = c('z' = 'w'))}\\
+      Join x and y where z = w.
+
+    \end{column}\hfill\hfill\hfill
+    \end{columns}
+    
+\end{block}
