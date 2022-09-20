@@ -1303,8 +1303,7 @@ src: url(data:application/font-sfnt;base64,AAEAAAARAQAABAAQR0RFRgs+Cz8AAjwQAAAAQ
       <ul>
       <li><a href="#load-and-filter-the-database" id="toc-load-and-filter-the-database">Load and filter the
       database</a></li>
-      <li><a href="#drop-nas-and-tally" id="toc-drop-nas-and-tally">Drop
-      NAs and tally</a></li>
+      <li><a href="#tally-species-records" id="toc-tally-species-records">Tally species records</a></li>
       <li><a href="#save-tables" id="toc-save-tables">Save
       tables</a></li>
       </ul></li>
@@ -1610,6 +1609,11 @@ exercise).</li>
 </ol>
 <div id="load-and-filter-the-database" class="section level2">
 <h2>Load and filter the database</h2>
+<p>This should be quite straightforward and you should know most of the
+verbs to use. One you may not remember is <code>transmute()</code>,
+which combines <code>mutate()</code> and <code>select()</code>. Also,
+the <em>tidyr</em> <code>drop_na()</code> is quite useful to drop rows
+with at least one NA.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fungal <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;fungal-database.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kingdom <span class="sc">==</span> <span class="st">&quot;Fungi&quot;</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
@@ -1620,27 +1624,32 @@ exercise).</li>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code></pre></div>
 <pre><code>## Warning: One or more parsing issues, see `problems()` for details</code></pre>
 </div>
-<div id="drop-nas-and-tally" class="section level2">
-<h2>Drop NAs and tally</h2>
-<p>Here you want as output a vector of species names to use to select
-species in the <em>fungal</em> table.</p>
+<div id="tally-species-records" class="section level2">
+<h2>Tally species records</h2>
+<p>Here, the best is to get a vector of species names that have at least
+5,000 records.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sp <span class="ot">&lt;-</span> fungal <span class="sc">%&gt;%</span> </span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tally</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;=</span> <span class="dv">5000</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(species)</span></code></pre></div>
+<p>This was quite intuitive; remember to ungroup grouped tables when you
+don’t need groups any more, as this avoids some issues that are quite
+hard to figure out.</p>
 </div>
 <div id="save-tables" class="section level2">
 <h2>Save tables</h2>
-<p>To achieve this, it is easier to create a list with elements the
-table of each species and than iterate over the list to save them. The
-dplyr function <code>group_split()</code> creates a list of tables from
-a grouped tables.</p>
+<p>We want to save one table for each speceis seprartely. The easiest
+thingis to create a list with elements the tables of each species and
+than iterate over the list to save them. The dplyr function
+<code>group_split()</code> creates a list of tables from a grouped
+tables.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tab_list <span class="ot">&lt;-</span> fungal <span class="sc">%&gt;%</span> </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> sp) <span class="sc">%&gt;%</span> </span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code></pre></div>
+<p>To write you can iterate, e.g. using a for loop.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># better to check species names again</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>sp <span class="ot">&lt;-</span> <span class="fu">sapply</span>(tab_list, <span class="cf">function</span>(l) l[[<span class="st">&quot;species&quot;</span>]][<span class="dv">1</span>])</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tab_list) <span class="ot">&lt;-</span> sp</span>
