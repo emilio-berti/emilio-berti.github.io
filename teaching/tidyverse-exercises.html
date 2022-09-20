@@ -1299,6 +1299,15 @@ src: url(data:application/font-sfnt;base64,AAEAAAARAQAABAAQR0RFRgs+Cz8AAjwQAAAAQ
       <li><a href="#add-n-to-tetradensity" id="toc-add-n-to-tetradensity">Add <em>N</em> to
       TetraDENSITY</a></li>
       </ul></li>
+      <li><a href="#fungal-record-database" id="toc-fungal-record-database">Fungal record database</a>
+      <ul>
+      <li><a href="#load-and-filter-the-database" id="toc-load-and-filter-the-database">Load and filter the
+      database</a></li>
+      <li><a href="#drop-nas-and-tally" id="toc-drop-nas-and-tally">Drop
+      NAs and tally</a></li>
+      <li><a href="#save-tables" id="toc-save-tables">Save
+      tables</a></li>
+      </ul></li>
       <li><a href="#marriage-dataset" id="toc-marriage-dataset">Marriage
       dataset</a>
       <ul>
@@ -1353,25 +1362,25 @@ three things:</p>
 ## • `Data set` -&gt; `Data set...36`</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>forage</span></code></pre></div>
 <pre><code>## # A tibble: 2,682 × 46
-##    `Data set...1` Source                 `Predation or …`   Dim `Field?` Habitat
-##             &lt;dbl&gt; &lt;chr&gt;                  &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;  
-##  1              1 Soluk 1993 ECOLOGY     Pred               2.5 &lt;NA&gt;     Aquatic
-##  2              2 Soluk 1993 ECOLOGY     Pred               2.5 &lt;NA&gt;     Aquatic
-##  3              3 Hassanpour et al 2010… Pred               2   &lt;NA&gt;     Terres…
-##  4              4 Hassanpour et al 2010… Pred               2   &lt;NA&gt;     Terres…
-##  5              5 Hassanpour et al 2010… Pred               2   &lt;NA&gt;     Terres…
-##  6              6 Hassanpour et al 2010… Pred               2   &lt;NA&gt;     Terres…
-##  7              7 Parajulee 2006 ENVIRO… Pred               2   &lt;NA&gt;     Terres…
-##  8              8 Parajulee 2006 ENVIRO… Pred               2   &lt;NA&gt;     Terres…
-##  9              9 Enkegaard et al 2001 … Pred               2   &lt;NA&gt;     Terres…
-## 10             10 Sepulveda and Carrill… Pred               2   &lt;NA&gt;     Terres…
-## # … with 2,672 more rows, and 40 more variables:
-## #   `Fresh or marine (fish only)` &lt;chr&gt;, `Predator cellularity` &lt;chr&gt;,
-## #   `Vert/invert...9` &lt;chr&gt;, `Major grouping 1...10` &lt;chr&gt;,
-## #   `Major grouping 2...11` &lt;chr&gt;, `Predator scientific name` &lt;chr&gt;,
-## #   `Predator type` &lt;chr&gt;, `Prey cellularity` &lt;chr&gt;, `Vert/invert...15` &lt;chr&gt;,
+##    Data s…¹ Source Preda…²   Dim Field…³ Habitat Fresh…⁴ Preda…⁵ Vert/…⁶ Major…⁷
+##       &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+##  1        1 Soluk… Pred      2.5 &lt;NA&gt;    Aquatic &lt;NA&gt;    Metazo… Invert… Insect 
+##  2        2 Soluk… Pred      2.5 &lt;NA&gt;    Aquatic &lt;NA&gt;    Metazo… Invert… Insect 
+##  3        3 Hassa… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  4        4 Hassa… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  5        5 Hassa… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  6        6 Hassa… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  7        7 Paraj… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  8        8 Paraj… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+##  9        9 Enkeg… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Insect 
+## 10       10 Sepul… Pred      2   &lt;NA&gt;    Terres… &lt;NA&gt;    Metazo… Invert… Arachn…
+## # … with 2,672 more rows, 36 more variables: `Major grouping 2...11` &lt;chr&gt;,
+## #   `Predator scientific name` &lt;chr&gt;, `Predator type` &lt;chr&gt;,
+## #   `Prey cellularity` &lt;chr&gt;, `Vert/invert...15` &lt;chr&gt;,
 ## #   `Major grouping 1...16` &lt;chr&gt;, `Major grouping 2...17` &lt;chr&gt;, Prey &lt;chr&gt;,
-## #   `Prey scientific name` &lt;chr&gt;, `Prey type` &lt;chr&gt;, `Data type` &lt;chr&gt;, …</code></pre>
+## #   `Prey scientific name` &lt;chr&gt;, `Prey type` &lt;chr&gt;, `Data type` &lt;chr&gt;,
+## #   `Prey replaced?` &lt;chr&gt;, `Hours starved` &lt;chr&gt;, `Temp (C )` &lt;dbl&gt;,
+## #   Interference &lt;chr&gt;, `Pred per arena` &lt;chr&gt;, …</code></pre>
 <p>As a first note, the dataset contains duplicated column names, which
 tidyverse handles by renaming them (<em>New names</em>). This is
 something that should not happend in datasets and there are proper ways
@@ -1573,6 +1582,78 @@ more efficiently:</p>
 ## # … with 18,236 more rows</code></pre>
 </div>
 </div>
+<div id="fungal-record-database" class="section level1">
+<h1>Fungal record database</h1>
+<p>The Danish fungal record database (<a href="https://doi.org/10.15468/zn159h" class="uri">https://doi.org/10.15468/zn159h</a>) contains ca. <span class="math inline">\(10^6\)</span> occurrence records of Fungi
+<em>worldwide</em>, even if most of the data pertains to Danish species.
+The database is hosted on GBIF, hence it is a Darwin Core archive (DwC).
+DwC has a high standard that follow optimal data science practices and
+insures quality control of datasets. Most notably DwC archives are
+already <em>tidy data</em> (one row = one observation) and have already
+been checked for quality and entries issues.</p>
+<p>When you are working with such a high standard as DwC, you will find
+out that tidyverse becomes a more secondary package. It is still useful
+though, especially to subset datasets, modify columns and select them.
+In this exercise, we want to:</p>
+<ol style="list-style-type: decimal">
+<li>Load the fungal record database.</li>
+<li>Retain only observation that pertain to the kingdom
+<em>Fungi</em>.</li>
+<li>Select only species, longitude, and latitude columns as
+<em>species</em>, <em>lon</em>, and <em>lat</em>.</li>
+<li>Drop rows that have at least one NAs, count the number of
+observation per species and drop species that had less than 5,000
+observations (so we don’t need to work with too many species for this
+exercise).</li>
+<li>Save the table for each species separately in a file called
+<em>genus-species.csv</em> in the directory <em>fungal-data/</em>.</li>
+</ol>
+<div id="load-and-filter-the-database" class="section level2">
+<h2>Load and filter the database</h2>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fungal <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;fungal-database.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(kingdom <span class="sc">==</span> <span class="st">&quot;Fungi&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    species,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">lon =</span> decimalLongitude,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">lat =</span> decimalLatitude</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code></pre></div>
+<pre><code>## Warning: One or more parsing issues, see `problems()` for details</code></pre>
+</div>
+<div id="drop-nas-and-tally" class="section level2">
+<h2>Drop NAs and tally</h2>
+<p>Here you want as output a vector of species names to use to select
+species in the <em>fungal</em> table.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sp <span class="ot">&lt;-</span> fungal <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tally</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;=</span> <span class="dv">5000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(species)</span></code></pre></div>
+</div>
+<div id="save-tables" class="section level2">
+<h2>Save tables</h2>
+<p>To achieve this, it is easier to create a list with elements the
+table of each species and than iterate over the list to save them. The
+dplyr function <code>group_split()</code> creates a list of tables from
+a grouped tables.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tab_list <span class="ot">&lt;-</span> fungal <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(species <span class="sc">%in%</span> sp) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># better to check species names again</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>sp <span class="ot">&lt;-</span> <span class="fu">sapply</span>(tab_list, <span class="cf">function</span>(l) l[[<span class="st">&quot;species&quot;</span>]][<span class="dv">1</span>])</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tab_list) <span class="ot">&lt;-</span> sp</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> sp) {</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(tab_list[[x]], <span class="fu">file.path</span>(<span class="st">&quot;fungal-data&quot;</span>, <span class="fu">paste0</span>(x, <span class="st">&quot;.csv&quot;</span>)))</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">&quot;fungal-data/&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Amanita rubescens.csv&quot;     &quot;Bjerkandera adusta.csv&quot;   
+## [3] &quot;Fomes fomentarius.csv&quot;     &quot;Fomitopsis pinicola.csv&quot;  
+## [5] &quot;Hypholoma fasciculare.csv&quot; &quot;Stereum hirsutum.csv&quot;     
+## [7] &quot;Trametes versicolor.csv&quot;</code></pre>
+</div>
+</div>
 <div id="marriage-dataset" class="section level1">
 <h1>Marriage dataset</h1>
 <p>The marriage dataset consists of 86 rows and 13 columns that reports
@@ -1583,23 +1664,23 @@ want to do three things:</p>
 <li>Make the wide table a long one.</li>
 <li>Plot the time series for each country and sex separately.</li>
 </ol>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;marriage.tsv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;marriage.tsv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>## # A tibble: 86 × 13
-##    `indic_de,geo\\time` `2007` `2008` `2009` `2010` `2011` `2012` `2013` `2014`
-##    &lt;chr&gt;                &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; 
-##  1 FAGEMAR1,AM          25.8   25.7   25.5   :      :      :      :      :     
-##  2 FAGEMAR1,AT          29.3   29.5   29.9   :      30.3   30.6   30.7   30.9  
-##  3 FAGEMAR1,AZ          24.5   24.3   24.3   :      :      :      :      24.4  
-##  4 FAGEMAR1,BE          28.6   28.9   29.3   29.4   : b    :      :      :     
-##  5 FAGEMAR1,BG          25.8   25.9   26.2   26.6   26.6   :      26.7   26.9  
-##  6 FAGEMAR1,BY          24.0   24.1   :      :      24.4   24.4   24.7   24.8  
-##  7 FAGEMAR1,CH          29.3   29.6   29.6   29.8   29.9   29.9   30.1   30.1  
-##  8 FAGEMAR1,CZ          27.0   27.2   27.6   27.9   28.1   28.3   28.5   28.7  
-##  9 FAGEMAR1,DE          29.3   29.6   29.8   :      30.2   :      30.5   30.7  
-## 10 FAGEMAR1,DK          31.3   31.4   31.1   31.2   31.4   31.8   31.9   31.9  
-## # … with 76 more rows, and 4 more variables: `2015` &lt;chr&gt;, `2016` &lt;chr&gt;,
-## #   `2017` &lt;chr&gt;, `2018` &lt;chr&gt;</code></pre>
+##    indic…¹ `2007` `2008` `2009` `2010` `2011` `2012` `2013` `2014` `2015` `2016`
+##    &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; 
+##  1 FAGEMA… 25.8   25.7   25.5   :      :      :      :      :      26.8   :     
+##  2 FAGEMA… 29.3   29.5   29.9   :      30.3   30.6   30.7   30.9   31.2   31.3  
+##  3 FAGEMA… 24.5   24.3   24.3   :      :      :      :      24.4   :      :     
+##  4 FAGEMA… 28.6   28.9   29.3   29.4   : b    :      :      :      :      :     
+##  5 FAGEMA… 25.8   25.9   26.2   26.6   26.6   :      26.7   26.9   27.0   27.1  
+##  6 FAGEMA… 24.0   24.1   :      :      24.4   24.4   24.7   24.8   24.8   24.9  
+##  7 FAGEMA… 29.3   29.6   29.6   29.8   29.9   29.9   30.1   30.1   30.2   30.4  
+##  8 FAGEMA… 27.0   27.2   27.6   27.9   28.1   28.3   28.5   28.7   28.8   29.0  
+##  9 FAGEMA… 29.3   29.6   29.8   :      30.2   :      30.5   30.7   30.9   31.1  
+## 10 FAGEMA… 31.3   31.4   31.1   31.2   31.4   31.8   31.9   31.9   31.9   32.2  
+## # … with 76 more rows, 2 more variables: `2017` &lt;chr&gt;, `2018` &lt;chr&gt;, and
+## #   abbreviated variable name ¹​`indic_de,geo\\time`</code></pre>
 <div id="fix-first-column" class="section level2">
 <h2>Fix first column</h2>
 <p>The first thing to notice is that the first column
@@ -1608,12 +1689,12 @@ two features (<em>indic_de</em> and <em>geo</em>) that should be
 separated. Let’s split the string into two strings and create two new
 columns, <em>indic_de</em> and <em>geo</em> with those entries. Let’s
 also drop the original column, which is confusing.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">indic_de =</span> <span class="fu">str_split</span>(<span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>, <span class="st">&quot;,&quot;</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>],</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">geo =</span> <span class="fu">str_split</span>(<span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>, <span class="st">&quot;,&quot;</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">2</span>]</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">indic_de =</span> <span class="fu">str_split</span>(<span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>, <span class="st">&quot;,&quot;</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">1</span>],</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">geo =</span> <span class="fu">str_split</span>(<span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>, <span class="st">&quot;,&quot;</span>, <span class="at">simplify =</span> <span class="cn">TRUE</span>)[, <span class="dv">2</span>]</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">indic_de,geo</span><span class="sc">\\</span><span class="at">time</span><span class="st">`</span>)</span></code></pre></div>
 </div>
 <div id="wide-to-long" class="section level2">
 <h2>Wide to long</h2>
@@ -1621,17 +1702,17 @@ also drop the original column, which is confusing.</p>
 into one column, i.e. we want to make this wide table a long one. We can
 match the relevant columns with the string <em>“20”</em>. As the values
 represent ages, we call the new value column <em>age</em>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">contains</span>(<span class="st">&quot;20&quot;</span>),</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;year&quot;</span>,</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;age&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">contains</span>(<span class="st">&quot;20&quot;</span>),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;year&quot;</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;age&quot;</span>)</span></code></pre></div>
 <p>Also, note that the <em>:</em> is the placeholder for missing values.
 We don’t want this as it will force the column to be a string, while we
 want a numeric value. The easiest way to fix this is to replace
 <em>:</em> with <em>NA</em> and cast the columns as numeric:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">ifelse</span>(age <span class="sc">==</span> <span class="st">&quot;:&quot;</span>, <span class="cn">NA</span>, age)) <span class="sc">%&gt;%</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(year<span class="sc">:</span>age, as.numeric))</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">ifelse</span>(age <span class="sc">==</span> <span class="st">&quot;:&quot;</span>, <span class="cn">NA</span>, age)) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(year<span class="sc">:</span>age, as.numeric))</span></code></pre></div>
 <pre><code>## Warning in mask$eval_all_mutate(quo): NAs introduced by coercion</code></pre>
 <p>This will throw a warning, but it’s safe to ignore it (NAs is what we
 want).</p>
@@ -1642,19 +1723,19 @@ want).</p>
 first letter. First, we want to create a new column <em>sex</em>
 specifying either “male” or “female” and drop <em>indic_de</em>. Use
 <em>stringr::str_starts()</em> to grep on the first letter.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sex =</span> <span class="fu">ifelse</span>(<span class="fu">str_starts</span>(indic_de, <span class="st">&quot;M&quot;</span>), <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>indic_de)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sex =</span> <span class="fu">ifelse</span>(<span class="fu">str_starts</span>(indic_de, <span class="st">&quot;M&quot;</span>), <span class="st">&quot;male&quot;</span>, <span class="st">&quot;female&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>indic_de)</span></code></pre></div>
 <p>and then we can draw the plot we wanted. I use again ggplot2, as it’s
 easy to achieve the goal, but you can use whatever you want.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(year, age, <span class="at">col =</span> geo) <span class="sc">+</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(year, age, <span class="at">group =</span> sex),</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">alpha =</span> .<span class="dv">2</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(sex <span class="sc">~</span> .) <span class="sc">+</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span> </span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(year, age, <span class="at">col =</span> geo) <span class="sc">+</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(year, age, <span class="at">group =</span> sex),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">alpha =</span> .<span class="dv">2</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(sex <span class="sc">~</span> .) <span class="sc">+</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code></pre></div>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <pre><code>## Warning: Removed 258 rows containing non-finite values (stat_smooth).</code></pre>
 <pre><code>## Warning: Removed 85 row(s) containing missing values (geom_path).</code></pre>
