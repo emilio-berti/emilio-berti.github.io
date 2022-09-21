@@ -12,18 +12,16 @@
 
 
  \blocksubtitle{Select columns}
-    \inline{select(df, x, y)} \\ Select columns x and y.
+    \inline{select(df, x, y)} \\ Select columns x and y.\br
+    \inline{select(df, -x)} \\ Select all columns except x.
 
   \blocksubtitle{Filter rows}
     \inline{filter(df, condition)} \\ Retain only rows based on condition.\br
     \inline{filter(df, x > 5)}. \\ Select rows where x $>$ 5.\br
-    \inline{filter(df, x > 5, y < 3)} \\ Select rows where x $>$ 5 \textsc{and} y $<$ 3.
+    \inline{filter(df, x > 5, y < 3)} \\ Select rows where x $>$ 5 \textsc{and} y $<$ 3.\br
     \inline{filter(df, x > 5 | y < 3)} \\ Select rows where x $>$ 5 \textsc{or} y $<$ 3.
 
     
-  \blocksubtitle{Extract columns}
-    \inline{pull(df, x)} \\ Extract column x and return it as a vector.
-  
   \blocksubtitle{Grouping}
     \inline{group_by(df, x)} \\ Group observation by the grouping variable x.\br
     Usually, the grouping variable is categorical, e.g. a string or a factor.
@@ -35,6 +33,9 @@
     \end{column}\hfill
     \begin{column}{.48\linewidth}
     
+    \blocksubtitle{Extract one column}
+    \inline{pull(df, x)} \\ Extract column x and return it as a vector.
+
     \blocksubtitle{Summarize observations}
     \inline{summarize(df, ...)} \\ Create a new table containing the summary statistic ...\br
     \inline{summarize(df, Average = mean(x))}. \\ Summarize all observation to give the average value of x.\br

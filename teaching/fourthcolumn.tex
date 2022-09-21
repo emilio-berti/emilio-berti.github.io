@@ -7,9 +7,10 @@
   \inline{map(x, function)}\\Apply a function to each element of x and return a list.\br
   \inline{map_dbl(x, function)}\\Apply a function to each element of x and return a numeric vector.\br
   \inline{map_chr(x, function)}\\Apply a function to each element of x and return a character vector.\br
+  These two syntaxes are equivalent:\\
   \inline{map(z, round)}\\
-  \inline{map(z, \~round(.x))}\\ Round z (the two are equivalent).\br
-  The function can be passed as a function or as a formula, in which case .x refers to the first input, .y to the second, etc.
+  \inline{map(z, \~round(.x))}\br
+  The function can be passed as a function or as a formula, in which case .x refers to the first input and .y to the second.
 \blocksubtitle{Two inputs}
   \inline{map2(x, y, function)}\\Apply a function to each pair of elements x and y and return a list.\br
   \inline{map2(x, y, ~round(.x, .y))}\\

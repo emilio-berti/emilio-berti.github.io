@@ -3,9 +3,9 @@
 \vspace{2ex}
 
 \begin{block}{tidyr}
-    \inline{pivot_wider(df, names_from = x, values_from = y )} \\ Make a long table a wide one by adding a new column for each value in x with entries the value of y. \br
+    \inline{pivot_wider(df, names_from = x, values_from = y )} \\ Make a long table a wide one by adding a new column for each value in x with entries the values of y. \br
 
-    \inline{pivot_longer(df, cols = ..., names_to = x, values_to = y )} \\ Make a wide table a long one by creating two new column x and y with values the column names select in \textit{cols}. \br
+    \inline{pivot_longer(df, cols = ..., names_to = x, values_to = y )} \\ Make a wide table a long one by creating two new column x, with levels the column names selected in \textit{cols}, and y, with their values. \br
 
     \textit{cols = ...} takes \textit{tidyselect} arguments.\\
 \end{block}

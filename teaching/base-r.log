@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.5.7)  26 JUL 2022 08:27
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.5.7)  21 SEP 2022 09:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1679,27 +1679,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 8--8
 LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <9.45> not available
 (Font)              Font shape `OT1/phv/m/sl' tried instead on input line 8.
 ) (./fourthcolumn.tex
-LaTeX Font Info:    Calculating math sizes for size <5.47> on input line 11.
+LaTeX Font Info:    Calculating math sizes for size <5.47> on input line 12.
 
 
 LaTeX Font Warning: Font shape `OT1/cmss/b/n' undefined
-(Font)              using `OT1/cmss/m/n' instead on input line 11.
+(Font)              using `OT1/cmss/m/n' instead on input line 12.
 
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <5.47> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 11.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 12.
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <3.82898> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 11.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 12.
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <2.735> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 11.
-LaTeX Font Info:    Calculating math sizes for size <9.45> on input line 22.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 12.
+LaTeX Font Info:    Calculating math sizes for size <9.45> on input line 23.
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <9.45> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 22.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 23.
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <6.61496> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 22.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 23.
 LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <4.72499> not available
-(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 22.
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 23.
 
-Underfull \hbox (badness 1418) in paragraph at lines 25--25
+Underfull \hbox (badness 1418) in paragraph at lines 26--26
  []\OT1/phv/m/n/9.45 Both map2 and pmap can re-turn nu-meric vec-tors in-stead 
 of lists 
  []
@@ -1711,23 +1711,23 @@ of lists
 
  (./base-r.vrb
 (./thirdcolumn.tex
-LaTeX Font Info:    Trying to load font information for OML+phv on input line 1
-9.
+LaTeX Font Info:    Trying to load font information for OML+phv on input line 2
+0.
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omlphv.fd
 File: omlphv.fd 
 )
 LaTeX Font Info:    Font shape `OML/phv/b/n' in size <9.45> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 19.
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 20.
 LaTeX Font Info:    Trying to load font information for OMS+phv on input line 2
-1.
+2.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsphv.fd
 File: omsphv.fd 
 )
 LaTeX Font Info:    Font shape `OMS/phv/b/n' in size <9.45> not available
-(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 21.
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 22.
 LaTeX Font Info:    Trying to load font information for TS1+phv on input line 5
-6.
+7.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1phv.fd
 File: ts1phv.fd 2001/06/04 scalable font definitions for TS1/phv.
@@ -1757,7 +1757,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Here is how much of TeX's memory you used:
  25350 strings out of 483172
  477686 string characters out of 5965817
- 1135695 words of memory out of 5000000
+ 1139695 words of memory out of 5000000
  39713 multiletter control sequences out of 15000+600000
  566241 words of font info for 101 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -1771,7 +1771,7 @@ st/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type
 1/urw/helvetic/uhvb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvet
 ic/uhvbo8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.p
 fb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on base-r.pdf (2 pages, 70116 bytes).
+Output written on base-r.pdf (2 pages, 70450 bytes).
 PDF statistics:
  65 PDF objects out of 1000 (max. 8388607)
  45 compressed objects within 1 object stream
