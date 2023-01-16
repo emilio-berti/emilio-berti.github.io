@@ -1,0 +1,24 @@
+header h1 {
+  padding: 30px;
+  text-align: center;
+  background: hsl(120, 40%, 50%);
+  color: #ffffff;
+  font-size: 35px;
+  font-family: Roboto;
+}
+
+header h2 {
+  padding: 5px;
+  text-align: left;
+  /* background: hsl(120, 100%, 80%); */
+  opacity: 1;
+  color: hsl(120, 40%, 50%);
+  font-size: 30px;
+  font-family: Roboto;
+}
+
+body {
+  font-size: 20px;
+  font-family: Roboto;
+  color: hsl(120, 0%, 20%);
+}
