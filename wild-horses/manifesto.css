@@ -22,3 +22,15 @@ body {
   font-family: Roboto;
   color: hsl(120, 0%, 20%);
 }
+
+.email {
+  font-size: 20px;
+  font-family: monospace;
+  color: hsl(120, 0%, 50%);
+}
+
+.phone {
+  font-size: 20px;
+  font-family: monospace;
+  color: hsl(120, 0%, 50%);
+}
