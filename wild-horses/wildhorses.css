@@ -1,10 +1,16 @@
 header h1 {
-  padding: 30px;
+  padding: 100px;
   text-align: center;
-  background: hsl(120, 40%, 50%);
-  color: #ffffff;
+  /* background: hsl(120, 40%, 50%); */
+  background-image: url(banner.png);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 800px;
+  color: white;
+  text-shadow: 0px 0px 2px hsl(120, 40%, 50%), 0px 0px 2px hsl(120, 40%, 50%), 0px 0px 2px hsl(120, 40%, 50%);
   font-size: 35px;
   font-family: Roboto;
+  text-transform: uppercase;
 }
 
 header h2 {
