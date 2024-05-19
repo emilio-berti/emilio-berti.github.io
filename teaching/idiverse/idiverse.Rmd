@@ -1,0 +1,21 @@
+---
+title: "idiVerse"
+author: Emilio Berti
+output: beamer_presentation
+date: "2024-04-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Load the Tidyverse
+
+```{r libraries}
+library(tidyverse)
+```
+
+# Read a csv file
+```{r}
+d <- read_csv("~/emmy-noether/data/delaware/csv")
+```
