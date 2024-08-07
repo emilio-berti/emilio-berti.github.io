@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>5 Vector operations | GIS And Remote Sensing For Ecologists</title>
+<meta name="author" content="Emilio Berti">
+<meta name="generator" content="bookdown 0.40 with bs4_book()">
+<meta property="og:title" content="5 Vector operations | GIS And Remote Sensing For Ecologists">
+<meta property="og:type" content="book">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="5 Vector operations | GIS And Remote Sensing For Ecologists">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><link href="libs/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source%20Code%20Pro&amp;display=swap" rel="stylesheet">
+<script src="libs/bs3compat-0.8.0/transition.js"></script><script src="libs/bs3compat-0.8.0/tabs.js"></script><script src="libs/bs3compat-0.8.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<meta name="description" content='5.1 Loading vectors Load the vector shapefile of EU countries: eu &lt;- vect("data/EU/EU.shp") eu ## class    : SpatVector ## geometry  : polygons ## dimensions : 27, 12 (geometries, attributes) ##...'>
+<meta property="og:description" content='5.1 Loading vectors Load the vector shapefile of EU countries: eu &lt;- vect("data/EU/EU.shp") eu ## class    : SpatVector ## geometry  : polygons ## dimensions : 27, 12 (geometries, attributes) ##...'>
+<meta name="twitter:description" content='5.1 Loading vectors Load the vector shapefile of EU countries: eu &lt;- vect("data/EU/EU.shp") eu ## class    : SpatVector ## geometry  : polygons ## dimensions : 27, 12 (geometries, attributes) ##...'>
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">GIS And Remote Sensing For Ecologists</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html">Preface</a></li>
+<li><a class="" href="a-history-of-gis.html">A history of GIS</a></li>
+<li><a class="" href="projections.html"><span class="header-section-number">1</span> Projections</a></li>
+<li><a class="" href="shapefiles.html"><span class="header-section-number">2</span> Shapefiles</a></li>
+<li><a class="" href="rasters.html"><span class="header-section-number">3</span> Rasters</a></li>
+<li><a class="" href="basic-operations.html"><span class="header-section-number">4</span> Basic Operations</a></li>
+<li><a class="active" href="vector-operations.html"><span class="header-section-number">5</span> Vector operations</a></li>
+<li><a class="" href="mapping.html"><span class="header-section-number">6</span> Mapping</a></li>
+</ul>
+
+        <div class="book-extra">
+          
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="vector-operations" class="section level1" number="5">
+<h1>
+<span class="header-section-number">5</span> Vector operations<a class="anchor" aria-label="anchor" href="#vector-operations"><i class="fas fa-link"></i></a>
+</h1>
+<div id="loading-vectors" class="section level2" number="5.1">
+<h2>
+<span class="header-section-number">5.1</span> Loading vectors<a class="anchor" aria-label="anchor" href="#loading-vectors"><i class="fas fa-link"></i></a>
+</h2>
+<p>Load the vector shapefile of EU countries:</p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">eu</span> <span class="op">&lt;-</span> <span class="fu">vect</span><span class="op">(</span><span class="st">"data/EU/EU.shp"</span><span class="op">)</span></span>
+<span><span class="va">eu</span></span></code></pre></div>
+<pre><code>##  class       : SpatVector 
+##  geometry    : polygons 
+##  dimensions  : 27, 12  (geometries, attributes)
+##  extent      : -10.38743, 34.39352, 34.57181, 70.0864  (xmin, xmax, ymin, ymax)
+##  source      : EU.shp
+##  coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+##  names       : CNTR_ID       CNTR_NAME NAME_ENGL NAME_FREN ISO3_CODE
+##  type        :   &lt;chr&gt;           &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;
+##  values      :      AT      Österreich   Austria  Autriche       AUT
+##                     BE Belgien-Belgiq~   Belgium  Belgique       BEL
+##                     BG        България  Bulgaria  Bulgarie       BGR
+##          SVRG_UN     CAPT EU_STAT EFTA_STAT CC_STAT  NAME_GERM   FID
+##            &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;
+##  UN Member State   Vienna       T         F       F Österreich    AT
+##  UN Member State Brussels       T         F       F    Belgien    BE
+##  UN Member State    Sofia       T         F       F  Bulgarien    BG</code></pre>
+<p>This vector contains the polygons of 27 countries in the European Union (EU).
+Additionally, an attribute table is attached to it, providing information about the country name, the ISO3 code, etc.
+You can see full list of attributes using <code>names(eu)</code>:</p>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##  [1] "CNTR_ID"   "CNTR_NAME" "NAME_ENGL" "NAME_FREN" "ISO3_CODE" "SVRG_UN"  
+##  [7] "CAPT"      "EU_STAT"   "EFTA_STAT" "CC_STAT"   "NAME_GERM" "FID"</code></pre>
+</div>
+<div id="plotting-vectors" class="section level2" number="5.2">
+<h2>
+<span class="header-section-number">5.2</span> Plotting vectors<a class="anchor" aria-label="anchor" href="#plotting-vectors"><i class="fas fa-link"></i></a>
+</h2>
+<p>Let’s put it on a map:</p>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">eu</span>, col <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span></span>
+<span><span class="fu">north</span><span class="op">(</span><span class="op">)</span> <span class="co">#show the North</span></span>
+<span><span class="fu">sbar</span><span class="op">(</span><span class="fl">1e3</span>, type <span class="op">=</span> <span class="st">"bar"</span>, divs <span class="op">=</span> <span class="fl">4</span>, below <span class="op">=</span> <span class="st">"kilometers"</span>, xy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="co">#show a scale bar</span></span></code></pre></div>
+<div class="inline-figure"><img src="_main_files/figure-html/unnamed-chunk-22-1.png" width="672"></div>
+<p>If you are familiar with maps, you may recognize that this is a longitude-latitude projection: the axes represent arc-degrees.
+To be sure, we check the CRS of the vector:</p>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">crs</span><span class="op">(</span><span class="va">eu</span>, proj <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] "+proj=longlat +datum=WGS84 +no_defs"</code></pre>
+<p>As expected, this is a <em>longlat</em> CRS.
+The argument <code>proj = TRUE</code> specifies that we want a PROJ-string output.
+This is more readable than the standard output of <code>terra</code>:</p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">crs</span><span class="op">(</span><span class="va">eu</span>, proj <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] "GEOGCRS[\"WGS 84\",\n    DATUM[\"World Geodetic System 1984\",\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n            LENGTHUNIT[\"metre\",1]]],\n    PRIMEM[\"Greenwich\",0,\n        ANGLEUNIT[\"degree\",0.0174532925199433]],\n    CS[ellipsoidal,2],\n        AXIS[\"geodetic latitude (Lat)\",north,\n            ORDER[1],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        AXIS[\"geodetic longitude (Lon)\",east,\n            ORDER[2],\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n    ID[\"EPSG\",4326]]"</code></pre>
+<p>For some cases, for instance calculating areas of polygons, <em>longlat</em> CRS are recommended.</p>
+</div>
+<div id="area-extent" class="section level2" number="5.3">
+<h2>
+<span class="header-section-number">5.3</span> Area extent<a class="anchor" aria-label="anchor" href="#area-extent"><i class="fas fa-link"></i></a>
+</h2>
+<p>In <code>terra</code>, the function <code>expanse()</code> calculate areas.
+If you read the documentation, it also specified that longlat CRS is the most accurate to calculate areas.
+Let’s calcualte the area of each country and add it to the attribute table of the vector:</p>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu">expanse</span><span class="op">(</span><span class="va">eu</span>, unit <span class="op">=</span> <span class="st">"km"</span><span class="op">)</span></span>
+<span><span class="va">eu</span><span class="op">$</span><span class="va">area</span> <span class="op">&lt;-</span> <span class="va">A</span></span>
+<span><span class="va">eu</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CNTR_NAME"</span>, <span class="st">"area"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+<pre><code>##  class       : SpatVector 
+##  geometry    : polygons 
+##  dimensions  : 27, 2  (geometries, attributes)
+##  extent      : -10.38743, 34.39352, 34.57181, 70.0864  (xmin, xmax, ymin, ymax)
+##  source      : EU.shp
+##  coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+##  names       :               CNTR_NAME      area
+##  type        :                   &lt;chr&gt;     &lt;num&gt;
+##  values      :              Österreich 8.386e+04
+##                Belgien-Belgique-België  3.07e+04
+##                               България 1.111e+05</code></pre>
+<p>We can now make a map with polygons filled with colors representing the county area:</p>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># a gradient palette with number of colors = countries</span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/colorRamp.html">colorRampPalette</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"grey80"</span>, <span class="st">"tomato3"</span>, <span class="st">"tomato"</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span><span class="op">(</span><span class="va">pal</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">eu</span><span class="op">$</span><span class="va">area</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="co">#arrange colors</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">eu</span>, col <span class="op">=</span> <span class="va">pal</span><span class="op">)</span> <span class="co">#adding a legend to vector maps is not easy and will leave it for another chapter.</span></span>
+<span><span class="fu">north</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">sbar</span><span class="op">(</span><span class="fl">1e3</span>, type <span class="op">=</span> <span class="st">"bar"</span>, divs <span class="op">=</span> <span class="fl">4</span>, below <span class="op">=</span> <span class="st">"kilometers"</span>, xy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<div class="inline-figure"><img src="_main_files/figure-html/unnamed-chunk-25-1.png" width="672"></div>
+</div>
+<div id="buffers-and-neighbours-of-a-polygon" class="section level2" number="5.4">
+<h2>
+<span class="header-section-number">5.4</span> Buffers and neighbours of a polygon<a class="anchor" aria-label="anchor" href="#buffers-and-neighbours-of-a-polygon"><i class="fas fa-link"></i></a>
+</h2>
+<p>Our shapefile is a good shapefile, meaning that the people who created it took care that the boundaries of countries did not overlap.
+Indeed, this would be a reason for tension between countries.
+However, we can still trick our way to obtain the neighbors of countries.
+Imagine to enlarge the countries, i.e. to expand their borders by a small amount, let’s say 1km.
+This opearation is called buffering:</p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">buffer</span><span class="op">(</span><span class="va">eu</span>, <span class="fl">1e5</span><span class="op">)</span> <span class="co">#100km for visualizing it</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">eu</span>, col <span class="op">=</span> <span class="st">"dodgerblue"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span></code></pre></div>
+<div class="inline-figure"><img src="_main_files/figure-html/unnamed-chunk-26-1.png" width="672"></div>
+<p>If done on one country only, then this will overlap with its adjacent neighbors (and with non-adjacent ones if they are closer than 1km).
+We can use this together with <code><a href="https://rspatial.github.io/terra/reference/intersect.html">terra::intersect()</a></code> to get its neighbors:</p>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">neigh_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">neigh_area</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">neigh_name</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">eu</span><span class="op">$</span><span class="va">CNTR_NAME</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">neigh_area</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">eu</span><span class="op">$</span><span class="va">CNTR_NAME</span></span>
+<span></span>
+<span><span class="co"># iterate over countries</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu">buffer</span><span class="op">(</span><span class="va">eu</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fl">1e3</span><span class="op">)</span></span>
+<span>  <span class="va">ans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html">intersect</a></span><span class="op">(</span><span class="va">eu</span><span class="op">[</span><span class="op">-</span><span class="va">i</span><span class="op">]</span>, <span class="va">b</span><span class="op">)</span></span>
+<span>  <span class="va">neigh_name</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">ans</span><span class="op">$</span><span class="va">CNTR_NAME</span></span>
+<span>  <span class="va">neigh_area</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">ans</span><span class="op">$</span><span class="va">area</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<pre><code>## Warning: [intersect] no intersection
+## Warning: [intersect] no intersection
+## Warning: [intersect] no intersection</code></pre>
+<p>Some warning are thrown telling use that some countries do not have neighbors:</p>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">neigh_name</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="va">neigh_name</span>, <span class="va">length</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">]</span></span></code></pre></div>
+<pre><code>## [1] "Κύπρος-Kıbrıs" "Ireland-Éire"  "Malta-Malta"</code></pre>
+<p>These are all islands (Cyprus, Ireland, and Malta), so that is correct.</p>
+<p>Importantly, <code>terra</code> has a special function to get adjanceny polygons, called (surprisingly) <code>adjacent()</code>.
+This is the funciton you should normally use; the approach used above is for teaching purposes.
+However, note that, in this case, the two approach give the same results:</p>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">adj</span> <span class="op">&lt;-</span> <span class="fu">adjacent</span><span class="op">(</span><span class="va">eu</span><span class="op">)</span></span>
+<span><span class="va">neigh_name_correct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">eu</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">neigh_name_correct</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">eu</span><span class="op">$</span><span class="va">CNTR_NAME</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">neigh_name_correct</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">neigh_name_correct</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">eu</span><span class="op">$</span><span class="va">CNTR_NAME</span><span class="op">[</span><span class="va">adj</span><span class="op">[</span><span class="va">adj</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">==</span> <span class="va">i</span>, <span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">compare</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<span>  buffering <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">neigh_name</span><span class="op">)</span>,</span>
+<span>  correct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">neigh_name_correct</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/any.html">any</a></span><span class="op">(</span><span class="va">compare</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">!=</span> <span class="va">compare</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">compare</span><span class="op">)</span></span></code></pre></div>
+<pre><code>##                   buffering         correct
+## Österreich1 Česká Republika Česká Republika
+## Österreich2     Deutschland     Deutschland
+## Österreich3    Magyarország    Magyarország
+## Österreich4          Italia          Italia
+## Österreich5       Slovinsko       Slovinsko
+## Österreich6       Slovensko       Slovensko</code></pre>
+<p>The reason they are identical is because there is no country close 1km or less to another and that is also not an adjacent neighbor.</p>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="basic-operations.html"><span class="header-section-number">4</span> Basic Operations</a></div>
+<div class="next"><a href="mapping.html"><span class="header-section-number">6</span> Mapping</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#vector-operations"><span class="header-section-number">5</span> Vector operations</a></li>
+<li><a class="nav-link" href="#loading-vectors"><span class="header-section-number">5.1</span> Loading vectors</a></li>
+<li><a class="nav-link" href="#plotting-vectors"><span class="header-section-number">5.2</span> Plotting vectors</a></li>
+<li><a class="nav-link" href="#area-extent"><span class="header-section-number">5.3</span> Area extent</a></li>
+<li><a class="nav-link" href="#buffers-and-neighbours-of-a-polygon"><span class="header-section-number">5.4</span> Buffers and neighbours of a polygon</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>GIS And Remote Sensing For Ecologists</strong>" was written by Emilio Berti. It was last built on 2024-08-07.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>
