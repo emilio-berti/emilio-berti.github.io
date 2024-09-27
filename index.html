@@ -9,7 +9,7 @@
 
  	  <h1>Emilio Berti homepage</h1><br>
 
-  	<div class="container">
+   	<div class="container">
   		<!-- about me -->
   		<div class="panel about">
   			<a target="_self" href = "About_me.html" target = "_blank">About me
@@ -19,26 +19,91 @@
 			<!-- cv -->
 			<div class="panel cv">
 				<a target="_self" href = "CV.html" target = "_blank">CV
-					<img src="Figures/chiusdino.jpg" height=400px alt="">
+					<img src="Figures/higuchi.jpg" height=400px alt="">
 				</a>
 			</div>
 
 			<!-- teaching -->
 			<div class="panel teaching">
 				<a target="_self" href = "Teaching.html" target = "_blank">Teaching
-					<img src="Figures/chiusdino.jpg" height=400px alt="">
+					<img src="Figures/humbold.jpg" height=400px alt="">
 				</a>
 			</div>
+
+			<div class="panel skip">
+		 		 <div class="index-section">
+		 		 	<b>Skip to</b><br>
+				  <ul>
+				    <li><a href="#publications">Publications</a></li>
+				    <li><a href="#conferences">Conferences</a></li>
+				    <li><a href="#packages">R packages</a></li>
+				    <li><a href="#contact">Contact</a></li>
+				  </ul>
+				</div>
+			</div>
+
   	</div>
 
-  	<br>
   	<!-- publications -->
-  	<h2>Publications</h2>
-		<div class="full-width-panel", style="margin: 0 20px 0 50px;">
+  	<h2 id="publications">Publications</h2>
+		<div class="full-width-panel" style="margin: 0 10px 0 10px; height: 600px; overflow: auto">
 			<iframe src="Publications.html"></iframe>
 		</div>
 
+		<!-- conferences -->
+  	<h2 id="conferences">Conferences</h2>
+		<div class="full-width-panel" style="margin: 0 10px 0 10px; height: 600px; overflow: auto">
+			<iframe src="Conferences.html" height="100px"></iframe>
+		</div>
+
+  	<!-- packages -->
+  	<h2>R packages</h2>
+  		<div class="packages" id="packages">
+        <!-- enerscape -->
+        <div class="panel first">
+          <h2 class="package-title">enerscape</h2>
+          <p class="package-description">Compute energy landscapes using a digital elevation model raster and body mass of animals.</p>  
+          <a href="https://cran.r-project.org/src/contrib/enerscape_1.1.0.tar.gz" class="download-link">
+            <button class="download-button">Download from CRAN</button>
+          </a>
+          <a target="_blank" href="https://github.com/emilio-berti/enerscape" class="github-link">
+            <button class="github-button">View on GitHub</button>
+          </a>
+        </div>
+
+        <!-- atnr -->
+        <div class="panel second">
+          <h2 class="package-title">ATNr</h2>
+          <p class="package-description">Estimate the temporal dynamics of species biomasses in food webs.</p>  
+          <a href="https://cran.r-project.org/src/contrib/ATNr_1.1.0.tar.gz" class="download-link">
+            <button class="download-button">Download from CRAN</button>
+          </a>
+          <a target="_blank" href="https://github.com/gauzens/ATNr" class="github-link">
+            <button class="github-button">View on GitHub</button>
+          </a>
+        </div>
+
+        <!-- xsdm -->
+        <div class="panel third">
+          <h2 class="package-title">xsdm</h2>
+          <p class="package-description">xsdm is a species distribution model that incorporate theory from stochastic demography in order to account for the effects of inter-annual climatic variability.</p>  
+          <a target="_blank" href="https://github.com/emilio-berti/xsdm" class="github-link">
+            <button class="github-button">View on GitHub</button>
+          </a>
+        </div>
+
+        <!-- assembly -->
+        <div class="panel fourth">
+          <h2 class="package-title">assembly</h2>
+          <p class="package-description">Simulate community assembly using three procedures: random, resource filtering, and limiting similarity filtering.</p>  
+          <a target="_blank" href="https://github.com/emilio-berti/assembly" class="github-link">
+            <button class="github-button">View on GitHub</button>
+          </a>
+        </div>
+    </div>
+
 		<!-- contacts -->
+		<h2 id = "contact">Contact</h2>
 		<div class="contact-container">
 				<div class="address">
 					Emilio Berti<br>
@@ -52,10 +117,9 @@
 				</div>
 		</div>
 
-		<a target="_self" href = "Work.html" target = "_blank"> Work </p>
 		<!-- <a target="_self" href = "Teaching.html" target = "_blank"> Teaching </a><br> -->
-		<a target="_self" href = "FAQs.html" target = "_blank"> FAQs </p>
-		<a target="_self" href = "Side_projects.html"> Side projects </p>
+		<!-- <a target="_self" href = "FAQs.html" target = "_blank"> FAQs </p> -->
+		<!-- <a target="_self" href = "Side_projects.html"> Side projects </p> -->
 		<!-- <a target="_self" href = "calvana.html"> Camera trapping in Calvana </p> -->
 		<!-- <a target="_self" href = "wild-horses/wildhorses.html"> Wild Horses Network </p> -->
 		<!-- <a target="_self" href = "animations.html"> Animations </p> -->
