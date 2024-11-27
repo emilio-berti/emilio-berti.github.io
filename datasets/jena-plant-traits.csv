@@ -1,0 +1,83 @@
+block,plot,S,species,gr,repl,history,n_leaves,height_m...9,height_m...10,Height_max_m,leaf_area_cm2,leaf_dry_mass_g,SLA
+1,B1A02,8,Festuca rubra,Grasses,1,new,5,0.15,0.39,0.39,2.9,0.03,107.4
+1,B1A02,8,Festuca rubra,Grasses,2,new,9,0.11,0.325,0.325,2.74,0.03,105.4
+1,B1A02,8,Festuca rubra,Grasses,3,new,9,0.16,0.345,0.345,3.48,0.05,74
+1,B1A02,8,Festuca rubra,Grasses,4,new,7,0.195,0.46,0.46,4.37,0.04,112.1
+1,B1A03,8,Primula veris,Small herbs,1,new,8,0.09,0.23,0.23,82.77,0.81,101.7
+1,B1A03,8,Primula veris,Small herbs,2,new,6,0.1,0.2,0.2,78.49,0.75,105.4
+1,B1A03,8,Primula veris,Small herbs,3,new,4,0.09,0.19,0.19,36.5,0.36,102.8
+1,B1A03,8,Primula veris,Small herbs,4,new,2,0.095,0.195,0.195,15.78,0.11,144.8
+1,B1A03,8,Primula veris,Small herbs,1,old,8,0.16,0.28,0.28,135.15,1.51,89.3
+1,B1A03,8,Primula veris,Small herbs,2,old,8,0.09,0.21,0.21,87.52,0.76,114.6
+1,B1A03,8,Primula veris,Small herbs,3,old,5,0.12,0.23,0.23,84.21,0.87,97
+1,B1A07,2,Ranunculus acris,Tall herbs,1,new,4,0.065,0.37,0.37,10.98,0.08,146.4
+1,B1A07,2,Ranunculus acris,Tall herbs,2,new,4,0.095,0.43,0.43,10.87,0.07,164.7
+1,B1A07,2,Ranunculus acris,Tall herbs,3,new,3,0.1,0.33,0.33,8.82,0.05,166.4
+1,B1A07,2,Ranunculus acris,Tall herbs,4,new,2,0.03,0.395,0.395,8.24,0.05,168.2
+1,B1A07,2,Ranunculus acris,Tall herbs,1,old,5,0.075,0.505,0.505,32.45,0.23,144.2
+1,B1A07,2,Ranunculus acris,Tall herbs,2,old,3,0.11,0.46,0.46,21.56,0.15,144.7
+1,B1A07,2,Ranunculus acris,Tall herbs,3,old,3,0.065,0.43,0.43,17.12,0.14,125.9
+1,B1A07,2,Ranunculus acris,Tall herbs,4,old,4,0.09,0.49,0.49,17.81,0.13,142.5
+1,B1A15,1,Crepis biennis,Tall herbs,1,new,9,0.125,0.255,0.255,86.37,0.52,165.1
+1,B1A15,1,Crepis biennis,Tall herbs,2,new,9,0.09,0.35,0.35,77.49,0.51,152.8
+1,B1A15,1,Crepis biennis,Tall herbs,3,new,9,0.13,0.43,0.43,165.35,1.06,155.8
+1,B1A15,1,Crepis biennis,Tall herbs,4,new,7,0.17,0.61,0.61,100.96,0.73,139.1
+1,B1A15,1,Crepis biennis,Tall herbs,1,old,9,0.095,0.33,0.33,98.71,0.51,193.5
+1,B1A15,1,Crepis biennis,Tall herbs,2,old,9,0.125,0.4,0.4,100.8,0.14,245.85
+1,B1A15,1,Crepis biennis,Tall herbs,3,old,6,0.07,0.315,0.315,25.19,0.66,38.3
+1,B1A15,1,Crepis biennis,Tall herbs,4,old,8,0.135,0.16,0.16,96.11,0.71,134.6
+1,B1A16,2,Poa pratensis,Grasses,1,new,6,0.11,0.335,0.335,2.37,0.04,64.1
+1,B1A16,2,Poa pratensis,Grasses,2,new,4,0.085,0.31,0.31,1.5,0.01,166.7
+1,B1A16,2,Poa pratensis,Grasses,3,new,6,0.18,0.465,0.465,3.93,0.07,55.4
+1,B1A16,2,Poa pratensis,Grasses,4,new,6,0.305,0.445,0.445,3.76,0.06,62.7
+1,B1A21,4,Crepis biennis,Tall herbs,1,new,8,0.125,0.9,0.9,129.4,0.98,131.6
+1,B1A21,4,Crepis biennis,Tall herbs,2,new,6,0.12,0.65,0.65,62,0.49,127
+1,B1A21,4,Crepis biennis,Tall herbs,3,new,3,0.07,0.65,0.65,20.37,0.11,190.4
+2,B2A09,4,Primula veris,Small herbs,1,new,5,0.11,0.26,0.26,65.72,0.67,98.2
+2,B2A09,4,Primula veris,Small herbs,2,new,8,0.115,0.26,0.26,106.41,0.95,112.4
+2,B2A09,4,Primula veris,Small herbs,3,new,5,0.14,0.28,0.28,76.2,0.75,101.5
+2,B2A09,4,Primula veris,Small herbs,1,old,4,0.115,0.2,0.2,73.21,0.47,155.4
+2,B2A09,4,Primula veris,Small herbs,2,old,7,0.115,0.19,0.19,100.04,0.74,135.2
+2,B2A09,4,Primula veris,Small herbs,3,old,5,0.09,0.22,0.22,65.68,0.48,136.3
+2,B2A09,4,Primula veris,Small herbs,4,old,4,0.11,0.16,0.16,51.21,0.47,109.2
+2,B2A20,2,Plantago lanceolata,Small herbs,4,new,11,0.13,0.19,0.19,88.76,0.79,112.5
+2,B2A21,8,Plantago media,Small herbs,1,new,3,0.09,0.27,0.27,20.71,0.14,153.4
+2,B2A21,8,Plantago media,Small herbs,2,new,5,0.045,0.195,0.195,33.66,0.33,102.6
+2,B2A21,8,Plantago media,Small herbs,1,old,4,0.065,0.27,0.27,48.29,0.42,116.4
+3,B3A04,8,Dactylis glomerata,Grasses,1,old,10,0.52,0.56,0.56,73.63,0.41,177.9
+3,B3A04,8,Dactylis glomerata,Grasses,2,old,8,0.37,0.38,0.38,27.05,0.12,225.4
+3,B3A04,8,Dactylis glomerata,Grasses,3,old,7,0.535,0.55,0.55,24.47,0.16,152
+3,B3A04,8,Dactylis glomerata,Grasses,4,old,9,0.46,0.45,0.46,44.64,0.24,190
+3,B3A08,2,Dactylis glomerata,Grasses,1,old,4,0.28,0.275,0.28,6.87,0.06,114.5
+3,B3A08,2,Dactylis glomerata,Grasses,3,old,5,0.44,0.415,0.44,23.28,0.13,180.5
+3,B3A08,2,Festuca pratensis,Grasses,1,old,4,0.52,0.57,0.57,23.34,0.2,115.5
+3,B3A08,2,Festuca pratensis,Grasses,3,old,5,0.47,0.59,0.59,23.21,0.21,110
+3,B3A08,2,Festuca pratensis,Grasses,4,old,6,0.66,0.65,0.66,19.32,0.2,98.6
+3,B3A11,4,Bromus erectus,Grasses,1,new,6,0.42,0.6,0.6,7.99,0.09,87.8
+3,B3A11,4,Bromus erectus,Grasses,2,new,7,0.43,0.62,0.62,10.56,0.1,103.5
+3,B3A11,4,Bromus erectus,Grasses,3,new,9,0.58,0.75,0.75,10,0.11,91.7
+3,B3A11,4,Bromus erectus,Grasses,4,new,5,0.34,0.465,0.465,4.59,0.06,71.7
+3,B3A11,4,Bromus erectus,Grasses,1,old,6,0.6,0.8,0.8,7.84,0.1,81.7
+3,B3A11,4,Bromus erectus,Grasses,2,old,7,0.525,0.715,0.715,10.2,0.1,99
+3,B3A11,4,Bromus erectus,Grasses,3,old,4,0.38,0.57,0.57,4.19,0.04,95.2
+3,B3A11,4,Bromus erectus,Grasses,4,old,6,0.64,0.85,0.85,15.25,0.14,106.6
+3,B3A19,2,Taraxacum officinale,Tall herbs,1,new,6,0.15,0.32,0.32,79.66,0.4,201.2
+3,B3A19,2,Taraxacum officinale,Tall herbs,2,new,5,0.11,0.22,0.22,65.31,0.29,228.4
+3,B3A19,2,Taraxacum officinale,Tall herbs,4,new,6,0.2,0.32,0.33,120.78,0.72,166.8
+3,B3A19,2,Taraxacum officinale,Tall herbs,2,old,3,0.085,0.2,0.2,26.44,0.17,154.6
+3,B3A19,2,Taraxacum officinale,Tall herbs,3,old,3,0.12,0.16,0.16,28.92,0.18,158
+3,B3A19,2,Taraxacum officinale,Tall herbs,4,old,6,0.075,0.125,0.125,20.43,0.1,198.3
+3,B3A21,2,Trifolium pratense,Legumes,3,new,14,0.19,0.19,0.19,37.07,0.24,153.8
+3,B3A21,2,Lotus corniculatus,Legumes,1,old,18,0.13,0.15,0.15,4.99,0.04,142.6
+3,B3A21,2,Lotus corniculatus,Legumes,2,old,28,0.32,0.33,0.33,19.32,0.06,333.1
+3,B3A21,2,Lotus corniculatus,Legumes,3,old,20,0.28,0.31,0.31,10.78,0.05,203.4
+4,B4A08,8,Plantago lanceolata,Small herbs,1,new,4,0.11,0.16,0.16,15.24,0.14,108.9
+4,B4A08,8,Plantago lanceolata,Small herbs,4,new,3,0.14,0.28,0.28,15.29,0.14,106.9
+4,B4A08,8,Taraxacum officinale,Tall herbs,3,new,3,0.08,0.18,0.18,15.54,0.09,180.7
+4,B4A08,8,Plantago lanceolata,Small herbs,2,old,3,0.15,0.335,0.335,21.38,0.21,104.3
+4,B4A08,8,Taraxacum officinale,Tall herbs,3,old,5,0.15,0.33,0.33,55.73,0.33,168.4
+4,B4A08,8,Taraxacum officinale,Tall herbs,4,old,5,0.17,0.25,0.25,69.55,0.4,173.4
+4,B4A09,1,Trifolium repens,Legumes,2,new,6,0.16,0.17,0.17,12.68,0.07,186.5
+4,B4A09,1,Trifolium repens,Legumes,3,new,6,0.16,0.19,0.19,10.02,0.05,189.1
+4,B4A09,1,Trifolium repens,Legumes,4,new,6,0.15,0.18,0.18,12.89,0.08,171.9
+4,B4A09,1,Trifolium repens,Legumes,1,old,6,0.12,0.12,0.12,9.53,0.05,179.8
