@@ -3,31 +3,59 @@
 	<head>
 		<title>Emilio Berti Homepage</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link rel="stylesheet" href=index.css>
+		<link rel="stylesheet" href=readthedown.css>
 	</head>
+
 	<body>
-		<h2> Courses </h2>
-	    <p><a href="#gis">GIS and remote sensing for ecologists</a></p>
-	    <p><a href="#tidyverse">Tidyverse</a></p>
-	    <p><a href="#tidyverse-cheat">Tidyverse cheatsheet</a></p>
+		<div class="sidebar">
+		<h2>Contents </h2>
+		<ul>
+			<li><a href="#statistics"> Statistics</a></li>
+			<li>
+				<ul>
+					<li><a href="#multivariate">Multivariate analysis</a></li>
+				</ul>
+			</li>
+			<li><a href="#gis">Geographic Information Systems (GIS)</a></li>
+			<li>
+				<ul>
+					<li><a href="#gis-ecologists">GIS and remote sensing for ecologists</a></li>
+				</ul>
+			</li>
+			<li><a href="#programming">Programming</a></li>
+			<li>
+				<ul>
+					<li><a href="#tidyverse">Tidyverse</a></li>
+					<li><a href="#tidyverse-cheat">Tidyverse cheatsheet</a></li>
+				</ul>
+			</li>
+		</ul>
+		</div>
 
+		<div class="content">
 
-		<h2 id="gis"> GIS and remote sensing for ecologists </h2>
-		<embed src="teaching/gis-course.pdf" type="application/pdf" width="60%" height="1000px" />
+		<h2 id="statistics"> Statistics </h2>
+			<h3 id="multivariate"> Multivariate analysis </h3>
+			<ul>
+				<li><a href = "teaching/statistics/multivariate.html" target = "_blank">Lecture</a></li>
+				<li><a href = "teaching/statistics/multivariate-example.html" target = "_blank">Example</a></li>
+			  <li><a href = "teaching/statistics/multivariate-exercise.html" target = "_blank">Exercises</a></li>
+			</ul>
 		</br>
 
-		<h2 id="tidyverse"> Tidyverse @ yDiv</h2>
-		Slidy HTML version:
-		<a href = "teaching/tidyverse.html" target = "_blank"> Tidyverse slides @ yDiv </a>
+		<h2 id="gis"> Geographic Information Systems (GIS) </h2>
+			<h3 id="gis-ecologists"> GIS and remote sensing for ecologists </h3>
+				<embed src="teaching/gis-course.pdf" type="application/pdf" width="60%" height="1000px" />
 		</br>
-		<p>Beamer PDF version:</p>
-    	<embed src="teaching/tidyverse.pdf" type="application/pdf" width="40%" height="450px" />
-		</br>
-		<h3> Exercises </h3>
-		<a href = "teaching/tidyverse-exercises.html" target = "_blank"> Tidyverse exercises </a>
-
-    	<h2 id="tidyverse-cheatsheet"> Tidyverse cheat-sheet </h2>
-    	<embed src="teaching/tidyverse-cheatsheet.pdf" type="application/pdf" width="40%" height="450px" />
-    	
+		
+	  <h2 id="programming"> Programming </h2>
+	    <h3 id="tidyverse"> Tidyverse </h3>
+	    	<ul>
+	    		<li><a href = "teaching/tidyverse.html" target = "_blank">Lecture</a></li>
+	    		<li><a href = "teaching/tidyverse-exercises.html" target = "_blank">Exercises</a></li>
+	    	</ul>
+    	<h3 id="tidyverse-cheat">Tidyverse cheat-sheet</h3>
+    		<embed src="teaching/tidyverse-cheatsheet.pdf" type="application/pdf" width="40%" height="450px" />
+    </div>  	
 	</body>
 </html>
