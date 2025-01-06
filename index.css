@@ -263,6 +263,7 @@ iframe {
 }
 
 .download-link,
+.paper-link,
 .github-link {
   text-decoration: none;
   margin-bottom: 10px;
@@ -296,6 +297,20 @@ iframe {
 
 .github-button:hover {
   background-color: #333;
+}
+
+.paper-button {
+  background-color: #861a13;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.paper-button:hover {
+  background-color: #2980b9;
 }
 
 /* index */
