@@ -1,0 +1,168 @@
+---
+title: "GIS course @ yDiv"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    theme: united
+    highlight: tango
+    smart: true
+    fig_width: 4
+    fig_height: 4
+    fig_caption: true
+    df_print: paged
+    code_folding: show
+---
+
+# Introduction {.tabset}
+
+## Lecturers {.tabset}
+
+### Emilio Berti (TiBS)
+![](figures/emilio.png)
+
+ - Theory in Biodiversity Science
+ - Macroecologist / biogeographer
+ - Theoretical ecologists
+
+
+
+### Guilherme Pinto (BioEcon)
+
+## Program {.tabset}
+
+### What we will cover
+
+  - Two days course
+  - First day: get to know geometries and rasters
+  - Second day: GIS operations + individual/group project
+
+### What to expect
+
+  - Familiarize yourself with basic GIS data and operations
+  - Start a project of your interest
+  - Getting some simple figures/analyses started
+
+### What not to expect
+
+  - To become a world-leading GIS expert
+
+## Set up
+
+  - R installed
+  - `terra` installed
+  - `codetools` installed (optional)
+
+```{r setup}
+library(terra)
+```
+
+# GIS Data Types {.tabset}
+
+## Geometries {.tabset}
+
+### Overview
+Structures such as a street or a building can be represented by a geometric objects.
+For instance, a street can be represented by a straight line, whereas a building by a polygon.
+It makes sense to store the data of these type of structures as their geometric representation.
+For example, the building we are in and the adjacent street:
+
+```{r idiv-building, class.source="fold-hide", fig.align='center'}
+# This code in incomprehensible for you FOR NOW
+# Just an example of geometries
+r <- rast("data/idiv-building.tif")
+plotRGB(r)
+l <- vect(
+  rbind(
+    c(12.39585, 51.31866),
+    c(12.39846, 51.31722)
+  ),
+  crs = "EPSG:4326"
+)
+lines(l, col = "green", lw = 5)
+p <- vect(
+  rbind(
+    c(12.39573, 51.31794),
+    c(12.39645, 51.31765),
+    c(12.39664, 51.31812),
+    c(12.39602, 51.31849),
+    c(12.39573, 51.31794)
+  ),
+  crs = "EPSG:4326"
+) |>
+  as.lines() |>
+  as.polygons()
+p$name <- "iDiv building"
+p$perimeter <- perim(p)
+p$area <- expanse(p)
+plot(p, add = TRUE, col = adjustcolor("blue", alpha.f = .5))
+```
+
+Geometries are saved in _vector_ or _shape_ files.
+In addition to the geometric representation of the structure, 
+shapefiles also contain metadata for the geometric representation, 
+such as the its extent and coordinate reference system (we will talk about this later),
+and for the structure, such as their name, length, etc.
+For instance, the geometry of the iDiv building above is:
+```{r example-geometry, class.source="fold-hide", }
+p
+```
+
+Note that this structure has one geometry and three attributes/variables (`dimensions : 1, 3 (geometries, attributes)`): `name`, `perimeter` ($m$), and `area` ($m^2$).
+
+### Geometry Types
+
+In `terra`, there are three main geometry types:
+
+  1. Points: they are defined by a vector with two values for coordinates (e.g., longitude and latitude)
+  2. Lines: they are a series of points connected pairwise by straight lines
+  3. Polygons: they are a series of lines inscribing a closed area
+
+In `terra`, geometries are created with the function `vect()`.
+To create a point geometry, you need to pass a matrix with the coordinates:
+```{r create-point}
+xy <- cbind(12.39585, 51.31866)  # cbind force it to be a matrix
+vect(xy)
+```
+To create a geometry of multiple points, simply pass a matrix that has multiple rows:
+```{r create-points}
+xy <- rbind(
+  cbind(12.39585, 51.31866),
+  cbind(12.39584, 51.31865)
+)
+poi <- vect(xy)
+```
+
+In order to create lines, first create a multi-point geometry, then convert it using `as.lines()`:
+```{r create-lines}
+xy <- rbind(
+  cbind(12.39585, 51.31866),
+  cbind(12.39584, 51.31865)
+)
+lin <- vect(xy) |> as.lines()
+```
+
+In order to create polygons, first create a mutli-point geometry, then covert it to lines, and finally to polygons using `as.polygons()`.
+The last point should be the same as the first to close the geometry.
+
+```{r create-polygons}
+xy <- rbind(
+  cbind(12.39585, 51.31866),
+  cbind(12.39584, 51.31865),
+  cbind(12.39584, 51.31866),
+  cbind(12.39585, 51.31866)
+)
+pol <- vect(xy) |> as.lines() |> as.polygons()
+```
+
+```{r geometries-plot, fig.align='center'}
+plot(pol, col = "gold")
+lines(lin, col = "red", lw = 5)
+points(poi, col = "blue", cex = 1)
+```
+
+## Rasters {.tabset}
+
+A raster is a 
+
