@@ -15,6 +15,16 @@ output:
     code_folding: show
 ---
 
+```{r utils, include=FALSE}
+highlight <- function(x, pattern) {
+  gsub(
+    pattern,
+    paste0("\033[0;41m", pattern,"\033[0m"),
+    x
+  )
+}
+```
+
 # Introduction {.tabset}
 
 ## Set up
@@ -206,6 +216,28 @@ r
 Note the metadata `dimensions` (grid size), `resolution` (spatial resolution, in $m$), 
 and `extent` (spatial extent).
 
+### Creating Rasters from Scratch
+Simply put, rasters are array associated spatial metadata.
+In `terra`, use `rast()` to create a raster from a matrix.
+```{r array, fig.align='center'}
+m <- matrix(rnorm(100), nrow = 10, ncol = 10)  # 10x10 matrix
+r <- rast(m)
+plot(r)
+```
+Usually, you won't create rasters from scratch.
+However, if you are familiar with R arrays, you will notice a nice properties that is inherited by rasters: rasters can have multiple layers, with each layers being a matrix.
+```{r stack, fig.align='center', fig.width=8}
+r <- rast(array(rnorm(200), dim = c(10, 10, 2)))
+plot(r)
+```
+Multiple rasters can also be stacked using `c()`.
+```{r stack-c, fig.align='center', fig.width=8}
+r1 <- rast(matrix(rnorm(100), nrow = 10, ncol = 10))
+r2 <- rast(matrix(rnorm(100), nrow = 10, ncol = 10))
+r <- c(r1, r2)
+plot(r)
+```
+
 ### Reading & Writing Rasters
 To read rasters into memory, use `rast()`.
 ```{r read-raster, fig.align='center'}
@@ -235,7 +267,13 @@ The most important metadata are:
 We will cover each one of these three metadata in detail.
 
 ### Spatial extent
-
+The spatial extent is the quadrilateral that inscribe the area of the spatial data.
+The extent is usually represented by the coordinates of the four vertices of the quadrilateral, i.e. `xmin`, `xmax`, `ymin`, and `ymax`.
+To get the spatial extent of an object, use `ext()`.
+```{r ext}
+r <- rast("data/landcover-2015.tif")
+ext(r)
+```
 ### Coordinate reference system
 
 To know the CRS of an object, use `crs()`.
@@ -244,26 +282,101 @@ WKT is not very nice for humans; use the extra argument `proj = TRUE` to see the
 format of the CRS.
 
 ```{r, crs}
-crs(idiv)
+crs(idiv, parse = TRUE)
 crs(idiv, proj = TRUE)
 ```
 
 ### Resolution
 
+Resolution applies only to rasters, as geometries are geometric representation of structure and can be scaled at any level.
+To get the resolution of a raster, use `res()`.
+```{r res}
+r <- rast("data/landcover-2015.tif")
+res(r)
+```
+The unit of the output of `res()` is the same as the unit of the CRS, in this case meters:
+```{r unit}
+crs(r, proj = TRUE)
+```
+
 ## Data Conversion
 
 ### Geometries to Rasters
 
+To convert geometries to raster, use `rasterize()`.
+In addition to the geometry to rasterize, you need to pass a raster to function as template, i.e. from which extent, CRS, and resolution are extracted from.
 ```{r geom-to-rast}
+r <- rast("data/landcover-2015.tif")
 idiv <- project(idiv, crs(r))
 idiv_r <- rasterize(idiv, r, touches = TRUE)
-plot(trim(idiv_r)); lines(idiv)
+```
+I specified `touches = TRUE` assign a value of 1 to all cells that are touched by the polygon.
+The extent of this new raster is the same as the landcover one, which is too big to actually see the raterized polygon.
+Use `trim()` to trim the raster to the smallest raster containing all values that are not `NA`.
+```{r trim, fig.align='center'}
+plot(trim(idiv_r))
+lines(idiv)
 ```
 
 ### Rasters to Geometries
 
+To convert rasters to geometries, use `as.points()` or `as.polygons()`.
 ```{r rast-to-geom}
-r <- crop(r, buffer(idiv, 1e3))
-p <- as.polygons(r)
-plot(p, "category")
+r <- rast("data/landcover-2015.tif")
+r <- crop(r, buffer(idiv, 1e2))  # restrict the area to something that can be plotted
+poi <- as.points(r)
+pol <- as.polygons(r)
+```
+```{r, class.source="fold-hide", fig.align='center', fig.width=10}
+op <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2))
+plot(poi, "category")
+lines(idiv)
+plot(pol, "category")
+lines(idiv)
+par(op)
+```
+
+# Reprojecting
+
+It is quite common that data are obtained from a source that uses a CRS that is not ideal for analyses.
+It is even more common that data are gathered from multiple sources that do not use the same CRS.
+In such cases, the spatial data should be reprojected to one common CRS that is ideal for analyses.
+
+In `terra`, use `project()`, which can take three types of arguments:
+
+  1. A spatial object with known CRS
+  2. A string with the WKT or PROJ4 CRS
+  3. A code of a known CRS, e.g. from the EPSG standard
+
+```{r reproject}
+r <- rast("data/landcover-2015.tif")
+germany <- vect("data/germany.shp")
+
+germany <- project(germany, r)  # a spatial object
+germany_mollweide <- project(germany, "+proj=moll")  # a proj4
+germany_4326 <- project(germany, "EPSG:4326")  # a CRS code
+```
+
+As always, be careful, because CRS have a big influence on analyses and visualization:
+
+```{r, class.source="fold-hide", fig.align='center', fig.width=5, fig.height=5}
+plot(buffer(vect(cbind(2e6, 3e6)), 4e6), col = "white", lw = 1e-6)
+polys(germany, col = "grey90")
+polys(germany_mollweide, col = "grey90")
+polys(germany_4326, col = "grey90")
+l <- vect(
+  rbind(
+    cbind(5e5, 5e5),
+    cbind(0, 0)
+  )
+)
+lines(l[1], l[2], arrows = TRUE, length = .1)
+l <- vect(
+  rbind(
+    cbind(1e6, 1e6),
+    cbind(0, 0)
+  )
+)
+text(l[1], labels = "Cannot be seen,\nbut EPSG:4326 is here")
 ```
