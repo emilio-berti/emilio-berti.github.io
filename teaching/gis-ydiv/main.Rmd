@@ -16,6 +16,31 @@ output:
     code_folding: show
 ---
 
+<style>
+blockquote.nb {
+  border-left: 5px solid #007BFF;
+  padding: 15px 20px;
+  margin: 20px 0;
+  background-color: #e9f5ff;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+blockquote.nb::before {
+  content: "NB";
+  position: absolute;
+  top: 50%;
+  left: -43px; /* Move outside the block */
+  transform: translateY(-50%);
+  background: #007BFF;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+</style>
+
 ```{r utils, include=FALSE}
 highlight <- function(x, pattern) {
   gsub(
@@ -30,11 +55,12 @@ highlight <- function(x, pattern) {
 
 ## Set up
 
-  - R installed
-  - `terra` installed
-  - `codetools` installed (optional)
+  - R installed.
+  - `terra` installed.
+  - `codetools` installed (optional, used by `terra` to perform code checks).
+  - Download the [data archive](https://emilio-berti.github.io/teaching/gis-ydiv/data.zip) and decompress it.
 
-## Program {.tabset}
+## Program
 
 ### What we will cover
 
@@ -67,7 +93,7 @@ highlight <- function(x, pattern) {
 library(terra)
 ```
 
-# Data Types {.tabset}
+# Data Types
 
 There are two main data types used in GIS:
 
@@ -277,13 +303,30 @@ ext(r)
 ```
 ### Coordinate reference system
 
+GIS try to represent the surface of the Earth, a 3D spheroid, onto a plane.
+The coordinate reference system (CRS), also known as spatial reference system (SRS), defines how this _projection_ of a 3D object to a 2D one is achieved.
+It is not possible to achieve this projection accurately and some distortions will always be present.
+In particular, at least one of distance, angular conformity, and area will be distorted.
+Projections can be grouped into types, depending on which property of the Earth surface they do not distort:
+
+  - Conformal projections: they correctly represent the angles between points and, thus, shapes (e.g. ESRI:54004^[ESRI stands for Environmental Systems Research Institute, Inc., which is the company that developed ArcGIS and created a code standard for projections. The other commonly used standard is maintained by the European Petroleum Survey Group (EPSG).]).
+  - Equidistant: they correctly represent distances (e.g. ESRI:54002).
+  - Equal-area: they correctly represent areas (e.g. ESRI:54034).
+
+An overview of ESRI and EPSG projections can be found at <https://spatialreference.org/>.
+Wikipedia also has a nice list with the property of each projection: <https://en.wikipedia.org/wiki/List_of_map_projections>.
+
 To know the CRS of an object, use `crs()`.
 By default, `crs()` displays the CRS in Well Known Text (WKT) format.
-WKT is not very nice for humans; use the extra argument `proj = TRUE` to see the PROJ4
-format of the CRS.
 
 ```{r, crs}
 crs(idiv, parse = TRUE)
+```
+Notice, among the others, the attributes `AREA` (the area of usage for the CRS) and `ID` (in this case, the EPSG code).
+
+WKT is not very nice for humans; use the extra argument `proj = TRUE` to see the PROJ4 format of the CRS.
+
+```{r crs-proj}
 crs(idiv, proj = TRUE)
 ```
 
@@ -346,9 +389,9 @@ In such cases, the spatial data should be reprojected to one common CRS that is 
 
 In `terra`, use `project()`, which can take three types of arguments:
 
-  1. A spatial object with known CRS
-  2. A string with the WKT or PROJ4 CRS
-  3. A code of a known CRS, e.g. from the EPSG standard
+  1. A spatial object with known CRS.
+  2. A string with the WKT or PROJ4 CRS.
+  3. A code of a known CRS, e.g. from the EPSG standard.
 
 ```{r reproject}
 r <- rast("data/landcover-2015.tif")
@@ -359,7 +402,9 @@ germany_mollweide <- project(germany, "+proj=moll")  # a proj4
 germany_4326 <- project(germany, "EPSG:4326")  # a CRS code
 ```
 
-As always, be careful, because CRS have a big influence on analyses and visualization:
+<blockquote class="nb">
+CRS have a big influence on analyses and visualization.
+</blockquote>
 
 ```{r, class.source="fold-hide", fig.align='center', fig.width=5, fig.height=5}
 plot(buffer(vect(cbind(2e6, 3e6)), 4e6), col = "white", lw = 1e-6)
@@ -380,4 +425,116 @@ l <- vect(
   )
 )
 text(l[1], labels = "Cannot be seen,\nbut EPSG:4326 is here")
+```
+
+# Geometry Operations {.tabset}
+
+Commonly operations on geometries are to calculate their length and area, find their centroids, calculate distance, and buffering them.
+
+## Length
+Use `perim()` to obtain the length of lines or the perimeter of polygons.
+```{r perim}
+perim(idiv)
+idiv |> disagg(segments = TRUE) |> perim() |> sum()  # disagg(segments = TRUE) split the polygon into lines
+```
+The units are defined by the CRS.
+<blockquote class="nb">
+It is best to project the geometry to a longitude/latitude CRS to get more accurate results.
+</blockquote>
+```{r perim-projected}
+idiv |> project("EPSG:4326") |> perim()  # difference of 3 mm 
+```
+
+## Area
+Use `expanse()` to obtain the area of polygons.
+```{r area}
+expanse(idiv)
+```
+The units are defined by the CRS.
+<blockquote class="nb">
+It is best to project the geometry to a longitude/latitude CRS to get more accurate results.
+</blockquote>
+```{r area-projected}
+idiv |> project("EPSG:4326") |> expanse()  # same result, as CRS was equal-area
+```
+
+## Centroid
+The centroid of a geometry is the point defined as the arithmetic mean position of all the points on the surface of the geometry.
+Use `centroids()` to get the centroids of the geometries.
+```{r centroids, fig.align='center'}
+centr <- centroids(idiv)
+plot(idiv, col = "blue")
+points(centr, bg = "gold", cex = 2, pch = 21)
+```
+
+For concave polygons, the centroid may lay outside of the polygon itself
+```{r centroid-concave, fig.align='center'}
+p <- vect(matrix(c(0, 0, 1, 0, 1, 1, 0.9, 0.1, 0, 0), byrow = TRUE, ncol = 2)) |> 
+  as.lines() |> 
+  as.polygons()
+centr <- centroids(p)
+plot(p, col = "blue")
+points(centr, bg = "gold", cex = 2, pch = 21)
+```
+
+Specify `centroids(inside = TRUE)` to force the "centroid" to be inside the polygon.
+```{r centroid-inside, fig.align='center'}
+p <- vect(matrix(c(0, 0, 1, 0, 1, 1, 0.9, 0.1, 0, 0), byrow = TRUE, ncol = 2)) |> 
+  as.lines() |> 
+  as.polygons()
+centr <- centroids(p, inside = TRUE)
+plot(p, col = "blue")
+points(centr, bg = "gold", cex = 2, pch = 21)
+```
+
+## Distance
+Use `distance()` to get the distances between geometries
+When passing only an object will multiple geometries, distances will be calculated among each geometry and a (symmetric) matrix is returned.
+```{r distance-one}
+poi <- vect(matrix(rnorm(10), ncol = 2), crs = "EPSG:4326")  # 5 random points
+poi |> distance() |> as.matrix()
+```
+
+When passing also a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
+```{r distance-two}
+distance(
+  poi,
+  idiv |> project("EPSG:4326") |> centroids()
+)
+```
+
+## Buffer
+The buffer of a geometry is obtained by extending the geometry perpendicular to the tangent line of its side.
+It is easier to see it than to explain it.
+Use `buffer()` to buffer geometries.
+```{r buffer, fig.align='center'}
+b <- buffer(idiv, 10)  # 10 meters
+plot(b, col = "gold")
+polys(idiv, col = "blue")
+```
+
+## Example
+Let's see an example where all operation are combined.
+I want to find the centroid of Germany, how far is from the centroid of the main iDiv bulding, 
+and plot the circle centered at the centroid with the smallest area that is touching the centroid of the iDiv building.
+
+```{r example-geometry-operation, fig.align='center', fig.width=7, fig.height=7}
+ger <- vect("data/germany.shp")
+centr <- centroids(ger)  # centroid of Germany
+idiv_centr <- idiv |> project(crs(centr)) |> centroids()
+d <- distance(centr, idiv_centr)  # distance between centroids
+b <- buffer(centr, d)  # circle with the smallest area touching iDiv
+l <- as.lines(rbind(centr, idiv_centr))  # line connecting centroids
+
+plot(ger)
+polys(b, col = adjustcolor("blue", alpha.f = .5))
+lines(l)
+points(centr, pch = 21, cex = 2, bg = "gold")
+points(idiv_centr, pch = 21, cex = 2, bg = "green")
+text(centr, "Germany\ncentroid", pos = 2)
+text(idiv_centr, "iDiv\ncentroid", pos = 4, adj = 0.5)
+text(l, paste(round(d) / 1e3, "km"), pos = 3)
+
+message("Distance between Germany centroid and iDiv: ", round(d / 1e3), " km")
+message("Area of the smallest circle centered at the centroid of Germany and touching iDiv: ", round(expanse(b) / 1e6), " km^2")
 ```
