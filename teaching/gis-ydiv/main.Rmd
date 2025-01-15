@@ -1,9 +1,10 @@
 ---
 title: "GIS course @ yDiv"
+author: "Emilio Berti"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
 output:
-  html_document:
-    toc: true
-    toc_depth: 2
+  rmdformats::readthedown:
+    toc_depth: 4
     number_sections: true
     theme: united
     highlight: tango
