@@ -4,7 +4,7 @@ author: "Emilio Berti"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 output:
   rmdformats::readthedown:
-    toc_depth: 4
+    toc_depth: 6
     number_sections: true
     theme: united
     highlight: tango
@@ -25,11 +25,13 @@ output:
 ``` 
 <style>
 blockquote.nb {
-  border-left: 5px solid #007BFF;
-  padding: 15px 20px;
+  border-left: 5px solid #a82020;
+  padding: 5px 10px;
   margin: 20px 0;
-  background-color: #e9f5ff;
-  font-family: Arial, sans-serif;
+  background-color: #ffe0e0;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
   position: relative;
 }
 
@@ -37,9 +39,9 @@ blockquote.nb::before {
   content: "NB";
   position: absolute;
   top: 50%;
-  left: -43px; /* Move outside the block */
+  left: -40px; /* Move outside the block */
   transform: translateY(-50%);
-  background: #007BFF;
+  background: #a82020;
   color: white;
   font-weight: bold;
   font-size: 14px;
@@ -413,7 +415,7 @@ In `terra`, use `project()`, which can take three types of arguments:
 r <- rast("data/landcover-2015.tif")
 germany <- vect("data/germany.shp")
 
-germany <- project(germany, r)  # a spatial object
+germany <- project(germany, crs(r))  # a spatial object
 germany_mollweide <- project(germany, "+proj=moll")  # a proj4
 germany_4326 <- project(germany, "EPSG:4326")  # a CRS code
 ```
@@ -443,7 +445,7 @@ l <- vect(
 text(l[1], labels = "Cannot be seen,\nbut EPSG:4326 is here")
 ```
 
-# Geometry Operations {.tabset}
+# Geometry Operations
 Commonly operations on geometries are to calculate their length and area, find their centroids, calculate distance, and buffering them.
 
 ## Length
@@ -554,13 +556,15 @@ message("Distance between Germany centroid and iDiv: ", round(d / 1e3), " km")
 message("Area of the smallest circle centered at the centroid of Germany and touching iDiv: ", round(expanse(b) / 1e6), " km^2")
 ```
 
-# Raster Operations {.tabset}
+# Raster Operations
 
 Commonly operations on rasters are to calculate summary statistics, 
 aggregate of disaggregate to different resolutions, 
 resampling, and interpolation.
 
-## Summary Statistics
+## Summary Statistics {.tabset}
+
+### Local Summary
 Raster stacks can be summarized using common function, such as `mean`, `sd`, `sum`, etc.
 The output is a single raster layer with the summary.
 Mean, sum, minimum, and maximum, can be calculated simply using `mean()`, `sum()`, etc.
@@ -576,18 +580,218 @@ plot(std_ndvi, col = hcl.colors(100, "Reds", rev = TRUE))
 ```
 This is called a local summary, because it is calculated across pixels with the same coordinates.
 
+### Global Summary
 To get global summaries, i.e. calculated across all pixels of a layer, use `global()`
 ```{r global}
 global(ndvi, "mean", na.rm = TRUE)
 ```
 
+### Zonal Summary
 Zonal statistics summarize the values of a raster using categories from another raster of geometry.
 Use `zonal()` to obtain zonal statistics.
 ```{r zonal}
 landcover <- rast("data/landcover-2015.tif")
-avg_ndvi <- project(avg_ndvi, landcover)  # using classes from landcover
+avg_ndvi <- project(avg_ndvi, landcover)  # this will also resample avg_ndvi (see the chapter Raster Operations)
 zonal(avg_ndvi, r, fun = "mean", na.rm = TRUE)
 zonal(avg_ndvi, r, fun = "sd", na.rm = TRUE)  # spatial sd
 ```
 
-## Aggregate and disaggregate
+## Aggregate and Disaggregate {.tabset}
+
+### Aggregate
+Aggregating creates a raster that is at coarser resolution compared to the original raster.
+Use `aggregate()` to aggregate rasters.
+The arguments `fact`, number of cells in each direction to be aggregated, and `fun`, the function used for aggregatation, need to be specified.
+```{r aggregate, fig.align='center', fig.width=6, fig.height=6}
+r <- rast(matrix(rnorm(16^2), 16, 16))
+plot(r)
+r_aggr <- aggregate(r, 4, "max")  # maximum values in the 4x4 grid
+plot(r_aggr)
+```
+
+### Disaggregate
+Disaggregating creates a raster that is at finer resolution compared to the original raster.
+Use `disagg()` to disaggregate rasters.
+The arguments `fact`, number of cells in each direction to create for each cell of the original raster, and `method`, the method used for disaggregation, need to be specified.
+Available methods are `near`, for nearest neighbor, or `bilinear`, for bilinear interpolation.
+```{r disagg, fig.align='center', fig.width=6, fig.height=6}
+r_disagg <- disagg(r, 4, method = "bilinear")
+plot(r_disagg)
+```
+
+<blockquote class="nb">
+Aggregating and disaggregating a raster does not give, in general, the same raster back. Some of the original information is lost during aggregation.
+</blockquote>
+```{r agg-disagg, fig.align='center', fig.width=6, fig.height=6}
+plot(c(r, r |> aggregate(4, "mean") |> disagg(4, "bilinear")))
+```
+
+## Resampling
+When two rasters do not align, i.e. they have different origin or resolution, to make them comparable one of them must be resampled.
+Resampling transform one of the two rasters to a raster that align with the other.
+Use `resample()` to resample rasters.
+The argument `method` is used to specify the algorithm used for resampling.
+Among the available algorithms are:
+
+  - `near`, for nearest neighbor.
+  - `bilinear`, for bilinear interpolation.
+  - `cubic`, for cubic interpolation.
+  - `cubicspline`, for cubic-spline interpolation.
+  - `lanczos`, for Lanczos resampling.
+
+```{r resampling, fig.align='center', fig.width=6, fig.height=6}
+landcover <- rast("data/landcover-2015.tif")
+ndvi <- mean(rast("data/ndvi-2024.tif"), na.rm = TRUE)
+ndvi <- project(ndvi, crs(landcover))
+ndvi_resampled <- resample(ndvi, landcover, method = "lanczos")
+plot(ndvi, col = colorRampPalette(c("dodgerblue3", "gold", "darkgreen"))(100))
+plot(ndvi_resampled, col = colorRampPalette(c("dodgerblue3", "gold", "darkgreen"))(100))
+```
+
+<blockquote class="nb">
+The difference between `project(x, crs(y))` and `project(x, y)` is that the first only project the CRS, whereas the second actually resample `x` to `y`.
+In many cases `resample(x, y, method = <method>)` can be avoided by using `project(x, y, method = <method>)`
+</blockquote>
+
+## Interpolation
+Interpolation uses a statistical model to make geographic predictions.
+A simple statistical model can include, for example, the coordinates of the grid.
+This works relatively well with processes that change gradually with longitude or latitude, such as temperature.
+```{r interpolation, fig.align='center', fig.width=12, fig.height=6}
+# average annual temperature
+tas <- rast("data/wc2-bio1.tif")  
+elev <- rast("data/wc2-elevation.tif")  
+r <- c(tas, elev)
+
+# construct table for model fitting
+xy <- xyFromCell(r, 1:ncell(r))
+xy <- cbind(xy, extract(r, xy, cells = TRUE))
+
+# fit a simple linear model with coordinates
+model <- lm(tas ~ x * y + elevation, data = xy)
+
+# interpolate
+interpolated <- interpolate(r, model)
+interpolated <- mask(interpolated, tas)  # remove sea and large water bodies
+names(interpolated) <- "tas_interpolated"
+plot(c(tas, interpolated), col = hcl.colors(100, "Zissou 1"))
+```
+
+Considering the simplicity of the underlying model, the interpolation works quite well.
+```{r interpolated-plot, fig.align='center', fig.width=6, fig.height=6}
+# Prediction errors
+# In red, over-predictions
+# In blue, under-predictions
+plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3"))
+```
+
+# Examples 
+
+## Species Distribution Model (SDM)
+I will show how to perform a simple species distribution model (SDM) for the species _Erica arborea_.
+
+<img src="figures/erica-arborea.JPG" alt="erica-arborea" height="300px"/>
+<img src="figures/erica-arborea-flowers.jpg" alt="flowers" height="300px"/>
+
+I load the libraries.
+```{r erica-libraries}
+library(tibble)
+library(dplyr)
+library(readr)
+library(terra)
+```
+
+I load the file downloaded from GBIF and convert it to a geometry (points).
+```{r erica-gbif}
+gbif <- read_tsv("data/erica-arborea-gbif.tsv") |> 
+  select("decimalLongitude", "decimalLatitude") |>
+  vect(
+    geom = c("decimalLongitude", "decimalLatitude"),
+    crs = "+proj=longlat +datum=WGS84"  # I know this is GBIF CRS
+  )
+```
+
+I load the bioclimatic variables from WorldClim.
+```{r erica-template}
+bios <- rast("data/bios.tif")
+
+# I also create a template of the land
+land <- bios[[1]]
+land[!is.na(land)] <- 1
+names(land) <- "land"
+```
+
+I thin the GBIF data retaining only one point per grid cell.
+```{r erica-thin}
+gbif <- extract(land, gbif, cells = TRUE, xy = TRUE) |> 
+  as_tibble() |> 
+  filter(!is.na(land)) |> 
+  group_by(cell) |> 
+  slice_sample(n = 1) |> 
+  ungroup() |> 
+  select("x", "y") |> 
+  vect(geom = c("x", "y"), crs = "+proj=longlat +datum=WGS84")
+```
+
+I sample pseudo-absences randomly in the polygon that contains all GBIF observation, buffered to 100 km.
+```{r erica-absences}
+range <- gbif |> convHull()
+abs <- spatSample(buffer(range, 1e5), length(gbif) * 2)
+abs <- extract(land, abs, cells = TRUE, xy = TRUE) |> 
+  as_tibble() |> 
+  filter(!is.na(land)) |> 
+  group_by(cell) |> 
+  slice_sample(n = 1) |> 
+  ungroup() |> 
+  select("x", "y") |> 
+  slice_sample(n = length(gbif)) |> 
+  vect(geom = c("x", "y"), crs = "+proj=longlat +datum=WGS84")
+```
+
+I prepare the data frame to be used for fitting the SDM.
+```{r erica-prepdata}
+gbif$occ <- 1
+abs$occ <- 0
+p <- rbind(gbif, abs)
+d <- extract(bios, p, ID = FALSE) |> as_tibble()
+d
+```
+
+```{r erica-map, fig.align='center', fig.width=6, fig.height=6}
+plot(land, col = "grey90", legend = FALSE)
+points(p, col = ifelse(p$occ == 0, "darkblue", "gold2"))
+lines(buffer(range, 1e5))
+```
+
+I run the SDM, in this case a simple GLM.
+I use only some of the bioclimatic variables^[This is just an example, and you should do better than this.].
+```{r erica-model}
+d <- d[, c("BIO01", "BIO04", "BIO12", "BIO15")]
+d$occ <- p$occ
+sdm <- glm(occ ~ ., data = d, family = "binomial")
+summary(sdm)
+```
+
+I use the model to predict the suitability of the species in geographic space.
+```{r erica-predictions, fig.align='center', fig.width=6, fig.height=6}
+suitability <- predict(bios, sdm, type = "response")
+plot(
+  suitability,
+  col = hcl.colors(100, "Geyser", rev = TRUE),
+  breaks = seq(0, 1, by = .02),
+  type = "continuous",
+  main = "Predicted suitability"
+)
+```
+
+Zooming on the Mediterranean regions.
+```{r erica-zoomed, fig.align='center', fig.width=6, fig.height=6}
+plot(
+  crop(suitability, ext(-9, 24, 35, 50)),
+  col = hcl.colors(100, "Geyser", rev = TRUE),
+  breaks = seq(0, 1, by = .02),
+  type = "continuous",
+  main = "Predicted suitability"
+)
+points(p[p$occ == 1, ], cex = .3)
+```
