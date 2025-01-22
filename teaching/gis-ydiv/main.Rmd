@@ -17,6 +17,16 @@ output:
     keep_md: true
 ---
 
+<!--   pdf_document:
+    toc_depth: 6
+    number_sections: true
+    highlight: tango
+    fig_width: 4
+    fig_height: 4
+    fig_caption: true
+    df_print: paged
+    keep_md: true -->
+
 <!-- Page width -->
 ```{css, echo = FALSE}
 #content{
@@ -62,6 +72,23 @@ highlight <- function(x, pattern) {
 
 # Introduction {.tabset}
 
+This document is a living tutorial that mirrors the lectures of the yDiv course "An Introduction to GIS for Ecology", held at iDiv in Leipzig.
+In this two day course we will cover the very basics of GIS, focusing especially on applications to ecology.
+During the first day, we will get to know the main data types of GIS, that is geometries and rasters.
+During the second day, we will learn some of the most used GIS operations.
+You will also start your own individual/group project.
+The aims of this course are to
+
+  - Familiarize yourself with basic GIS data and operations
+  - Start a project of your interest
+  - Getting some simple figures/analyses started
+
+Do **not** expect to become a world-leading GIS expert by the end of the course; this is a basic introductory course (and GIS is quite hard to master).
+
+At the end of each section, you will find multiple exercises; they are not mandatory, but they will help you.
+Before starting, be sure to have your machine set up properly.
+Also, you can download all data used in this tutorial by clicking [here](teaching/gis-ydiv/data.zip).
+
 ## Set up
 
   - R installed.
@@ -69,29 +96,20 @@ highlight <- function(x, pattern) {
   - `codetools` installed (optional, used by `terra` to perform code checks).
   - Download the [data archive](https://emilio-berti.github.io/teaching/gis-ydiv/data.zip) and decompress it.
 
+Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
+
+```{r setup, echo=FALSE}
+library(terra)
+```
+
 ## Data Sets {.tabset}
 In this tutorial, we will use data sets for:
 
   - NDVI for the year 2024 in Leipzig, obtained from Sentinel2 (`ndvi-2024.tif`).
   - Landcover of Leipzig in 2015, obtained from the German Aerospace Center (DLR; `landcover-2015.tif`).
-
-## Program
-
-### What we will cover
-
-  - Two days course
-  - First day: get to know geometries and rasters
-  - Second day: GIS operations + individual/group project
-
-### What to expect
-
-  - Familiarize yourself with basic GIS data and operations
-  - Start a project of your interest
-  - Getting some simple figures/analyses started
-
-### What not to expect
-
-  - To become a world-leading GIS expert
+  - Average annual surface temperature from WorldClim (`wc2-bio1.tif`)
+  - Bioclimatic variables from WorldClim (`bios.tif`)
+  - Digital elevation model from WorldClim (`wc2-elevation.tif`)
 
 ## Lecturers {.tabset}
 
@@ -104,33 +122,33 @@ In this tutorial, we will use data sets for:
 
 ### Guilherme Pinto (BioEcon)
 
-```{r setup}
-library(terra)
-```
-
 # Data Types
 
 There are two main data types used in GIS:
 
-  1. Geometries, also called vectors or shapes
-  2. Rasters
+  1. Geometries (also called vectors or shapes). This usually has extension `.shp`.
+  2. Rasters. This usually has extension `.tif`.
 
 They fill two different needs, namely to represent structures that can be well approximated using geometric objects, such as lines, circles, etc., 
 and to represent grid data over an area.
 
-## Geometries {.tabset}
+If you have produced figures for a manuscript, you are actually already familiar with these type of data.
+Images can be saved as vector graphics, where each element is represented by a vector/geometry, or as a matrix/raster of pixels.
+This is an old topic in computer graphics, and a nice summary can be found on Adobe website: <https://www.adobe.com/creativecloud/file-types/image/comparison/raster-vs-vector.html>.
+This analogy is a useful one; remember it.
 
-### Overview
-Structures such as a street or a building can be represented by a geometric objects.
-For instance, a street can be represented by a straight line, whereas a building by a polygon.
-It makes sense to store the data of these type of structures as their geometric representation.
+## Geometries
+
+Structures such as trees, streets, or buildings can be represented by geometric objects.
+For instance, a tree can be represented by a point, a street by straight line, and a building by a polygon.
+It makes sense to store the data of these types of structures as their geometric representation.
 For example, the building we are in and the adjacent street:
 
 ```{r idiv-building, class.source="fold-hide", fig.align='center'}
 # This code in incomprehensible to you FOR NOW
-# Just an example of geometries
-r <- rast("data/idiv-building.tif")
-plotRGB(r)
+# Just an example of geometries to show you how they look on a map
+idiv <- rast("data/idiv-building.tif")
+plotRGB(idiv)
 l <- vect(
   rbind(
     c(12.39585, 51.31866),
@@ -154,27 +172,25 @@ idiv <- vect(
 idiv$name <- "iDiv building"
 idiv$perimeter <- perim(idiv)
 idiv$area <- expanse(idiv)
+writeVector(idiv, "data/idiv.shp", overwrite = TRUE)
 plot(idiv, add = TRUE, col = adjustcolor("blue", alpha.f = .5))
 ```
 
-Geometries are saved in _vector_ or _shape_ files.
-In addition to the geometric representation of the structure, 
-shapefiles also contain metadata for the geometric representation, 
-such as the its extent and coordinate reference system (we will talk about this later),
-and for the structure, such as their name, length, etc.
+Geometries are saved in _vector-_ or _shape-_files (usually with extension `.shp`).
+In addition to the geometric representation of the structure, shapefiles also contain metadata for the geometric representation, such as its extent and coordinate reference system (we will talk about this later), and for the structure, such as their name, length, etc.
 For instance, the geometry of the iDiv building above is:
 ```{r example-geometry, class.source="fold-hide", }
 idiv
 ```
 
-Note that this structure has one geometry and three attributes/variables (`dimensions : 1, 3 (geometries, attributes)`): `name`, `perimeter` ($m$), and `area` ($m^2$).
+Note that this structure has one geometry and three attributes/variables (`dimensions: 1, 3 (geometries, attributes)`): `name`, `perimeter` ($m$), and `area` ($m^2$).
 
 ### Geometry Types
 
 In `terra`, there are three main geometry types:
 
   1. Points: they are defined by a vector with two values for coordinates (e.g., longitude and latitude)
-  2. Lines: they are a series of points connected pairwise by straight lines
+  2. Lines: they are a series of points connected by straight lines
   3. Polygons: they are a series of lines inscribing a closed area
 
 In `terra`, geometries are created with the function `vect()`.
@@ -203,6 +219,7 @@ lin <- vect(xy) |> as.lines()
 
 In order to create polygons, first create a mutli-point geometry, then covert it to lines, and finally to polygons using `as.polygons()`.
 The last point should be the same as the first to close the geometry.
+A geometry that is not closed does not inscribe an area and is not a polygon.
 
 ```{r create-polygons}
 xy <- rbind(
@@ -221,45 +238,45 @@ points(poi, col = "blue", cex = 1)
 ```
 
 ### Reading & Writing Geometries
-`vect()` is also used to read geometries from a file.
-For instance, to read the shapefile with the country boundary of Germany:
+
+In most cases, you will not create your own geometry by hands, but load geometries from files.
+To read geometries from a file, use `vect()`.
 ```{r read-shapefile, fig.align='center'}
-ger <- vect("data/germany.shp")
+ger <- vect("data/germany.shp")  # shapefile with the country boundary of Germany
 ger
 ```
 
-To write geometries to disk, use `writeVector()`.
+To write geometries to a file, use `writeVector()`.
 
 ```{r, write-shapefile, eval=FALSE}
-writeVector(ger, "data/germany.shp", overwrite = TRUE)
+writeVector(ger, "data/germany.shp", overwrite = TRUE)  # if already exists you need overwrite = TRUE
 ```
 
-## Rasters {.tabset}
+## Rasters
 
-### Overview
+Rasters are gridded areas where each grid pixel takes a value.
+Rasters are useful because:
 
-Rasters are gridded areas where each grid pixel assumes a value.
-When the data we are interested in are values on a gridded area, 
-rasters are a better options than to using geometries.
-For example, if we want to represent landcover type over a large area(forest, agriculture, build-up, etc.),
-it is easier to grid the area into pixels and save the landcover type of each pixel rather
-than to create a geometry for each different structure.
+  - they compress the information of geometries to a manageable size. Imagine to have to work with building geometries *globally*. 
+  - the data they represent is obtained in a gridded format. This is common for satellite data, for example.
+
+When the data we are interested in are values on a gridded area, rasters are a better options than to using geometries, as they save a lot of memory and space on disk.
+For example, if we want to represent landcover type over a large area(forest, agriculture, build-up, etc.), it is easier to grid the area into pixels and save the landcover type of each pixel rather than to create a geometry for each different structure.
 ```{r leipzig-landcover, class.source="fold-hide", fig.align='center', fig.width=7, fig.caption="Landcover map of Leipzig from DLR (German Aerospace Center)"}
-r <- rast("data/landcover-2015.tif")
-plot(r)  # from EOC of DLR
+landcover <- rast("data/landcover-2015.tif")
+plot(landcover)  # from EOC of DLR
 ```
-Rasters are saved in raster files. 
-In addition to the values of each grid, rasterfiles also contain metadata for the grid, 
-such as the its extent and coordinate reference system (we will talk about this later).
+Rasters are saved in raster files (usually with extension `.tif`). 
+In addition to the values of each grid, rasterfiles also contain metadata for the grid,  such as the its extent and coordinate reference system (we will talk about this later).
 For instance, some of the metadata of the landcover raster:
 ```{r raster-metadata, class.source="fold-hide"}
-r
+landcover
 ```
-Note the metadata `dimensions` (grid size), `resolution` (spatial resolution, in $m$), 
+Note the metadata `dimensions` (grid size), `resolution` (spatial resolution, in $m$ for this raster), 
 and `extent` (spatial extent).
 
 ### Creating Rasters from Scratch
-Simply put, rasters are array associated spatial metadata.
+Simply put, rasters are matrices/arrays with associated spatial metadata.
 In `terra`, use `rast()` to create a raster from a matrix.
 ```{r array, fig.align='center'}
 m <- matrix(rnorm(100), nrow = 10, ncol = 10)  # 10x10 matrix
@@ -267,9 +284,9 @@ r <- rast(m)
 plot(r)
 ```
 Usually, you will not create rasters from scratch.
-However, if you are familiar with R arrays, you will notice a nice properties that is inherited by rasters: rasters can have multiple layers, with each layers being a matrix.
+However, if you are familiar with R arrays, you will notice a nice properties that is inherited by rasters: rasters can have multiple layers, with each layer being a matrix.
 ```{r stack, fig.align='center', fig.width=8}
-r <- rast(array(rnorm(200), dim = c(10, 10, 2)))
+r <- rast(array(rnorm(200), dim = c(10, 10, 2)))  # 10x10x2 array
 plot(r)
 ```
 
@@ -286,38 +303,39 @@ plot(r)
 ### Reading & Writing Rasters
 To read rasters into memory, use `rast()`.
 ```{r read-raster, fig.align='center'}
-r <- rast("data/landcover-2015.tif")
-r
+landcover <- rast("data/landcover-2015.tif")
+landcover
 ```
 
 To write rasters to disk, use `writeRaster()`.
 
 ```{r, write-raster, eval=FALSE}
-writeRaster(r, "data/landcover-2015.tif", overwrite = TRUE, datatype = "INT1U")
+writeRaster(landcover, "data/landcover-2015.tif", overwrite = TRUE, datatype = "INT1U")
 ```
-Here, the argument `datatype = "INTU1"` (specifying the values in the grid are 1-byte unsigned integers) 
+Here, the argument `datatype = "INT1U"` (specifying the values in the grid are 1-byte unsigned integers) 
 is needed because the rasters contains classes (levels).
 In most cases, this argument is best left unspecified, as `terra` picks the optimal value by default.
+Once you have used GIS for some time, you will notice that some of the rasters you downloaded have been scaled up to weird numbers, e.g. 65535.
+This is because the creator of those rasters decided to save them as, e.g., 2-bytes unsigned integers, to make them smaller and, thus, easier to move around the internet.
+If you need to deal with extremely big rasters, this trick may come in handy.
 
-## Spatial metadata {.tabset}
+## Spatial metadata
 
-Spatial objects, being geometries or rasters, always need certain metadata to be useful.
+Spatial objects always need certain metadata to be useful.
 For example, a raster is of little help if there is not information of the area it covers.
 The most important metadata are:
 
-  1. Spatial extent: the four corners of the quadrilateral polygon that inscribe the object represented
-  2. Coordinate reference system: how is the earth surface represented
-  3. Resolution (for rasters only)
-
-We will cover each one of these three metadata in detail.
+  1. Spatial extent: the four corners of the quadrilateral polygon that inscribe the object represented.
+  2. Coordinate reference system: how the earth surface is represented.
+  3. Resolution (for rasters only): the size of a pixel.
 
 ### Spatial extent
 The spatial extent is the quadrilateral that inscribe the area of the spatial data.
 The extent is usually represented by the coordinates of the four vertices of the quadrilateral, i.e. `xmin`, `xmax`, `ymin`, and `ymax`.
-To get the spatial extent of an object, use `ext()`.
+Use `ext()` to get the spatial extent of an object.
 ```{r ext}
-r <- rast("data/landcover-2015.tif")
-ext(r)
+landcover <- rast("data/landcover-2015.tif")
+ext(landcover)
 ```
 ### Coordinate reference system
 
@@ -327,76 +345,39 @@ It is not possible to achieve this projection accurately and some distortions wi
 In particular, at least one of distance, angular conformity, and area will be distorted.
 Projections can be grouped into types, depending on which property of the Earth surface they do not distort:
 
-  - Conformal projections: they correctly represent the angles between points and, thus, shapes (e.g. ESRI:54004^[ESRI stands for Environmental Systems Research Institute, Inc., which is the company that developed ArcGIS and created a code standard for projections. The other commonly used standard is maintained by the European Petroleum Survey Group (EPSG).]).
+  - Conformal: they correctly represent the angles between points and, thus, shapes (e.g. ESRI:54004).
   - Equidistant: they correctly represent distances (e.g. ESRI:54002).
   - Equal-area: they correctly represent areas (e.g. ESRI:54034).
 
-An overview of ESRI and EPSG projections can be found at <https://spatialreference.org/>.
-Wikipedia also has a nice list with the property of each projection: <https://en.wikipedia.org/wiki/List_of_map_projections>.
+An overview of ESRI and EPSG^[ESRI stands for Environmental Systems Research Institute, Inc., which is the company that developed ArcGIS and created a code standard for projections. The other commonly used standard is maintained by the European Petroleum Survey Group (EPSG).] projections can be found at <https://spatialreference.org/>.
+Wikipedia also has a nice list with the property of some projection: <https://en.wikipedia.org/wiki/List_of_map_projections>.
 
-To know the CRS of an object, use `crs()`.
+Use `crs()` to know the CRS of an object.
 By default, `crs()` displays the CRS in Well Known Text (WKT) format.
-
 ```{r, crs}
 crs(idiv, parse = TRUE)
 ```
 Notice, among the others, the attributes `AREA` (the area of usage for the CRS) and `ID` (in this case, the EPSG code).
-
 WKT is not very nice for humans; use the extra argument `proj = TRUE` to see the PROJ4 format of the CRS.
-
 ```{r crs-proj}
 crs(idiv, proj = TRUE)
+```
+Use `project()` to project a spatial object from one CRS to another.
+```{r project}
+landcover <- project(landcover, crs("EPSG:4326"))
 ```
 
 ### Resolution
 
-Resolution applies only to rasters, as geometries are geometric representation of structure and can be scaled at any level.
-To get the resolution of a raster, use `res()`.
+Resolution applies only to rasters, as geometries can be scaled at any level.
+Use `res()` to get the resolution of a raster.
 ```{r res}
-r <- rast("data/landcover-2015.tif")
-res(r)
+res(landcover)
 ```
-The unit of the output of `res()` is the same as the unit of the CRS, in this case meters:
+The first value is the "horizontal" and the second is the "vertical" resolution.
+The units of the output of `res()` is the same as the unit of the CRS, in this case $m$:
 ```{r unit}
-crs(r, proj = TRUE)
-```
-
-## Data Conversion
-
-### Geometries to Rasters
-
-To convert geometries to raster, use `rasterize()`.
-In addition to the geometry to rasterize, you need to pass a raster to function as template, i.e. from which extent, CRS, and resolution are extracted from.
-```{r geom-to-rast}
-r <- rast("data/landcover-2015.tif")
-idiv <- project(idiv, crs(r))
-idiv_r <- rasterize(idiv, r, touches = TRUE)
-```
-I specified `touches = TRUE` assign a value of 1 to all cells that are touched by the polygon.
-The extent of this new raster is the same as the landcover one, which is too big to actually see the raterized polygon.
-Use `trim()` to trim the raster to the smallest raster containing all values that are not `NA`.
-```{r trim, fig.align='center'}
-plot(trim(idiv_r))
-lines(idiv)
-```
-
-### Rasters to Geometries
-
-To convert rasters to geometries, use `as.points()` or `as.polygons()`.
-```{r rast-to-geom}
-r <- rast("data/landcover-2015.tif")
-r <- crop(r, buffer(idiv, 1e2))  # restrict the area to something that can be plotted
-poi <- as.points(r)
-pol <- as.polygons(r)
-```
-```{r, class.source="fold-hide", fig.align='center', fig.width=10}
-op <- par(no.readonly = TRUE)
-par(mfrow = c(1, 2))
-plot(poi, "category")
-lines(idiv)
-plot(pol, "category")
-lines(idiv)
-par(op)
+crs(landcover, proj = TRUE)
 ```
 
 # Reprojecting
@@ -405,7 +386,8 @@ It is quite common that data are obtained from a source that uses a CRS that is 
 It is even more common that data are gathered from multiple sources that do not use the same CRS.
 In such cases, the spatial data should be reprojected to one common CRS that is ideal for analyses.
 
-In `terra`, use `project()`, which can take three types of arguments:
+Use `project()` to project a spatial object from one CRS to another.
+Three types of arguments can be passed to `project()`:
 
   1. A spatial object with known CRS.
   2. A string with the WKT or PROJ4 CRS.
@@ -419,11 +401,11 @@ germany <- project(germany, crs(r))  # a spatial object
 germany_mollweide <- project(germany, "+proj=moll")  # a proj4
 germany_4326 <- project(germany, "EPSG:4326")  # a CRS code
 ```
-
 <blockquote class="nb">
-CRS have a big influence on analyses and visualization.
+When using an existing spatial object (`<obj>`) as CRS target, remember to use `project(<x>, crs(<obj>))` and not `project(<x>, <obj>)` if you are interested in reprojecting only. See section 5.3 about resampling for details.
 </blockquote>
 
+CRS have a big influence on analyses and visualization.
 ```{r, class.source="fold-hide", fig.align='center', fig.width=5, fig.height=5}
 plot(buffer(vect(cbind(2e6, 3e6)), 4e6), col = "white", lw = 1e-6)
 polys(germany, col = "grey90")
@@ -443,6 +425,49 @@ l <- vect(
   )
 )
 text(l[1], labels = "Cannot be seen,\nbut EPSG:4326 is here")
+```
+<blockquote class="nb">
+Be sure to use the CRS that is best for your analyses or visualization.
+</blockquote>
+
+# Data Conversion
+
+Sometimes is needed to create a raster from a geometry or *vice versa*.
+
+## Geometries to Rasters
+
+Use `rasterize()` to convert geometries to raster.
+In addition to the geometry to rasterize, you need to pass a raster to function as template, i.e. from which extent, CRS, and resolution are extracted from.
+```{r geom-to-rast}
+landcover <- rast("data/landcover-2015.tif")
+idiv <- vect("data/idiv.shp")
+idiv <- project(idiv, crs(landcover))  # CRS needs to be the same
+idiv_r <- rasterize(idiv, landcover, touches = TRUE)
+```
+If specified, `touches = TRUE` assigns a value of 1 to all cells that are touched by the polygon.
+The extent of this new raster is the same as the landcover one, which is too big to actually see the raterized polygon.
+Use `trim()` to trim the raster to the smallest raster containing all values that are not `NA`.
+```{r trim, fig.align='center'}
+plot(trim(idiv_r))
+lines(idiv)
+```
+
+## Rasters to Geometries
+
+Use `as.points()` or `as.polygons()` to convert rasters to geometries.
+```{r rast-to-geom}
+landcover <- crop(landcover, buffer(idiv, 1e2))  # restrict the area to something that can be plotted
+poi <- as.points(landcover)
+pol <- as.polygons(landcover)
+```
+```{r, class.source="fold-hide", fig.align='center', fig.width=10}
+op <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2))
+plot(poi, "category")
+lines(idiv)
+plot(pol, "category")
+lines(idiv)
+par(op)
 ```
 
 # Geometry Operations
@@ -530,15 +555,18 @@ plot(b, col = "gold")
 polys(idiv, col = "blue")
 ```
 
-## Example
-Let us see an example where all operation are combined.
-I want to find the centroid of Germany, how far is from the centroid of the main iDiv bulding, 
-and plot the circle centered at the centroid with the smallest area that is touching the centroid of the iDiv building.
+## Exercise
+Find the centroid of Germany, how far is from the centroid of the main iDiv bulding, and plot the circle centered at the centroid with the smallest area that is touching the centroid of the iDiv building.
+The geometry of Germany is saved in `data/germany.shp`.
+The geometry of the iDiv building is saved in `data/idiv.shp`.
+Click on the "Code" button below to see a solution to this problem.
 
-```{r example-geometry-operation, fig.align='center', fig.width=7, fig.height=7}
+```{r example-geometry-operation, fig.align='center', fig.width=7, fig.height=7, class.source="fold-hide"}
 ger <- vect("data/germany.shp")
+idiv <- vect("data/idiv.shp")
+
 centr <- centroids(ger)  # centroid of Germany
-idiv_centr <- idiv |> project(crs(centr)) |> centroids()
+idiv_centr <- idiv |> project(crs(ger)) |> centroids()  # centroid of iDiv
 d <- distance(centr, idiv_centr)  # distance between centroids
 b <- buffer(centr, d)  # circle with the smallest area touching iDiv
 l <- as.lines(rbind(centr, idiv_centr))  # line connecting centroids
@@ -549,39 +577,36 @@ lines(l)
 points(centr, pch = 21, cex = 2, bg = "gold")
 points(idiv_centr, pch = 21, cex = 2, bg = "green")
 text(centr, "Germany\ncentroid", pos = 2)
-text(idiv_centr, "iDiv\ncentroid", pos = 4, adj = 0.5)
+text(idiv_centr, "iDiv\ncentroid", pos = 4)
 text(l, paste(round(d) / 1e3, "km"), pos = 3)
-
-message("Distance between Germany centroid and iDiv: ", round(d / 1e3), " km")
-message("Area of the smallest circle centered at the centroid of Germany and touching iDiv: ", round(expanse(b) / 1e6), " km^2")
+text(b, paste("Area =", round(expanse(b) / 1e6), "km^2"), pos = 3, offset = 5)
 ```
 
 # Raster Operations
 
-Commonly operations on rasters are to calculate summary statistics, 
-aggregate of disaggregate to different resolutions, 
-resampling, and interpolation.
+Commonly operations on rasters are to calculate summary statistics, aggregate or disaggregate to different resolutions, resampling, and interpolation.
 
 ## Summary Statistics {.tabset}
 
 ### Local Summary
+A local summary is calculated across pixels with the same coordinates i.e. locally.
 Raster stacks can be summarized using common function, such as `mean`, `sd`, `sum`, etc.
 The output is a single raster layer with the summary.
 Mean, sum, minimum, and maximum, can be calculated simply using `mean()`, `sum()`, etc.
 For other function, use `app()`.
 ```{r local, fig.align='center', fig.width=6, fig.height=6}
 ndvi <- rast("data/ndvi-2024.tif")
-avg_ndvi <- mean(ndvi, na.rm = TRUE)  # equivalent to app(ndvi, "mean")
+avg_ndvi <- mean(ndvi, na.rm = TRUE)
 std_ndvi <- app(ndvi, "sd", na.rm = TRUE)
 month_max_ndvi <- app(ndvi, "which.max", na.rm = TRUE)  # month with the maximum NDVI
-
-plot(avg_ndvi, col = colorRampPalette(c("dodgerblue3", "gold", "darkgreen"))(100))
+plot(avg_ndvi, col = colorRampPalette(c("dodgerblue3", "orange", "darkgreen"))(100))
 plot(std_ndvi, col = hcl.colors(100, "Reds", rev = TRUE))
 ```
-This is called a local summary, because it is calculated across pixels with the same coordinates.
 
 ### Global Summary
-To get global summaries, i.e. calculated across all pixels of a layer, use `global()`
+Global summaries are calculated across all pixels of a layer.
+Use `global()` to get global summaries.
+When the input is a raster stack, the global summary is calculated for each layer separately.
 ```{r global}
 global(ndvi, "mean", na.rm = TRUE)
 ```
@@ -589,11 +614,11 @@ global(ndvi, "mean", na.rm = TRUE)
 ### Zonal Summary
 Zonal statistics summarize the values of a raster using categories from another raster of geometry.
 Use `zonal()` to obtain zonal statistics.
+Two arguments (`<x>`, `<y>`) are always required for `zonal(<x>, <y>)`, with `<x>` being the raster with the values to summarize and `<y>` the raster/geometry specifying the categories for the summary.
 ```{r zonal}
 landcover <- rast("data/landcover-2015.tif")
-avg_ndvi <- project(avg_ndvi, landcover)  # this will also resample avg_ndvi (see the chapter Raster Operations)
-zonal(avg_ndvi, r, fun = "mean", na.rm = TRUE)
-zonal(avg_ndvi, r, fun = "sd", na.rm = TRUE)  # spatial sd
+avg_ndvi <- project(avg_ndvi, landcover)  # this will also resample avg_ndvi (see the section Resampling)
+zonal(avg_ndvi, landcover, fun = "mean", na.rm = TRUE)
 ```
 
 ## Aggregate and Disaggregate {.tabset}
@@ -602,11 +627,14 @@ zonal(avg_ndvi, r, fun = "sd", na.rm = TRUE)  # spatial sd
 Aggregating creates a raster that is at coarser resolution compared to the original raster.
 Use `aggregate()` to aggregate rasters.
 The arguments `fact`, number of cells in each direction to be aggregated, and `fun`, the function used for aggregatation, need to be specified.
-```{r aggregate, fig.align='center', fig.width=6, fig.height=6}
+```{r aggregate, fig.align='center', fig.width=12, fig.height=6}
 r <- rast(matrix(rnorm(16^2), 16, 16))
-plot(r)
 r_aggr <- aggregate(r, 4, "max")  # maximum values in the 4x4 grid
+
+par(mfrow = c(1, 2))  # cannot stack rasters with different resolution
+plot(r)
 plot(r_aggr)
+par(mfrow = c(1, 1))
 ```
 
 ### Disaggregate
@@ -614,17 +642,61 @@ Disaggregating creates a raster that is at finer resolution compared to the orig
 Use `disagg()` to disaggregate rasters.
 The arguments `fact`, number of cells in each direction to create for each cell of the original raster, and `method`, the method used for disaggregation, need to be specified.
 Available methods are `near`, for nearest neighbor, or `bilinear`, for bilinear interpolation.
-```{r disagg, fig.align='center', fig.width=6, fig.height=6}
+```{r disagg, fig.align='center', fig.width=12, fig.height=6}
 r_disagg <- disagg(r, 4, method = "bilinear")
+
+par(mfrow = c(1, 2))  # cannot stack rasters with different resolution
+plot(r)
 plot(r_disagg)
+par(mfrow = c(1, 1))
 ```
 
 <blockquote class="nb">
 Aggregating and disaggregating a raster does not give, in general, the same raster back. Some of the original information is lost during aggregation.
 </blockquote>
-```{r agg-disagg, fig.align='center', fig.width=6, fig.height=6}
+```{r agg-disagg, fig.align='center', fig.width=12, fig.height=6}
 plot(c(r, r |> aggregate(4, "mean") |> disagg(4, "bilinear")))
 ```
+
+### Exercise
+Assess how global average of NDVI is affected by the resolution of the NDVI layers.
+Aggregate the NDVI layer by a factor `seq(2, 20, by = 1)` and see if the global average change.
+Click on the "Code" button below to see a solution to this problem.
+
+```{r, class.source="fold-hide", fig.align='center', fig.width=5, fig.height=5}
+ndvi <- rast("data/ndvi-2024.tif") |> mean()
+global_avg_ndvi <- rep(NA, 20)
+global_avg_ndvi[1] <- (ndvi |> global("mean", na.rm = TRUE))[1, 1]
+for (f in 2:20) {
+  global_avg_ndvi[f] <- (ndvi |> aggregate(fact = f) |> global("mean", na.rm = TRUE))[1, 1]
+}
+global_avg_ndvi <- data.frame(
+  fact = 1:20,
+  avg_ndvi = global_avg_ndvi
+)
+scatter.smooth(global_avg_ndvi, ylim = c(0, .5))
+```
+The average NDVI is not changing.
+This is a property of the average.
+Try instead to see if the standard deviation changes.
+
+```{r, class.source="fold-hide", fig.align='center', fig.width=5, fig.height=5}
+ndvi <- rast("data/ndvi-2024.tif") |> mean()
+global_std_ndvi <- rep(NA, 20)
+global_std_ndvi[1] <- (ndvi |> global("sd", na.rm = TRUE))[1, 1]
+for (f in 2:20) {
+  global_std_ndvi[f] <- (ndvi |> aggregate(fact = f) |> global("sd", na.rm = TRUE))[1, 1]
+}
+global_std_ndvi <- data.frame(
+  fact = 1:20,
+  std_ndvi = global_std_ndvi
+)
+scatter.smooth(global_std_ndvi, ylim = c(0.1, .3))
+```
+The standard deviation decreases for increasing aggregation factor.
+This is because aggregating is done here (implicitly) using `mean` as the aggregating function.
+This reduces spatial heterogeneity and, therefore, the global standard deviation.
+Scale is important for some processes, but not others.
 
 ## Resampling
 When two rasters do not align, i.e. they have different origin or resolution, to make them comparable one of them must be resampled.
@@ -639,13 +711,15 @@ Among the available algorithms are:
   - `cubicspline`, for cubic-spline interpolation.
   - `lanczos`, for Lanczos resampling.
 
-```{r resampling, fig.align='center', fig.width=6, fig.height=6}
+```{r resampling, fig.align='center', fig.width=6, fig.height=6, cache=TRUE}
 landcover <- rast("data/landcover-2015.tif")
-ndvi <- mean(rast("data/ndvi-2024.tif"), na.rm = TRUE)
-ndvi <- project(ndvi, crs(landcover))
+ndvi <- rast("data/ndvi-2024.tif") |>
+  mean(na.rm = TRUE) |>
+  project(crs(landcover))
+
 ndvi_resampled <- resample(ndvi, landcover, method = "lanczos")
-plot(ndvi, col = colorRampPalette(c("dodgerblue3", "gold", "darkgreen"))(100))
-plot(ndvi_resampled, col = colorRampPalette(c("dodgerblue3", "gold", "darkgreen"))(100))
+
+plot(ndvi_resampled, col = colorRampPalette(c("dodgerblue3", "orange", "darkgreen"))(100))
 ```
 
 <blockquote class="nb">
@@ -658,9 +732,15 @@ Interpolation uses a statistical model to make geographic predictions.
 A simple statistical model can include, for example, the coordinates of the grid.
 This works relatively well with processes that change gradually with longitude or latitude, such as temperature.
 ```{r interpolation, fig.align='center', fig.width=12, fig.height=6}
-# average annual temperature
-tas <- rast("data/wc2-bio1.tif")  
-elev <- rast("data/wc2-elevation.tif")  
+tas <- rast("data/wc2-bio1.tif")  # average annual temperature, Celsius
+elev <- rast("data/wc2-elevation.tif")  # elevation, meters
+
+par(mfrow = c(1, 2))
+plot(tas, col = hcl.colors(100, "Zissou 1"))
+plot(elev, col = map.pal("haxby", 5))
+plot(elev, col = colorRampPalette(c("forestgreen", "#CDFFA2", "#FFAF4D", "#FFFFFF"))(100))
+par(mfrow = c(1, 1))
+
 r <- c(tas, elev)
 
 # construct table for model fitting
