@@ -1,7 +1,7 @@
 ---
 title: "GIS course @ yDiv"
 author: "Emilio Berti"
-date: "22 January 2025"
+date: "27 January 2025"
 output:
   rmdformats::readthedown:
     toc_depth: 6
@@ -91,6 +91,9 @@ Also, you can download all data used in this tutorial by clicking [here](teachin
 Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
 
 
+```
+## terra 1.7.71
+```
 
 ## Data Sets {.tabset}
 In this tutorial, we will use data sets for:
@@ -713,12 +716,12 @@ poi |> distance() |> as.matrix()
 ```
 
 ```
-##           1        2         3        4         5
-## 1      0.00 190406.8  17477.25 260076.3  50142.74
-## 2 190406.79      0.0 179483.33 409508.5 230864.84
-## 3  17477.25 179483.3      0.00 257884.1  67467.95
-## 4 260076.25 409508.5 257884.09      0.0 265154.45
-## 5  50142.74 230864.8  67467.95 265154.5      0.00
+##           1         2        3         4         5
+## 1      0.00  65901.13 198139.1 166790.22 186834.32
+## 2  65901.13      0.00 169317.6 227851.19 252318.07
+## 3 198139.11 169317.64      0.0 277920.55 328937.39
+## 4 166790.22 227851.19 277920.6      0.00  60244.04
+## 5 186834.32 252318.07 328937.4  60244.04      0.00
 ```
 
 When passing also a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
@@ -732,11 +735,11 @@ distance(
 
 ```
 ##         [,1]
-## [1,] 5876848
-## [2,] 5894491
-## [3,] 5864594
-## [4,] 5666371
-## [5,] 5906264
+## [1,] 5823950
+## [2,] 5819965
+## [3,] 5655092
+## [4,] 5762035
+## [5,] 5813647
 ```
 
 ## Buffer
@@ -1026,7 +1029,7 @@ plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3"))
 
 <img src="main_files/figure-html/interpolated-plot-1.png" style="display: block; margin: auto;" />
 
-# Examples 
+# Examples {.tabset}
 
 ## Species Distribution Model (SDM)
 I will show how to perform a simple species distribution model (SDM) for the species _Erica arborea_.
@@ -1039,6 +1042,32 @@ I load the libraries.
 ```r
 library(tibble)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:terra':
+## 
+##     intersect, union
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(readr)
 library(terra)
 ```
