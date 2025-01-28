@@ -1,7 +1,7 @@
 ---
 title: "GIS course @ yDiv"
 author: "Emilio Berti"
-date: "27 January 2025"
+date: "28 January 2025"
 output:
   rmdformats::readthedown:
     toc_depth: 6
@@ -91,9 +91,6 @@ Also, you can download all data used in this tutorial by clicking [here](teachin
 Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
 
 
-```
-## terra 1.7.71
-```
 
 ## Data Sets {.tabset}
 In this tutorial, we will use data sets for:
@@ -716,12 +713,12 @@ poi |> distance() |> as.matrix()
 ```
 
 ```
-##           1         2        3         4         5
-## 1      0.00  65901.13 198139.1 166790.22 186834.32
-## 2  65901.13      0.00 169317.6 227851.19 252318.07
-## 3 198139.11 169317.64      0.0 277920.55 328937.39
-## 4 166790.22 227851.19 277920.6      0.00  60244.04
-## 5 186834.32 252318.07 328937.4  60244.04      0.00
+##           1        2         3        4         5
+## 1      0.00 190406.8  17477.25 260076.3  50142.74
+## 2 190406.79      0.0 179483.33 409508.5 230864.84
+## 3  17477.25 179483.3      0.00 257884.1  67467.95
+## 4 260076.25 409508.5 257884.09      0.0 265154.45
+## 5  50142.74 230864.8  67467.95 265154.5      0.00
 ```
 
 When passing also a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
@@ -735,11 +732,11 @@ distance(
 
 ```
 ##         [,1]
-## [1,] 5823950
-## [2,] 5819965
-## [3,] 5655092
-## [4,] 5762035
-## [5,] 5813647
+## [1,] 5876848
+## [2,] 5894491
+## [3,] 5864594
+## [4,] 5666371
+## [5,] 5906264
 ```
 
 ## Buffer
@@ -1029,7 +1026,7 @@ plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3"))
 
 <img src="main_files/figure-html/interpolated-plot-1.png" style="display: block; margin: auto;" />
 
-# Examples {.tabset}
+# Examples
 
 ## Species Distribution Model (SDM)
 I will show how to perform a simple species distribution model (SDM) for the species _Erica arborea_.
@@ -1042,32 +1039,6 @@ I load the libraries.
 ```r
 library(tibble)
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:terra':
-## 
-##     intersect, union
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 library(readr)
 library(terra)
 ```
@@ -1084,14 +1055,15 @@ gbif <- read_tsv("data/erica-arborea-gbif.tsv") |>
 ```
 
 ```
-## Warning: One or more parsing issues, call `problems()` on your data frame for details, e.g.:
+## Warning: One or more parsing issues, call `problems()` on your data frame for details,
+## e.g.:
 ##   dat <- vroom(...)
 ##   problems(dat)
 ```
 
 ```
 ## Rows: 13228 Columns: 50
-## ── Column specification ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: "\t"
 ## chr  (31): datasetKey, occurrenceID, kingdom, phylum, class, order, family, ...
 ## dbl  (13): gbifID, individualCount, decimalLatitude, decimalLongitude, coord...
@@ -1234,3 +1206,105 @@ points(p[p$occ == 1, ], cex = .3)
 ```
 
 <img src="main_files/figure-html/erica-zoomed-1.png" style="display: block; margin: auto;" />
+
+## Finding Social Groups using GPS
+I will show how to find social groups in a population of feral horses (_Equus ferus caballus_) from Wyoming.
+The original telemetry data was obtained from MoveBank: <https://www.movebank.org/cms/webapp?gwt_fragment=page%3Dstudies%2Cpath%3Dstudy2478104452>.
+<img src="figures/equus-ferus.jpg" alt="horses" width="800px"/>
+
+The approach I will use is very simple: overlap the home range of individuals and see how much they overlap.
+Other, more sophisticated techniques have been developed to achieve this.
+
+
+```r
+library(terra)
+library(dplyr)
+library(tibble)
+
+pal <- adjustcolor(hcl.colors(17, "Set 2"), alpha.f = .3)
+```
+
+I load the data, which is a shapefile containing the timestamp from the GPS collars and the ID of the individual.
+The timestamp needs to be converted to a `POSIXct`, which is the proper R class to store dates and times.
+
+```r
+p <- vect("data/movebank.shp")
+p$timestamp <- as.POSIXct(p$timestamp, format = c("%Y-%m-%d %H:%M:%S"))
+plot(p, "individual", col = pal)
+```
+
+<img src="main_files/figure-html/equus-data-1.png" style="display: block; margin: auto;" />
+
+I calculate the home ranges of the individuals as the minimum convex polygon (`convHull()`) inscribing all GPS locations.
+
+```r
+homeranges <- convHull(p, by = "individual")
+plot(homeranges, "individual", pal)
+```
+
+<img src="main_files/figure-html/equus-homeranges-1.png" style="display: block; margin: auto;" />
+
+I calculate the area ($km^2$) of overlap between pairs of home ranges.
+I obtain the overlap between home ranges using `terra::intersect()` and then calculate its area using `expanse()`.
+
+```r
+overlap_area <- function(shape1, shape2) {
+  intersection <- suppressWarnings(terra::intersect(shape1, shape2))
+  if (length(intersection) == 1) {
+    area <- expanse(intersection, unit = "km")  # km2
+  } else {
+    area <- 0
+  }
+  return(area)
+}
+overlap <- matrix(NA, ncol = length(homeranges), nrow = length(homeranges))
+colnames(overlap) <- homeranges$individual
+rownames(overlap) <- homeranges$individual
+for (i in seq_len(length(homeranges$individual))) {
+  for (j in seq(i, length(homeranges$individual))) {
+    overlap[i, j] <- overlap_area(homeranges[i], homeranges[j])
+    overlap[j, i] <- overlap[i, j]
+  }
+}
+overlap[1:5, 1:5]
+```
+
+```
+##           h395       h396      h397      h398      h399
+## h395 1144.4063  999.46566 111.26179 130.65929 103.98251
+## h396  999.4657 1013.01030 105.75089 130.65929  58.52838
+## h397  111.2618  105.75089 204.25506  85.05612  59.81245
+## h398  130.6593  130.65929  85.05612 130.65929  32.54874
+## h399  103.9825   58.52838  59.81245  32.54874 123.05021
+```
+
+I use `hclust()` to get an idea of how many groups there are and to which group the individuals belong.
+
+```r
+clusters <- hclust(dist(1 / (overlap + 1e-6)), method = "average")
+plot(clusters)  # I see 3 major groups
+```
+
+<img src="main_files/figure-html/equus-hclust-1.png" style="display: block; margin: auto;" />
+
+I plot the home ranges of the individuals coloring them by which social groups they belong.
+
+```r
+groups <- cutree(clusters, 3)  # 3 groups
+plot(homeranges, col = hcl.colors(k, "Set 2")[groups], alpha = .5)
+text(homeranges, names(homeranges))
+```
+
+<img src="main_files/figure-html/equus-groups-1.png" style="display: block; margin: auto;" />
+
+Finally, I extract the information of the social groups.
+
+```r
+tibble(individual = names(groups), group = groups) |> arrange(group)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["individual"],"name":[1],"type":["chr"],"align":["left"]},{"label":["group"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"h395","2":"1"},{"1":"h396","2":"1"},{"1":"h397","2":"1"},{"1":"h398","2":"1"},{"1":"h399","2":"1"},{"1":"h410","2":"1"},{"1":"h402","2":"2"},{"1":"h403","2":"2"},{"1":"h404","2":"2"},{"1":"h405","2":"2"},{"1":"h407","2":"2"},{"1":"h408","2":"2"},{"1":"h461","2":"2"},{"1":"h468","2":"2"},{"1":"h470","2":"2"},{"1":"h456","2":"3"},{"1":"h467","2":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
