@@ -766,6 +766,14 @@ plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3"))
 ```
 
 # Examples
+I provide three examples below of some of the most common applications of GIS in Ecology:
+
+  1. Species distribution modelling (SDM).
+  2. Analysis of telemetry (GPS) data.
+  3. Count points inside polygons, e.g. number of trees in Leipzig districts.
+
+These examples are not _reserach-ready_, i.e. the analysis can be largely improved.
+However, they provide a good starting point to start similar projects using GIS.
 
 ## Species Distribution Model (SDM)
 I will show how to perform a simple species distribution model (SDM) for the species _Erica arborea_.
@@ -939,11 +947,93 @@ plot(clusters)  # I see 3 major groups
 I plot the home ranges of the individuals coloring them by which social groups they belong.
 ```{r equus-groups, fig.align='center', fig.width=8}
 groups <- cutree(clusters, 3)  # 3 groups
-plot(homeranges, col = hcl.colors(k, "Set 2")[groups], alpha = .5)
+plot(homeranges, col = hcl.colors(3, "Set 2")[groups], alpha = .5)
 text(homeranges, names(homeranges))
 ```
 
 Finally, I extract the information of the social groups.
 ```{r equus-results}
 tibble(individual = names(groups), group = groups) |> arrange(group)
+```
+
+## Density of Planted Trees in Leipzig
+I will show how to find the density of planted trees ^[Or better, of planted trees that have been recorded.] for the districts of the city of Leipzig.
+The original data was obtained from the Leipzig Bureau for green and water in the city: <https://opendata.leipzig.de/dataset/baumkataster-stadt-leipzig1>.
+
+```{r baum-libraries}
+library(readr)
+library(dplyr)
+library(terra)
+```
+
+I load the shapefile of the districts of Leipzig and the planted tree census (_baumkataster_).
+The census is a csv file with the column `geom` representing the geometries in well-known text (WKT) format.
+```{r baum-load}
+districts <- vect("data/ot.shp")  # Leipzig districts
+
+baumkataster <- read_csv(
+  "data/Baumkataster_Stadt_Leipzig.csv",
+  show_col_types = FALSE
+) |>
+  mutate(  # rename the columns
+    species = ga_lang_wiss,
+    geom,
+    .keep = "none"  # keep only species and geom columns
+  )
+
+baumkataster
+```
+
+I create the geometry object, specifying the CRS to be the same of the Leipzig districts.
+```{r baum-vect}
+tree <- vect(baumkataster, geom = "geom", crs = crs(districts))
+tree
+```
+
+Next, I want to know in which district each tree is located.
+There are several ways of achieving this, but the fastest is probably using `terra::extract(<x>, <y>)`, which returns a data frame with the features of `<x>` for the geometries of `<y>`.
+I extract the features of `district` for the locations specified by `tree`.
+
+```{r baum-extract, cache=TRUE}
+tab <- extract(districts, tree) |>
+  as_tibble() |>
+  bind_cols(tree |> as_tibble()) |>  # add the columns from tree
+  filter(!is.na(Name))  # remove trees outside Leipzig proper
+
+tab
+```
+
+Then, I count the number of rows (one row = one tree) per district.
+```{r baum-tally}
+tally <- table(tab$Name)
+tally
+```
+
+I add the value to `district` so I have everything in one object.
+```{r baum-add}
+districts$n_trees <- tally[districts$Name]
+```
+
+Finally, I calculate the area of each polygon using `expanse()` and the tree density.
+```{r baum-density}
+districts$area <- expanse(districts, "km")
+districts$tree_density <- log10(districts$n_trees / districts$area)
+```
+`tree_density` is $log_{10}-$scaled to make visualization easier.
+I plot everything, adding also the Leipzig riparian forest (`auwald`) to the map.
+```{r baum-plot, fig.width=8, fig.height=8, fig.align='center'}
+auwald <- vect("data/auwald.shp") |> project(crs(districts))
+
+plot(districts, "tree_density", col = hcl.colors(100, "Fall", rev = TRUE), type = "continuous")
+lines(auwald, col = "grey20", lw = 5)
+# I show the names of the districts with highest tree density
+text(
+  districts[districts$tree_density > quantile(districts$tree_density, .9)],
+  districts$Name[districts$tree_density > quantile(districts$tree_density, .9)],
+  col = "grey20",
+  halo = TRUE,
+  hw = .15,
+  cex = 0.7
+)
+text(auwald, "Auwald", adj = c(0, -3.7), halo = TRUE, hw = .3, cex = 1.8)
 ```
