@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List of Ideas</title>
+  <link rel="stylesheet" href=ideas.css>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Food webs</h1>
+    <ul class="ideas-list">
+        
+        <li>
+        Predator-prey body mass ratio for machine-learned groups.
+        <div class="details">
+            <ol>
+              <li>Identify \(k_i\) groups based on k-mean clustering on traits or other table.</li>
+              <li>Fit the food web inference model with each group having a predator-prey optimal scaling ratio.</li>
+              <li>Repeat using \(k_{i+1} = k_i + 1\)</li>
+              <li>Repeat for several \(k\).</li>
+              <li>Compare each inference model using AUC or Boyce index.</li>
+              <li>Select the best model.</li>
+              <li>Explore how the species were partitioned into groups.</li>
+            </ol>
+        </div>
+        </li>
+        
+        <li>ASD
+        <div class="details">
+          <ol>
+            <li>First.</li>
+            <li>Second.</li>
+          </ol>
+        </div>
+        </li>
+
+    </ul>
+  </div>
+
+  <br>
+  
+  <div class="container">
+    <h1>Species distribution modeling</h1>
+    <ul class="ideas-list">
+        
+        <li>ASD
+        <div class="details">
+          <ol>
+            <li>First.</li>
+            <li>Second.</li>
+          </ol>
+        </div>
+        </li>
+
+    </ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const listItems = document.querySelectorAll('.ideas-list li');
+      listItems.forEach(item => {
+        item.addEventListener('click', function() {
+          this.classList.toggle('active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
