@@ -1,144 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Emilio Berti Homepage</title>
+		<title>Emilio Berti</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link rel="stylesheet" href=index.css>
+		<!-- <link rel="stylesheet" href=index.css> -->
+    <link rel="stylesheet" href=base.css>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	</head>
-	<body>
+	<body class="bg-light min-vh-100">
 
- 	  <h1>Emilio Berti homepage</h1><br>
-
-   	<div class="container">
-  		<!-- about me -->
-  		<div class="panel about">
-  			<a target="_self" href = "About_me.html" target = "_blank">About me
-	  			<img src="Figures/dionisio.jpg" height=400px alt="">
-  			</a>
-		</div>
-			<!-- cv -->
-			<div class="panel cv">
-				<a target="_self" href = "CV.html" target = "_blank">CV
-					<img src="Figures/higuchi.jpg" height=400px alt="">
-				</a>
-			</div>
-
-			<!-- teaching -->
-			<div class="panel teaching">
-				<a target="_self" href = "Teaching.html" target = "_blank">Teaching
-					<img src="Figures/humbold.jpg" height=400px alt="">
-				</a>
-			</div>
-
-			<div class="panel skip">
-		 		 <div class="index-section">
-		 		 	<b>Skip to</b><br>
-				  <ul>
-				    <li><a href="#publications">Publications</a></li>
-				    <li><a href="#conferences">Conferences</a></li>
-				    <li><a href="#packages">R packages</a></li>
-				    <li><a href="#contact">Contact</a></li>
-				  </ul>
-				</div>
-			</div>
-
-  	</div>
-
-  	<!-- publications -->
-  	<h2 id="publications">Publications</h2>
-		<div class="full-width-panel" style="margin: 0 0 0 0; height: 600px; overflow: auto">
-			<iframe src="Publications.html"></iframe>
-		</div>
-
-		<!-- conferences -->
-  	<h2 id="conferences">Conferences</h2>
-		<div class="full-width-panel" style="margin: 0 0 0 0; height: 300px; overflow: auto">
-			<iframe src="Conferences.html"></iframe>
-		</div>
-
-  	<!-- packages -->
-  	<h2>R packages</h2>
-  		<div class="packages" id="packages">
-        <!-- enerscape -->
-        <div class="panel first">
-          <h2 class="package-title">enerscape</h2>
-          <p class="package-description">Compute energy landscapes using a digital elevation model raster and body mass of animals.</p>  
-          <a href="https://cran.r-project.org/src/contrib/enerscape_1.1.0.tar.gz" class="download-link">
-            <button class="download-button">Download from CRAN</button>
-          </a>
-          <a target="_blank" href="https://github.com/emilio-berti/enerscape" class="github-link">
-            <button class="github-button">View on GitHub</button>
-          </a>
-          <a target="_blank" href="https://doi.org/10.1111/2041-210X.13734" class="paper-link">
-            <button class="paper-button">Read the paper</button>
-          </a>
-        </div>
-
-        <!-- atnr -->
-        <div class="panel second">
-          <h2 class="package-title">ATNr</h2>
-          <p class="package-description">Simulate the dynamics of species biomasses in food webs using Allometric Trophic Network (ATN) models.</p>  
-          <a href="https://cran.r-project.org/src/contrib/ATNr_1.1.0.tar.gz" class="download-link">
-            <button class="download-button">Download from CRAN</button>
-          </a>
-          <a target="_blank" href="https://github.com/gauzens/ATNr" class="github-link">
-            <button class="github-button">View on GitHub</button>
-          </a>
-          <a target="_blank" href="https://doi.org/10.1111/2041-210X.14212" class="paper-link">
-            <button class="paper-button">Read the paper</button>
-          </a>
-        </div>
-
-        <!-- GHCNr -->
-        <div class="panel third">
-          <h2 class="package-title">GHCNr</h2>
-          <p class="package-description">Download and process daily weather data from the Global Historical Climatology Network (GHCN) database.</p>  
-          <a href="https://cran.r-project.org/src/contrib/GHCNr_0.8.0.tar.gz" class="download-link">
-            <button class="download-button">Download from CRAN</button>
-          </a>
-          <a target="_blank" href="https://github.com/emilio-berti/GHCNr" class="github-link">
-            <button class="github-button">View on GitHub</button>
-          </a>
-        </div>
-        <!-- xsdm -->
-        <!-- <div class="panel fourth">
-          <h2 class="package-title">xsdm</h2>
-          <p class="package-description">xsdm is a species distribution model that incorporate theory from stochastic demography in order to account for the effects of inter-annual climatic variability.</p>  
-          <a target="_blank" href="https://github.com/emilio-berti/xsdm" class="github-link">
-            <button class="github-button">View on GitHub</button>
-          </a>
-        </div> -->
-
-        <!-- assembly -->
-        <div class="panel fourth">
-          <h2 class="package-title">assembly</h2>
-          <p class="package-description">Simulate community assembly using three procedures: random, resource filtering, and limiting similarity filtering.</p>  
-          <a target="_blank" href="https://github.com/emilio-berti/assembly" class="github-link">
-            <button class="github-button">View on GitHub</button>
-          </a>
-        </div>
+    <div class="banner text-white p-4 text-center">
+      <h1>Emilio Berti</h1>
+      <div class="mt-3">
+        <a href="index.html" class="btn btn-light mx-2 col-md-1">Home</a>
+        <a href="CV.html" class="btn btn-light mx-2 col-md-1">CV</a>
+        <a href="Teaching.html" class="btn btn-light mx-2 col-md-1">Teaching</a>
+        <a href="Publications.html" class="btn btn-light mx-2 col-md-1">Publications</a>
+        <a href="#contact" class="btn btn-light mx-2 col-md-1">Contacts</a>
+      </div>
     </div>
 
-		<!-- contacts -->
-		<h2 id = "contact">Contact</h2>
-		<div class="contact-container">
-				<div class="address">
-					Emilio Berti<br>
-					German Centre for Integrative Biodiversity Research (iDiv) Halle-Jena-Leipzig,<br>
-					Puschstrasse 4,<br>
-					04103, Leipzig, Germany
-				</div>
-				<div class="email">
-					emilio.berti@idiv.de<br>
-					emilio.berti.academia@gmail.com
-				</div>
-		</div>
+    <section id="about" class="bg-tertiary container my-5 py-4">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center py-3">
+          <h2 class="display-6 mb-3 text-center">About Me</h2>
+          <p class="lead">Theoretical ecologist with a passion for math and computing</p>
+          <p class="text-muted">
+            I am a biologist with a passion for theoretical ecology and animal movement. 
+            I have experience in many different fields of biology, from muscle physiology to macroecology and biogeography.
+            Currently a PostDoctoral research at iDiv.
+            I live inside the Tower of Babel: I am Italian, my wife is Bulgarian, we met in Denmark, and we live in Germany.
+            I am an avid reader of ancient history and I love sumo.
+          </p>
+        </div>
+          <div class="col-md-3 text-center mt-4 mt-md-0">
+            <div class="image-hover-wrapper">
+              <img src="Figures/dionisio.jpg" class="img-fluid rounded shadow hover-zoom" alt="Description 1">
+              <div class="overlay-text">The perfect acoustic of the cave was used by tyrant Dionisio to spy on the plans of political dissidents.</div>
+            </div>
+            <h5 class="mt-3 text-center">Me in front of Dionisio's ear.</h5>
+          </div>
+          <div class="col-md-3">
+            <div class="image-hover-wrapper">
+              <img src="Figures/humbold.jpg" class="img-fluid rounded shadow hover-zoom" alt="Description 1">
+              <div class="overlay-text">Luckily I am not that tall and they can still see.</div>
+            </div>
+            <h5 class="mt-3 text-center">Me, standing in front of giants.</h5>
+          </div>
 
-		<!-- <a target="_self" href = "Teaching.html" target = "_blank"> Teaching </a><br> -->
-		<!-- <a target="_self" href = "FAQs.html" target = "_blank"> FAQs </p> -->
-		<!-- <a target="_self" href = "Side_projects.html"> Side projects </p> -->
-		<!-- <a target="_self" href = "calvana.html"> Camera trapping in Calvana </p> -->
-		<!-- <a target="_self" href = "wild-horses/wildhorses.html"> Wild Horses Network </p> -->
-		<!-- <a target="_self" href = "animations.html"> Animations </p> -->
+        </div>
+    </section>
+
+    <section id="research" class="container my-5">
+      <div class="row mb-5"><div class="col-12 text-center"><h2 class="display-6 mb-3 text-center">Research Projects</h2></div></div>
+      <!-- Project 1 -->
+      <div class="row align-items-center mb-5 g-4">  <!-- Added gutter between columns -->
+        <!-- Image (Left) -->
+        <div class="col-md-5">
+          <img src="Figures/enerscape.png" 
+               class="img-fluid rounded shadow" 
+               alt="Project 1 Visualization"
+               style="max-height: 300px; width: 100%; object-fit: cover;">
+        </div>
+        
+        <!-- Text (Right) -->
+        <div class="col-md-7">
+          <h3 class="mb-3">How do animals use energy landscapes?</h3>
+          <p class="text-muted mb-2"><em>
+            Expanding our knowledge of how animals use energy landscapes.
+            Developing theory and methods to estimate energy costs.
+            Analyzing telemetry data.
+          </em></p>
+          <p>
+            I got into movement ecology during my MSc degree, where I studied how ants behavior can be described by a combination of slow and fast movements.
+            I kept <em>moving</em> in this field during my PhD, where I assessed how deep-time megafaunal extinctions have reduced biotic connectivity by removing megalinker species from ecosystems (<a href="https://doi.org/10.1111/geb.13182">Berti & Svenning, 2020</a>).
+            In my PostDoc, I got interested in energy landscapes: I developed a framework to quantify energy costs of travel for terrestrial animals (<a href="https://doi.org/10.1111/2041-210x.13734">Berti et al., 2021</a>) and applied it for fundamental research (<a href="https://doi.org/10.1002/jwmg.70013">Berti et al., 2025</a>) as well as for conservation practices (<a href="https://doi.org/10.1111/acv.12937">Carter et al., 2024</a>).
+            More is to come.
+          </p>
+        </div>
+      </div>
+
+      <!-- Project 2 (Reversed layout) -->
+      <div class="row align-items-center mb-5 g-4 flex-md-row-reverse">  <!-- Reversed on desktop -->
+        <!-- Image (Right) -->
+        <div class="col-md-5">
+          <img src="Figures/climate.png" 
+               class="img-fluid rounded shadow" 
+               alt="Project 2 Diagram"
+               style="width: 100%; object-fit: cover;">
+        </div>
+        
+        <!-- Text (Left) -->
+        <div class="col-md-7">
+          <h3 class="mb-3">Ecological Data Science</h3>
+          <p class="text-muted mb-2"><em>
+            Integrating data for ecological research.
+            Developing pipelines and methods for data acquisition and processing.
+            Expanding data sources and best practices into ecology.
+          </em></p>
+          <p>
+            Ecology has reached a levels of data complexity and scale.
+            However, there is big scope for improving how we use such data and we should strive to improve the fundamental understanding of the data used in ecology, provide easy access to it, and expand the reproducibility of analyses.
+            A combination of effective communication, software development (e.g. <a href="https://doi.org/10.1111/2041-210x.14212">Gauzens et al., 2023</a>), and guidelines for best practices (e.g. <a href="https://doi.org/10.1111/2041-210x.13802">Grenié et al., 2022</a>) is best to achieve these goals.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="software" class="container my-5 py-4">
+      <h2 class="display-6 mb-3 text-center">Software</h2>
+      	<div class="container mt-4" id="packages">
+          <div class="row g-4">
+            <!-- enerscape -->
+            <div class="col-md-6 col-lg-3"> 
+              <div class="card h-100 shadow-sm bg-tertiary">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                  <h5 class="card-title">enerscape</h5>
+                  <p class="card-text">Compute energy landscapes using a digital elevation model raster and body mass of animals.</p>
+                  <a href="https://cran.r-project.org/src/contrib/enerscape_1.1.0.tar.gz" class="download-link">
+                    <button class="download-button">Download from CRAN</button>
+                  </a>
+                  <a target="_blank" href="https://github.com/emilio-berti/enerscape" class="github-link">
+                    <button class="github-button">View on GitHub</button>
+                  </a>
+                  <a target="_blank" href="https://doi.org/10.1111/2041-210X.13734" class="paper-link">
+                    <button class="paper-button">Read the paper</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- atnr -->
+            <div class="col-md-6 col-lg-3">  <!-- 2 cols on mobile, 4 on desktop -->
+              <div class="card h-100 shadow-sm bg-tertiary">  <!-- Card panel -->
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                  <h5 class="card-title">ATNr</h5>
+                  <p class="card-text">Simulate the dynamics of species biomasses in food webs using Allometric Trophic Network (ATN) models.</p>
+                  <a href="https://cran.r-project.org/src/contrib/ATNr_1.1.0.tar.gz" class="download-link">
+                    <button class="download-button">Download from CRAN</button>
+                  </a>
+                  <a target="_blank" href="https://github.com/gauzens/ATNr" class="github-link">
+                    <button class="github-button">View on GitHub</button>
+                  </a>
+                  <a target="_blank" href="https://doi.org/10.1111/2041-210X.14212" class="paper-link">
+                    <button class="paper-button">Read the paper</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- GHCNr -->
+            <div class="col-md-6 col-lg-3">  <!-- 2 cols on mobile, 4 on desktop -->
+              <div class="card h-100 shadow-sm bg-tertiary">  <!-- Card panel -->
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                  <h5 class="card-title">GHCNr</h5>
+                  <p class="card-text">Download and process daily weather data from the Global Historical Climatology Network (GHCN) database.</p>
+                  <a href="https://cran.r-project.org/src/contrib/GHCNr_0.8.0.tar.gz" class="download-link">
+                    <button class="download-button">Download from CRAN</button>
+                  </a>
+                  <a target="_blank" href="https://github.com/emilio-berti/GHCNr" class="github-link">
+                    <button class="github-button">View on GitHub</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- assembly -->
+            <div class="col-md-6 col-lg-3">  <!-- 2 cols on mobile, 4 on desktop -->
+              <div class="card h-100 shadow-sm bg-tertiary">  <!-- Card panel -->
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                  <h5 class="card-title">assembly</h5>
+                  <p class="card-text">Simulate community assembly using three procedures: random, resource filtering, and limiting similarity filtering.</p>
+                  <a target="_blank" href="https://github.com/emilio-berti/assembly" class="github-link">
+                    <button class="github-button">View on GitHub</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+      
+      </div>
+    </div>
+  </section>
+
+		<!-- footer -->
+    <footer id="contact" class="footer text-white p-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">  <!-- Added column -->
+          <h5>Address</h5>
+          <address class="mt-6">
+            <i class="bi bi-building me-2"></i>German Centre for Integrative Biodiversity Research (iDiv) Halle-Jena-Leipzig<br>
+            <i class="bi bi-geo-fill me-2"></i>Puschstrasse 4<br>
+            <i class="bi bi-pin-map me-2"></i>Leipzig 04103<br>
+            <i class="bi bi-globe me-2"></i> Germany
+          </address>
+        </div>
+        <div class="col-md-4">
+          <h5>Contact</h5>
+          <ul class="list-unstyled">
+            <li><i class="bi bi-envelope me-2"></i>emilio.berti@idiv.de</li>
+            <li><i class="bi bi-envelope me-2"></i>emilio.berti.academia@gmail.com</li>
+          </ul>
+        </div>
+        <div class="col-md-1">
+          <h5>Social</h5>
+          <a href="https://github.com/emilio-berti/" class="text-white"><i class="bi bi-github"></i>GitHub</a><br>
+          <a href="https://www.linkedin.com/in/emilio-berti-55a348146/" class="text-white me-3"><i class="bi bi-linkedin"></i>Linkedin</a>
+          <a href="https://orcid.org/0000-0001-9286-011X/" class="text-white me-3"><i class="bi bi-orcid"></i>OrcID</a>
+          <a href="https://scholar.google.com/citations?user=5KPh-oUAAAAJ&hl=en/" class="text-white me-3"><i class="bi bi-scholar"></i>Scholar</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
 	</body>
 </html>
