@@ -111,6 +111,8 @@ In this tutorial, we will use data sets for:
   - Bioclimatic variables from WorldClim (`bios.tif`)
   - Digital elevation model from WorldClim (`wc2-elevation.tif`)
 
+All these files can be downloaded from <https://emilio-berti.github.io/teaching/gis-ydiv/data.zip>. 
+
 ## Lecturers {.tabset}
 
 ### Emilio Berti (TiBS)
@@ -1036,4 +1038,55 @@ text(
   cex = 0.7
 )
 text(auwald, "Auwald", adj = c(0, -3.7), halo = TRUE, hw = .3, cex = 1.8)
+```
+
+```{r, echo=FALSE, eval=FALSE}
+library(terra)
+p <- vect("/media/eb97ziwi/emilio-idiv/telemetry/mols/gps_cleaned.shp")
+mols <- vect("/media/eb97ziwi/emilio-idiv/telemetry/mols/Mols.shp") |>
+  project(crs(p))
+
+plot(mols)
+points(p)
+r <- rast(p, res = c(30, 30))
+r <- rasterize(p, r, by = "CollarID", fun = length)
+r <- mask(r, mols)
+panel(log10(r))
+plot(r[[1]])
+lines(mols, lw = 3, col = "grey80")
+
+collars <- unique(p$CollarID)
+x <- collars[1]
+for (x in collars) {
+  gps <- p[p$CollarID == x]  
+  gps$date <- as.POSIXct(gps$date)
+  gps$Temp <- as.numeric(gps$Temp)
+  gps <- gps[order(gps$date)]
+  gps <- gps[gps$Temp < 50]
+  delta_time <- diff(gps$date, units = "days")
+  delta_time <- as.numeric(delta_time)
+  gps <- gps[1:which.min(delta_time < 1)]
+  delta_time <- diff(gps$date, units = "days")
+  delta_time <- as.numeric(delta_time)
+  plot(gps$date)
+  d <- distance(gps[2], gps[1], pairwise = TRUE)
+  d <- distance(gps[-1], gps[-length(gps)], pairwise = TRUE)
+  boxplot(d ~ gps$Temp[-length(gps)], las = 2)
+  gps$distance <- c(NA, d)
+  gps$speed <- gps$distance / c(NA, delta_time) / 1e3
+  plot(
+    gps, "speed",
+    type = "cont", col = hcl.colors(100, "Zissou 1"),
+    cex = .5
+  )
+  v <- rast(gps, res = c(30, 30))
+  v <- rasterize(gps, v, field = "speed", fun = max)
+  v <- mask(v, mols)
+  plot(v, col = hcl.colors(100, "Zissou 1"))
+}
+
+p$date <- as.POSIXct(p$date)
+delta_time <- diff(p$date, units = "mins") |> as.vector()
+delta_time[which(p$CollarID[-1] != p$CollarID[-length(p)])] <- NA
+range(na.omit(delta_time))
 ```
