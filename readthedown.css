@@ -97,3 +97,31 @@ footer {
     color: #555;
     margin-top: 30px;
 }
+
+.preview {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    max-height: 600px;
+    overflow: hidden;
+    position: relative;
+}
+.preview:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, white);
+}
+.expand-btn {
+    display: block;
+    text-align: center;
+    padding: 5px;
+    background: #f0f0f0;
+    cursor: pointer;
+}
+.full-content {
+    display: none;
+}
