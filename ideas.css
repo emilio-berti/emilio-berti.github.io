@@ -13,7 +13,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: #ffffff50;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -54,6 +54,10 @@ h1 {
     border-left: 0px solid #007bff;
 }
 
+.importance {
+    background-color: #b3000080;
+}
+
 .ideas-list li.active {
     background-color: #e1e1e1;
 }
@@ -61,6 +65,11 @@ h1 {
 .ideas-list li.active .details {
     display: block;
 }
+
+.ideas-list li.active .importance {
+    display: block;
+}
+
 
 /* Link styling */
 a {
