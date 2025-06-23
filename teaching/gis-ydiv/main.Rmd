@@ -91,12 +91,21 @@ Also, you can download all data used in this tutorial by clicking [here](teachin
 
 ## Set up
 
+You are strongly encouraged to run the examples as we progress through the lectures. 
+For this you will need to following set up:
+
   - R installed.
   - `terra` installed.
   - `codetools` installed (optional, used by `terra` to perform code checks).
   - Download the [data archive](https://emilio-berti.github.io/teaching/gis-ydiv/data.zip) and decompress it.
 
-Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
+Try run `library(terra)`. If it works, good news. If it does not, we will fix it during the lectures.
+
+For the final exercise of the course, you will perform a simple  species' distribution modeling.
+For this, you will need to:
+
+  - Download [WorldClim bioclimatic variables at 5 arc-minute resolution](https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_5m_bio.zip).
+  - Download the presence records for a species of your choosing from [GBIF](https://www.gbif.org/).
 
 ```{r setup, echo=FALSE}
 library(terra)

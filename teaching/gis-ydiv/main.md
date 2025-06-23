@@ -1,7 +1,7 @@
 ---
 title: "GIS course @ yDiv"
 author: "Emilio Berti"
-date: "29 January 2025"
+date: "23 June 2025"
 output:
   rmdformats::readthedown:
     toc_depth: 6
@@ -83,14 +83,26 @@ Also, you can download all data used in this tutorial by clicking [here](teachin
 
 ## Set up
 
+You are strongly encouraged to run the examples as we progress through the lectures. 
+For this you will need to following set up:
+
   - R installed.
   - `terra` installed.
   - `codetools` installed (optional, used by `terra` to perform code checks).
   - Download the [data archive](https://emilio-berti.github.io/teaching/gis-ydiv/data.zip) and decompress it.
 
-Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
+Try run `library(terra)`. If it works, good news. If it does not, we will fix it during the lectures.
+
+For the final exercise of the course, you will perform a simple  species' distribution modeling.
+For this, you will need to:
+
+  - Download [WorldClim bioclimatic variables at 5 arc-minute resolution](https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_5m_bio.zip).
+  - Download the presence records for a species of your choosing from [GBIF](https://www.gbif.org/).
 
 
+```
+## terra 1.7.71
+```
 
 ## Data Sets {.tabset}
 In this tutorial, we will use data sets for:
@@ -100,6 +112,8 @@ In this tutorial, we will use data sets for:
   - Average annual surface temperature from WorldClim (`wc2-bio1.tif`)
   - Bioclimatic variables from WorldClim (`bios.tif`)
   - Digital elevation model from WorldClim (`wc2-elevation.tif`)
+
+All these files can be downloaded from <https://emilio-berti.github.io/teaching/gis-ydiv/data.zip>. 
 
 ## Lecturers {.tabset}
 
@@ -713,12 +727,12 @@ poi |> distance() |> as.matrix()
 ```
 
 ```
-##           1        2         3        4         5
-## 1      0.00 190406.8  17477.25 260076.3  50142.74
-## 2 190406.79      0.0 179483.33 409508.5 230864.84
-## 3  17477.25 179483.3      0.00 257884.1  67467.95
-## 4 260076.25 409508.5 257884.09      0.0 265154.45
-## 5  50142.74 230864.8  67467.95 265154.5      0.00
+##          1         2        3         4        5
+## 1      0.0 276408.70 175990.5 212056.75 150844.6
+## 2 276408.7      0.00 227544.9  94572.06 353024.5
+## 3 175990.5 227544.85      0.0 228895.57 146635.1
+## 4 212056.8  94572.06 228895.6      0.00 322066.4
+## 5 150844.6 353024.53 146635.1 322066.35      0.0
 ```
 
 When passing also a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
@@ -732,11 +746,11 @@ distance(
 
 ```
 ##         [,1]
-## [1,] 5876848
-## [2,] 5894491
-## [3,] 5864594
-## [4,] 5666371
-## [5,] 5906264
+## [1,] 5803878
+## [2,] 5617048
+## [3,] 5841985
+## [4,] 5621491
+## [5,] 5940329
 ```
 
 ## Buffer
@@ -1047,6 +1061,32 @@ I load the libraries.
 ```r
 library(tibble)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:terra':
+## 
+##     intersect, union
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(readr)
 library(terra)
 ```
@@ -1063,15 +1103,15 @@ gbif <- read_tsv("data/erica-arborea-gbif.tsv") |>
 ```
 
 ```
-## Warning: One or more parsing issues, call `problems()` on your data frame for details,
-## e.g.:
+## Warning: One or more parsing issues, call `problems()` on your data frame for
+## details, e.g.:
 ##   dat <- vroom(...)
 ##   problems(dat)
 ```
 
 ```
 ## Rows: 13228 Columns: 50
-## ── Column specification ────────────────────────────────────────────────────────
+## ── Column specification ───────────────────────────────────────────────
 ## Delimiter: "\t"
 ## chr  (31): datasetKey, occurrenceID, kingdom, phylum, class, order, family, ...
 ## dbl  (13): gbifID, individualCount, decimalLatitude, decimalLongitude, coord...
@@ -1501,3 +1541,5 @@ text(auwald, "Auwald", adj = c(0, -3.7), halo = TRUE, hw = .3, cex = 1.8)
 ```
 
 <img src="main_files/figure-html/baum-plot-1.png" style="display: block; margin: auto;" />
+
+
