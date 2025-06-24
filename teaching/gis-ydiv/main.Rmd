@@ -1,7 +1,7 @@
 ---
 title: "GIS course @ yDiv"
-author: "Emilio Berti"
-date: "`r format(Sys.Date(), '%d %B %Y')`"
+author: "Emilio Berti, Guilherme Pinto"
+date: "27-28 June 2025"
 output:
   rmdformats::readthedown:
     toc_depth: 6
@@ -17,17 +17,6 @@ output:
     keep_md: true
 ---
 
-<!--   pdf_document:
-    toc_depth: 6
-    number_sections: true
-    highlight: tango
-    fig_width: 4
-    fig_height: 4
-    fig_caption: true
-    df_print: paged
-    keep_md: true -->
-
-<!-- Page width -->
 ```{css, echo = FALSE}
 #content{
   max-width:1000px;
@@ -99,7 +88,7 @@ For this you will need to following set up:
   - `codetools` installed (optional, used by `terra` to perform code checks).
   - Download the [data archive](https://emilio-berti.github.io/teaching/gis-ydiv/data.zip) and decompress it.
 
-Try run `library(terra)`. If it works, good news. If it does not, we will fix it during the lectures.
+Try run `library(terra)`. If it works, good news. If it does not, contact me some days before the course starts.
 
 For the final exercise of the course, you will perform a simple  species' distribution modeling.
 For this, you will need to:
@@ -115,7 +104,7 @@ library(terra)
 In this tutorial, we will use data sets for:
 
   - NDVI for the year 2024 in Leipzig, obtained from Sentinel2 (`ndvi-2024.tif`).
-  - Landcover of Leipzig in 2015, obtained from the German Aerospace Center (DLR; `landcover-2015.tif`).
+  - Landcover of Leipzig in 2015, obtained from the German Aerospace Center (DLR; `landcover_4326-2015.tif`).
   - Average annual surface temperature from WorldClim (`wc2-bio1.tif`)
   - Bioclimatic variables from WorldClim (`bios.tif`)
   - Digital elevation model from WorldClim (`wc2-elevation.tif`)
@@ -124,15 +113,22 @@ All these files can be downloaded from <https://emilio-berti.github.io/teaching/
 
 ## Lecturers {.tabset}
 
-### Emilio Berti (TiBS)
-![](figures/emilio.png)
+Emilio Berti (TiBS)
+
+![](figures/emilio.png){width=200px}
 
  - Theory in Biodiversity Science
  - Macroecologist / biogeographer
- - Theoretical ecologists
+ - Theoretical ecologist
 
-### Guilherme Pinto (BioEcon)
+Guilherme Pinto (BioEcon)
 
+![](figures/Guilherme-Pinto.png){width=200px}
+
+ - Geoinformatics
+ - Data scientist
+ - Marine heatwaves / fisheries
+ 
 # Data Types
 
 There are two main data types used in GIS:
@@ -140,8 +136,7 @@ There are two main data types used in GIS:
   1. Geometries (also called vectors or shapes). This usually has extension `.shp`.
   2. Rasters. This usually has extension `.tif`.
 
-They fill two different needs, namely to represent structures that can be well approximated using geometric objects, such as lines, circles, etc., 
-and to represent grid data over an area.
+They fill two different needs, namely to represent structures that can be well approximated using geometric objects, such as lines, circles, etc., and to represent grid data over an area.
 
 If you have produced figures for a manuscript, you are actually already familiar with these type of data.
 Images can be saved as vector graphics, where each element is represented by a vector/geometry, or as a matrix/raster of pixels.
@@ -187,7 +182,7 @@ writeVector(idiv, "data/idiv.shp", overwrite = TRUE)
 plot(idiv, add = TRUE, col = adjustcolor("blue", alpha.f = .5))
 ```
 
-Geometries are saved in _vector-_ or _shape-_files (usually with extension `.shp`).
+Geometries are saved in *vector-* or *shape-*files (usually with extension `.shp`).
 In addition to the geometric representation of the structure, shapefiles also contain metadata for the geometric representation, such as its extent and coordinate reference system (we will talk about this later), and for the structure, such as their name, length, etc.
 For instance, the geometry of the iDiv building above is:
 ```{r example-geometry, class.source="fold-hide", }
@@ -248,19 +243,34 @@ lines(lin, col = "red", lw = 5)
 points(poi, col = "blue", cex = 1)
 ```
 
-### Reading & Writing Geometries
+### Reading, Subsetting & Writing Geometries
 
 In most cases, you will not create your own geometry by hands, but load geometries from files.
 To read geometries from a file, use `vect()`.
 ```{r read-shapefile, fig.align='center'}
-ger <- vect("data/germany.shp")  # shapefile with the country boundary of Germany
+ger <- vect("data/germany_bundes.shp")  # shapefile with the country boundary of Germany
 ger
+plot(ger)
+```
+
+To subset a geometry, use `subset()`
+```{r, subset-shapefile, eval=FALSE}
+sn <- subset(ger, ger$NAME_1 == "Sachsen")
+sn
+plot(sn)
+```
+
+To load a geometry from a .csv file (or any data xy coordinates), use `vect()` with the `geom` parameter
+```{r read-shapefile from a file with xy coordinates, fig.align='center'}
+coo <- read.csv2("data/points.csv")
+poi <- vect(coo, geom=c("x", "y"))
+poi
+plot(poi)
 ```
 
 To write geometries to a file, use `writeVector()`.
-
 ```{r, write-shapefile, eval=FALSE}
-writeVector(ger, "data/germany.shp", overwrite = TRUE)  # if already exists you need overwrite = TRUE
+writeVector(sn, "data/sachsen.shp", overwrite = TRUE)  # if already exists you need overwrite = TRUE
 ```
 
 ## Rasters
@@ -274,7 +284,7 @@ Rasters are useful because:
 When the data we are interested in are values on a gridded area, rasters are a better options than to using geometries, as they save a lot of memory and space on disk.
 For example, if we want to represent landcover type over a large area(forest, agriculture, build-up, etc.), it is easier to grid the area into pixels and save the landcover type of each pixel rather than to create a geometry for each different structure.
 ```{r leipzig-landcover, class.source="fold-hide", fig.align='center', fig.width=7, fig.caption="Landcover map of Leipzig from DLR (German Aerospace Center)"}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 plot(landcover)  # from EOC of DLR
 ```
 Rasters are saved in raster files (usually with extension `.tif`). 
@@ -301,7 +311,7 @@ r <- rast(array(rnorm(200), dim = c(10, 10, 2)))  # 10x10x2 array
 plot(r)
 ```
 
-When an area has multiple rasters, it is possible to stack them to create a single raster object.
+When an area has multiple rasters (e.g.: multiple observation dates), it is possible to stack them to create a single raster object.
 The rasters in the stack need to have all the same extent and coordinate reference system.
 Use `c()` to stack rasters using `terra`.
 ```{r stack-c, fig.align='center', fig.width=8}
@@ -314,14 +324,14 @@ plot(r)
 ### Reading & Writing Rasters
 To read rasters into memory, use `rast()`.
 ```{r read-raster, fig.align='center'}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 landcover
 ```
 
 To write rasters to disk, use `writeRaster()`.
 
 ```{r, write-raster, eval=FALSE}
-writeRaster(landcover, "data/landcover-2015.tif", overwrite = TRUE, datatype = "INT1U")
+writeRaster(landcover, "data/landcover_4326-2015.tif", overwrite = TRUE, datatype = "INT1U")
 ```
 Here, the argument `datatype = "INT1U"` (specifying the values in the grid are 1-byte unsigned integers) 
 is needed because the rasters contains classes (levels).
@@ -345,7 +355,7 @@ The spatial extent is the quadrilateral that inscribe the area of the spatial da
 The extent is usually represented by the coordinates of the four vertices of the quadrilateral, i.e. `xmin`, `xmax`, `ymin`, and `ymax`.
 Use `ext()` to get the spatial extent of an object.
 ```{r ext}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 ext(landcover)
 ```
 ### Coordinate reference system
@@ -375,7 +385,8 @@ crs(idiv, proj = TRUE)
 ```
 Use `project()` to project a spatial object from one CRS to another.
 ```{r project}
-landcover <- project(landcover, crs("EPSG:4326"))
+landcover <- project(landcover, crs("EPSG:3035"))
+crs(landcover)
 ```
 
 ### Resolution
@@ -385,8 +396,7 @@ Use `res()` to get the resolution of a raster.
 ```{r res}
 res(landcover)
 ```
-The first value is the "horizontal" and the second is the "vertical" resolution.
-The units of the output of `res()` is the same as the unit of the CRS, in this case $m$:
+The first value is the "horizontal" and the second is the "vertical" resolution.Basically, it is the size of the pixel. The units of the output of `res()` is the same as the unit of the CRS, in this case $m$:
 ```{r unit}
 crs(landcover, proj = TRUE)
 ```
@@ -405,12 +415,12 @@ Three types of arguments can be passed to `project()`:
   3. A code of a known CRS, e.g. from the EPSG standard.
 
 ```{r reproject}
-r <- rast("data/landcover-2015.tif")
-germany <- vect("data/germany.shp")
+r <- rast("data/landcover_4326-2015.tif")
+germany <- vect("data/germany_bundes.shp")
 
 germany <- project(germany, crs(r))  # a spatial object
 germany_mollweide <- project(germany, "+proj=moll")  # a proj4
-germany_4326 <- project(germany, "EPSG:4326")  # a CRS code
+germany_3035 <- project(germany, "EPSG:3035")  # a CRS code
 ```
 <blockquote class="nb">
 When using an existing spatial object (`<obj>`) as CRS target, remember to use `project(<x>, crs(<obj>))` and not `project(<x>, <obj>)` if you are interested in reprojecting only. See section 5.3 about resampling for details.
@@ -421,7 +431,7 @@ CRS have a big influence on analyses and visualization.
 plot(buffer(vect(cbind(2e6, 3e6)), 4e6), col = "white", lw = 1e-6)
 polys(germany, col = "grey90")
 polys(germany_mollweide, col = "grey90")
-polys(germany_4326, col = "grey90")
+polys(germany_3035, col = "grey90")
 l <- vect(
   rbind(
     cbind(5e5, 5e5),
@@ -450,7 +460,7 @@ Sometimes is needed to create a raster from a geometry or *vice versa*.
 Use `rasterize()` to convert geometries to raster.
 In addition to the geometry to rasterize, you need to pass a raster to function as template, i.e. from which extent, CRS, and resolution are extracted from.
 ```{r geom-to-rast}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 idiv <- vect("data/idiv.shp")
 idiv <- project(idiv, crs(landcover))  # CRS needs to be the same
 idiv_r <- rasterize(idiv, landcover, touches = TRUE)
@@ -490,7 +500,7 @@ Use `perim()` to obtain the length of lines or the perimeter of polygons.
 perim(idiv)
 idiv |> disagg(segments = TRUE) |> perim() |> sum()  # disagg(segments = TRUE) split the polygon into lines
 ```
-The units are defined by the CRS.
+The output units are in "m", though you may get more accurate results by first transforming the data to longitude/latitude.
 <blockquote class="nb">
 It is best to project the geometry to a longitude/latitude CRS to get more accurate results.
 </blockquote>
@@ -499,11 +509,11 @@ idiv |> project("EPSG:4326") |> perim()  # difference of 3 mm
 ```
 
 ## Area
-Use `expanse()` to obtain the area of polygons.
+Use `expanse()` to obtain the area of polygons and rasters (please read the function's help to see tips on how the calculations work for both).
 ```{r area}
 expanse(idiv)
 ```
-The units are defined by the CRS.
+The output units can be in "m", "km", or "ha".
 <blockquote class="nb">
 It is best to project the geometry to a longitude/latitude CRS to get more accurate results.
 </blockquote>
@@ -541,56 +551,63 @@ points(centr, bg = "gold", cex = 2, pch = 21)
 ```
 
 ## Distance
-Use `distance()` to get the distances between geometries
-When passing only an object will multiple geometries, distances will be calculated among each geometry and a (symmetric) matrix is returned.
+Use `distance()` to get the distances between geometries.
+When passing only one object with multiple geometries, distances will be calculated among each geometry and a (symmetric) matrix is returned. 
 ```{r distance-one}
 poi <- vect(matrix(rnorm(10), ncol = 2), crs = "EPSG:4326")  # 5 random points
-poi |> distance() |> as.matrix()
+poi |> distance(unit = "km") |> as.matrix()
 ```
 
-When passing also a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
+When passing a second geometry, distances will be calculated among each geometry of the first object and each geometry of the second object.
 ```{r distance-two}
 distance(
   poi,
-  idiv |> project("EPSG:4326") |> centroids()
+  idiv |> project("EPSG:4326") |> centroids(),
+  unit = "km"
 )
 ```
 
 ## Buffer
-The buffer of a geometry is obtained by extending the geometry perpendicular to the tangent line of its side.
+The buffer of a geometry is obtained by extending the geometry perpendicular to the tangent line of its side, i.e., a buffer around all cells/geometries.
 It is easier to see it than to explain it.
-Use `buffer()` to buffer geometries.
+Use `buffer()` to buffer geometries. The distance unit of the buffer `width` parameter generally is meters.
 ```{r buffer, fig.align='center'}
-b <- buffer(idiv, 10)  # 10 meters
+b <- buffer(idiv, width = 10)  # 10 meters
 plot(b, col = "gold")
 polys(idiv, col = "blue")
 ```
 
 ## Exercise
-Find the centroid of Germany, how far is from the centroid of the main iDiv bulding, and plot the circle centered at the centroid with the smallest area that is touching the centroid of the iDiv building.
-The geometry of Germany is saved in `data/germany.shp`.
+
+  1. Find the centroid of each German state and how far is from the centroid of the main iDiv bulding. 
+  2. Find the state which centroid is closest to iDiv.
+  3. Plot the circle centered at the centroid with the smallest area that is touching the centroid of the iDiv building.
+
+The geometry of Germany is saved in `data/germany_bundes.shp`.
 The geometry of the iDiv building is saved in `data/idiv.shp`.
 Click on the "Code" button below to see a solution to this problem.
 
 ```{r example-geometry-operation, fig.align='center', fig.width=7, fig.height=7, class.source="fold-hide"}
-ger <- vect("data/germany.shp")
+ger <- vect("data/germany_bundes.shp")
 idiv <- vect("data/idiv.shp")
 
-centr <- centroids(ger)  # centroid of Germany
+centr <- centroids(ger)  # centroids of German states
 idiv_centr <- idiv |> project(crs(ger)) |> centroids()  # centroid of iDiv
-d <- distance(centr, idiv_centr)  # distance between centroids
-b <- buffer(centr, d)  # circle with the smallest area touching iDiv
-l <- as.lines(rbind(centr, idiv_centr))  # line connecting centroids
+d <- distance(idiv_centr, centr)
+closest_state_id <- which.min(d)
+closest <- centr[closest_state_id]  # closest centroid state
+b <- buffer(centr[closest_state_id], d[closest_state_id])  # circle with the smallest area touching iDiv
+l <- as.lines(rbind(centr[closest_state_id], idiv_centr))  # line connecting centroids
 
 plot(ger)
 polys(b, col = adjustcolor("blue", alpha.f = .5))
 lines(l)
 points(centr, pch = 21, cex = 2, bg = "gold")
 points(idiv_centr, pch = 21, cex = 2, bg = "green")
-text(centr, "Germany\ncentroid", pos = 2)
-text(idiv_centr, "iDiv\ncentroid", pos = 4)
-text(l, paste(round(d) / 1e3, "km"), pos = 3)
-text(b, paste("Area =", round(expanse(b) / 1e6), "km^2"), pos = 3, offset = 5)
+text(centr, centr$NAME_1, pos = 3)
+text(idiv_centr, "iDiv", pos = 4)
+text(l, paste(round(d[closest_state_id]) / 1e3, "km"), pos = 3)
+text(b, paste("Area =", round(expanse(b) / 1e6), "km^2"), pos = 1, offset = 1)
 ```
 
 # Raster Operations
@@ -627,7 +644,7 @@ Zonal statistics summarize the values of a raster using categories from another 
 Use `zonal()` to obtain zonal statistics.
 Two arguments (`<x>`, `<y>`) are always required for `zonal(<x>, <y>)`, with `<x>` being the raster with the values to summarize and `<y>` the raster/geometry specifying the categories for the summary.
 ```{r zonal}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 avg_ndvi <- project(avg_ndvi, landcover)  # this will also resample avg_ndvi (see the section Resampling)
 zonal(avg_ndvi, landcover, fun = "mean", na.rm = TRUE)
 ```
@@ -723,7 +740,7 @@ Among the available algorithms are:
   - `lanczos`, for Lanczos resampling.
 
 ```{r resampling, fig.align='center', fig.width=6, fig.height=6, cache=TRUE}
-landcover <- rast("data/landcover-2015.tif")
+landcover <- rast("data/landcover_4326-2015.tif")
 ndvi <- rast("data/ndvi-2024.tif") |>
   mean(na.rm = TRUE) |>
   project(crs(landcover))
@@ -738,42 +755,75 @@ The difference between `project(x, crs(y))` and `project(x, y)` is that the firs
 In many cases `resample(x, y, method = <method>)` can be avoided by using `project(x, y, method = <method>)`
 </blockquote>
 
-## Interpolation
-Interpolation uses a statistical model to make geographic predictions.
-A simple statistical model can include, for example, the coordinates of the grid.
-This works relatively well with processes that change gradually with longitude or latitude, such as temperature.
-```{r interpolation, fig.align='center', fig.width=12, fig.height=6}
-tas <- rast("data/wc2-bio1.tif")  # average annual temperature, Celsius
-elev <- rast("data/wc2-elevation.tif")  # elevation, meters
+<!-- ## Interpolation -->
+<!-- Interpolation uses a statistical model to make geographic predictions. -->
+<!-- A simple statistical model can include, for example, the coordinates of the grid. -->
+<!-- This works relatively well with processes that change gradually with longitude or latitude, such as temperature. -->
+<!-- ```{r interpolation, fig.align='center', fig.width=12, fig.height=6} -->
+<!-- tas <- rast("data/wc2-bio1.tif")  # average annual temperature, Celsius -->
+<!-- elev <- rast("data/wc2-elevation.tif")  # elevation, meters -->
 
-par(mfrow = c(1, 2))
-plot(tas, col = hcl.colors(100, "Zissou 1"))
-plot(elev, col = map.pal("haxby", 5))
-plot(elev, col = colorRampPalette(c("forestgreen", "#CDFFA2", "#FFAF4D", "#FFFFFF"))(100))
-par(mfrow = c(1, 1))
+<!-- par(mfrow = c(1, 2)) -->
+<!-- plot(tas, col = hcl.colors(100, "Zissou 1")) -->
+<!-- plot(elev, col = map.pal("haxby", 5)) -->
+<!-- plot(elev, col = colorRampPalette(c("forestgreen", "#CDFFA2", "#FFAF4D", "#FFFFFF"))(100)) -->
+<!-- par(mfrow = c(1, 1)) -->
 
-r <- c(tas, elev)
+<!-- r <- c(tas, elev) -->
 
-# construct table for model fitting
-xy <- xyFromCell(r, 1:ncell(r))
-xy <- cbind(xy, extract(r, xy, cells = TRUE))
+<!-- # construct table for model fitting -->
+<!-- xy <- xyFromCell(r, 1:ncell(r)) -->
+<!-- xy <- cbind(xy, extract(r, xy, cells = TRUE)) -->
 
-# fit a simple linear model with coordinates
-model <- lm(tas ~ x * y + elevation, data = xy)
+<!-- # fit a simple linear model with coordinates -->
+<!-- model <- lm(tas ~ x * y + elevation, data = xy) -->
 
-# interpolate
-interpolated <- interpolate(r, model)
-interpolated <- mask(interpolated, tas)  # remove sea and large water bodies
-names(interpolated) <- "tas_interpolated"
-plot(c(tas, interpolated), col = hcl.colors(100, "Zissou 1"))
+<!-- # interpolate -->
+<!-- interpolated <- interpolate(r, model) -->
+<!-- interpolated <- mask(interpolated, tas)  # remove sea and large water bodies -->
+<!-- names(interpolated) <- "tas_interpolated" -->
+<!-- plot(c(tas, interpolated), col = hcl.colors(100, "Zissou 1")) -->
+<!-- ``` -->
+
+<!-- Considering the simplicity of the underlying model, the interpolation works quite well. -->
+<!-- ```{r interpolated-plot, fig.align='center', fig.width=6, fig.height=6} -->
+<!-- # Prediction errors -->
+<!-- # In red, over-predictions -->
+<!-- # In blue, under-predictions -->
+<!-- plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3")) -->
+<!-- ``` -->
+
+## Raster and vector techniques
+
+### Mask
+Create a new raster (or vector) where values outside a specified mask are set to NA (or another specified value). Essentially, it "masks out" or hides portions of a raster based on a separate "mask" object, which can be another raster, a polygon, or an extent.
+
+idiv_m <- mask(landcover, idiv)
+plot(idiv_m)
+
+### point in raster
+Extract the values from a raster or a polygon based on a set of locations (ex.: points or polygons).  
+```{r, fig.align='center', fig.width=6, fig.height=6, cache=TRUE}
+landcover <- rast("data/landcover_4326-2015.tif")
+coo <- read.csv2("data/points.csv")
+poi <- vect(coo, geom=c("x", "y"))
+landcover_ex <- extract(landcover, poi)
+landcover_ex
 ```
 
-Considering the simplicity of the underlying model, the interpolation works quite well.
-```{r interpolated-plot, fig.align='center', fig.width=6, fig.height=6}
-# Prediction errors
-# In red, over-predictions
-# In blue, under-predictions
-plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3"))
+### exercise
+Get the mean, min and max ndvi values for the month of August, using a 100 meters buffer of around the points given. 
+```{r, fig.align='center', fig.width=6, fig.height=6, cache=TRUE}
+coo <- read.csv2("data/points.csv")
+poi <- vect(coo, geom=c("x", "y"))
+ndvi <- rast("data/ndvi-2024.tif") 
+poi_b <- buffer(poi, 100)
+ndvi.mean <- extract(ndvi[["august"]], poi_b, fun = mean, na.rm = T)
+ndvi.mean
+ndvi.min <- extract(ndvi[["august"]], poi_b, fun = min, na.rm = T)
+ndvi.min
+ndvi.max <- extract(ndvi[["august"]], poi_b, fun = max, na.rm = T)
+ndvi.max 
 ```
 
 # Examples
