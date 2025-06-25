@@ -755,51 +755,19 @@ The difference between `project(x, crs(y))` and `project(x, y)` is that the firs
 In many cases `resample(x, y, method = <method>)` can be avoided by using `project(x, y, method = <method>)`
 </blockquote>
 
-<!-- ## Interpolation -->
-<!-- Interpolation uses a statistical model to make geographic predictions. -->
-<!-- A simple statistical model can include, for example, the coordinates of the grid. -->
-<!-- This works relatively well with processes that change gradually with longitude or latitude, such as temperature. -->
-<!-- ```{r interpolation, fig.align='center', fig.width=12, fig.height=6} -->
-<!-- tas <- rast("data/wc2-bio1.tif")  # average annual temperature, Celsius -->
-<!-- elev <- rast("data/wc2-elevation.tif")  # elevation, meters -->
-
-<!-- par(mfrow = c(1, 2)) -->
-<!-- plot(tas, col = hcl.colors(100, "Zissou 1")) -->
-<!-- plot(elev, col = map.pal("haxby", 5)) -->
-<!-- plot(elev, col = colorRampPalette(c("forestgreen", "#CDFFA2", "#FFAF4D", "#FFFFFF"))(100)) -->
-<!-- par(mfrow = c(1, 1)) -->
-
-<!-- r <- c(tas, elev) -->
-
-<!-- # construct table for model fitting -->
-<!-- xy <- xyFromCell(r, 1:ncell(r)) -->
-<!-- xy <- cbind(xy, extract(r, xy, cells = TRUE)) -->
-
-<!-- # fit a simple linear model with coordinates -->
-<!-- model <- lm(tas ~ x * y + elevation, data = xy) -->
-
-<!-- # interpolate -->
-<!-- interpolated <- interpolate(r, model) -->
-<!-- interpolated <- mask(interpolated, tas)  # remove sea and large water bodies -->
-<!-- names(interpolated) <- "tas_interpolated" -->
-<!-- plot(c(tas, interpolated), col = hcl.colors(100, "Zissou 1")) -->
-<!-- ``` -->
-
-<!-- Considering the simplicity of the underlying model, the interpolation works quite well. -->
-<!-- ```{r interpolated-plot, fig.align='center', fig.width=6, fig.height=6} -->
-<!-- # Prediction errors -->
-<!-- # In red, over-predictions -->
-<!-- # In blue, under-predictions -->
-<!-- plot(interpolated - tas, col = hcl.colors(100, "Blue-Red 3")) -->
-<!-- ``` -->
-
 ## Raster and vector techniques
 
 ### Mask
 Create a new raster (or vector) where values outside a specified mask are set to NA (or another specified value). Essentially, it "masks out" or hides portions of a raster based on a separate "mask" object, which can be another raster, a polygon, or an extent.
 
-idiv_m <- mask(landcover, idiv)
-plot(idiv_m)
+```{r mask, fig.align='center', fig.width=6, fig.height=6, cache=TRUE}
+landcover <- rast("data/landcover_4326-2015.tif")
+idiv <- vect("data/idiv.shp")
+landcover_idiv <- mask(landcover, idiv)
+landcover_idiv <- trim(landcover_idiv) # remove rows and columns with all NAs
+plot(landcover_idiv)
+lines(idiv)
+```
 
 ### point in raster
 Extract the values from a raster or a polygon based on a set of locations (ex.: points or polygons).  
