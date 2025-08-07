@@ -262,6 +262,7 @@ iframe {
   line-height: 1.5;
 }
 
+.app-link,
 .download-link,
 .paper-link,
 .github-link {
@@ -310,6 +311,20 @@ iframe {
 
 .paper-button:hover {
   background-color: #2980b9;
+}
+
+.app-button {
+  background-color: #00b386;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.app-button:hover {
+  background-color: #333;
 }
 
 /* index */

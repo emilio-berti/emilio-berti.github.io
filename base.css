@@ -23,6 +23,7 @@
   line-height: 1.5;
 }
 
+.app-link,
 .download-link,
 .paper-link,
 .github-link {
@@ -70,6 +71,20 @@
 }
 
 .paper-button:hover {
+  background-color: #861a13;
+}
+
+.app-button {
+  background-color: #009973;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.app-button:hover {
   background-color: #861a13;
 }
 
