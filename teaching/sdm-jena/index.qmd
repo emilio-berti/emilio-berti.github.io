@@ -1,0 +1,53 @@
+---
+title: "Introduction to GIS with R"
+subtitle: "Spatial data analysis using sf, terra, and friends"
+---
+
+## Course overview
+
+This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.
+
+::: {.callout-important}
+This course assumes basic R knowledge.
+:::
+
+In the first \# days, etc.
+
+::: {.callout-important}
+A basic knowledge of Geographic Information Systems is required for ENM/SDM.
+I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.
+
+I give a course at iDiv that you can access [here](https://emilio-berti.github.io/teaching/gis-ydiv/main.html).
+SFU Jena also offers GIS courses: [MSc Environmental and Georesources Management ](https://www.chemgeo.uni-jena.de/en/56067/teaching), [MSc Geoinformatic](https://www.uni-jena.de/6655/m-sc-geoinformatik), and [BSc Geography](https://www.uni-jena.de/7195/b-sc-geographie).
+:::
+
+## Learning objectives
+
+- Understand the theory behind ENM/SDM.
+- Perform ENM/SDM in R.
+- Apply ENM/SDM to real data.
+- Produce maps.
+
+## Course structure
+
+### Lectures
+- [01 – Introduction](lectures/01-background.html)
+
+### Labs
+- [Lab 1 – R & spatial data](labs/lab01.html)
+
+### Slides
+- [List all Slides](slides/slides.html)
+
+## Software
+
+The only package that we will use is `terra`.
+You might want to install also `codetools`, which performs checks on the C++ code of `terra`.
+
+```{r, eval=FALSE}
+install.packages(c("codetools", "terra"))
+```
+
+::: {.callout-note}
+`terra` is still in active development and some functionalities change with newer releases.
+:::

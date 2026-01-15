@@ -1,0 +1,28 @@
+project:
+  type: website
+
+website:
+  title: "Species Distribution Models"
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Lectures
+        href: lectures/lectures.qmd
+      - text: Labs
+        href: labs/01-GIS-lab.qmd
+      - text: Slides
+        href: slides/slides.qmd
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  cache: true
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    bibliography: references.bib

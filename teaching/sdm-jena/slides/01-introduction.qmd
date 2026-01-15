@@ -1,0 +1,53 @@
+---
+title: "Introduction to species distribution modeling"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+## Lecturers
+
+ - Prof. Ulrich Brose
+ - Dr. Emilio Berti
+
+## Course overview
+
+Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language. This course assumes basic R knowledge.
+
+In the first \# days, etc.
+
+A basic knowledge of Geographic Information Systems is required for ENM/SDM.
+I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.
+
+## Learning objectives
+
+- Understand the theory behind ENM/SDM.
+- Perform ENM/SDM in R.
+- Apply ENM/SDM to real data.
+- Produce maps.
+
+## Material
+
+The material of this course is hosted at [asd](https://emilio-berti.github.io/).
+It consists of:
+
+- Lectures.
+- Labs.
+- Slides.
+
+## Software
+
+The only package that we will use is `terra`.
+You might want to install also `codetools`, which performs checks on the C++ code of `terra`.
+
+```{r, eval=FALSE}
+install.packages(c("codetools", "terra"))
+```
+
+::: {.callout-note}
+`terra` is still in active development and some functionalities change with newer releases.
+:::

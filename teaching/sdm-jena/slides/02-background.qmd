@@ -1,0 +1,127 @@
+---
+title: "What are ENM/SDM and why do we use them?"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+## Background
+
+ENM/SDM 
+
+# Theory Primer
+
+## Ecological Niche Modeling (ENM)
+
+ENM try to reconstruct the ecological (climatic) niche of a species.
+
+Theory suggests the niche must be convex.
+
+```{r niche-symm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
+l <- function(x, mu, sigl, sigr) {
+  out <- rep(NA, length(x))
+  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
+  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
+  return(out)
+}
+x <- seq(-10, 40, length.out = 1e3)
+par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
+plot(
+  x, l(x, 10, 5, 5),
+  type = "l", lwd = 2, col = "dodgerblue3",
+  xlab = "Temperature", 
+  ylab = "Suitability"
+)
+```
+
+## Ecological Niche Modeling (ENM)
+
+Theory suggests the niche must be convex and potentially not symmetrical
+
+```{r niche-asymm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
+l <- function(x, mu, sigl, sigr) {
+  out <- rep(NA, length(x))
+  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
+  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
+  return(out)
+}
+x <- seq(-10, 40, length.out = 1e3)
+par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
+plot(
+  x, l(x, 10, 5, 10),
+  type = "l", lwd = 2, col = "dodgerblue3",
+  xlab = "Temperature", 
+  ylab = "Suitability"
+)
+```
+
+## Ecological Niche Modeling (ENM)
+
+Example of non-symmetrical, convex 2D niche.
+
+```{r niche-2d, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
+l <- function(x, mu, sigl, sigr) {
+  out <- rep(NA, length(x))
+  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
+  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
+  return(out)
+}
+x <- seq(-10, 40, length.out = 1e2)
+y <- seq(300, 5000, length.out = 1e2)
+z <- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))
+for (X in unique(x)) {
+  for (Y in unique(y)) {
+    i <- which(unique(x) == X)
+    j <- which(unique(y) == Y)
+    z[i, j] <- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)
+  }
+}
+image(z, axes = FALSE, col = hcl.colors(100, "Blues", rev = TRUE))
+contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
+axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
+axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
+title(xlab = "Temperature", ylab = "Precipitation")
+```
+
+## Species Distribution Modeling (SDM)
+
+SDMs project ENMs from an environmental space to a geographical area.
+
+```{r sdm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
+w <- terra::vect("../data/ne_110m_land.shp")
+w <- terra::crop(w, terra::ext(-13, 33, 33, 62))
+p <- terra::vect(
+  matrix(c(
+    4.3226, 49.1915,
+    1.6996, 47.9762,
+    0.7767, 47.2537,
+    1.2625, 45.3487,
+    3.3025, 44.7575,
+    5.6341, 44.7903,
+    6.4598, 46.1698,
+    9.3742, 47.4179,
+    2.7744, 47.1551,
+    5.8345, 47.3522,
+    7.8260, 50.2754,
+    4.1769, 49.9798,
+    4.3226, 49.1915
+  ), ncol = 2, byrow = TRUE),
+  type = "points", crs = terra::crs(w)
+)
+p <- terra::convHull(p)
+p <- terra::densify(p, interval = 1e3)
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 2))
+image(z, axes = FALSE, col = hcl.colors(100, "Blues", rev = TRUE))
+contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
+axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
+axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
+title(xlab = "Temperature", ylab = "Precipitation")
+terra::plot(
+  w, fun = \() terra::polys(p, col = "tomato2"),
+  mar = c(0, 0, 0, 0)
+)
+```

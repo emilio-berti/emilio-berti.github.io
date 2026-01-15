@@ -1,0 +1,28 @@
+---
+title: "What are ENM/SDM and why do we use them?"
+author: "Emilio Berti"
+format:
+  html: 
+    code-fold: true
+    toc: true
+  pdf: default
+---
+
+## Background
+
+The goal of Ecological Niche Modeling (ENM) is to infer the ecological niche of species.
+A typical set of questions that ENM tries to answer is:
+
+ - What is the optimal temperature for this species?
+ - What is the range of temperature that this species can tolerate?
+ - What is the minimum level of precipitation that this species need to survive?
+ - Is this species limited by temperature of precipitation?
+
+ENM works entirely in environmental space.
+Species Distribution Modeling (SDM) is the projection of a ENM into geographical space.
+The workflow of SDM is always to first perform an ENM and then to use this to achieve a SDM.
+
+The applications of ENM/SDM are varied.
+Insights from ENM when employed alone (i.e. without an SDM) are useful mostly for academic and research purposes.
+In addition to these, SDM have conservation applications.
+For instance, SDM can project future biodiversity changes [@sinclair2010useful], highlight species particularly sensitive to future climate changes [@zurell2023predicting], and help designing protected areas and guide policy making [@villero2017integrating].

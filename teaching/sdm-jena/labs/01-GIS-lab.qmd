@@ -1,0 +1,11 @@
+---
+title: "Exercice 1"
+subtitle: "Spatial data analysis using sf, terra, and friends"
+---
+
+## Software
+
+```{r}
+# Packages used throughout the course
+c("sf", "terra", "tmap", "ggplot2")
+```
