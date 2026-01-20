@@ -49,42 +49,56 @@ Species usually respond to more than one environmental covariate, making the nic
 An example of a non-symmetrical convex 2D niche is shown below.
 
 ```{r niche-2d, fig.width=5, fig.height=4, fig.align='center'}
-x <- seq(-10, 40, length.out = 1e2)
-y <- seq(300, 5000, length.out = 1e2)
-z <- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))
-for (X in unique(x)) {
-  for (Y in unique(y)) {
-    i <- which(unique(x) == X)
-    j <- which(unique(y) == Y)
-    z[i, j] <- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)
-  }
+# actual niche
+mu <- c(12, 800)
+sigl <- c(3, 300)
+sigr <- c(4, 500)
+
+x <- seq(4, 22, length.out = 500)
+y <- seq(0, 2000, length.out = 500)
+z <- matrix(NA, nrow = length(y), ncol = length(x))
+for (j in seq_along(x)) {
+  z[j, ] <- l(x[j], mu[1], sigl[1], sigr[1]) * l(y, mu[2], sigl[2], sigr[2])
 }
-image(z, axes = FALSE, col = hcl.colors(100, "Blues", rev = TRUE))
-contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
-axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
-axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
-title(xlab = "Temperature", ylab = "Precipitation")
+image(
+  x, y, z,
+  xlab = "Temperature",
+  ylab = "Precipitation",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(
+  x, y, z,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2)
+)
 ```
+
 
 ## Species Distribution Modeling (SDM)
 
 SDMs project ENMs from an environmental space to a geographical area.
 Its nuances are mainly in achieving this efficiently using GIS software and highlighting uncertainty of projections due to model extrapolation.
-For example, projecting the second niche shown in this page onto Europe gives the projected suitability distribution shown below.
+For example, projecting the last 2D niche shown in this page onto Europe gives the projected suitability distribution shown below.
 
 ```{r sdm, fig.width=5, fig.height=4, fig.align='center'}
 library(terra)
 
-tavg <- rast("../data/wc_tavg.tif")
-niche <- app(tavg, fun = function(x) l(x, 10, 3, 1))
-w <- niche
+roi <- ext(-13, 33, 33, 62) # Europe
+r <- rast(c("../data/wc2.1_10m_bio_1.tif", "../data/wc2.1_10m_bio_12.tif")) |> # load rasters
+  crop(roi) # crop to Europe
+w <- r[[1]]
 w[!is.na(w)] <- 1
 w <- as.polygons(w)
 
-# SDM
+vals <- values(r)
+l1 <- l(vals[, 1], mu[1], sigl[1], sigr[1]) # first component of the niche
+l2 <- l(vals[, 2], mu[2], sigl[2], sigr[2]) # second component of the niche
+sdm <- r[[1]]
+names(sdm) <- ""
+values(sdm) <- l1 * l2 # multiply two components
 plot(
-  crop(niche, ext(-15, 45, 25, 75)),
-  col = hcl.colors(100, "Blues", rev = TRUE),
+  sdm,
+  col = hcl.colors(100, "Fall", rev = TRUE),
   fun = \() lines(w),
   axes = FALSE,
   mar = c(2, 0, 1, 0)
@@ -99,32 +113,16 @@ Once the niche of inferred, projecting in geographic space is relatively trivial
 *Ecological Niche Modeling* is a general term that applies to many types of models, all of which try to infer the niche of species.
 In this course, we will focus on two ENM frameworks, one relying on a generalized linear model (GLM) and one on the Random Forest (RF) algorithm [@breiman2001random].
 I chose GLM and RF because they represent two extremes of algorithms used in ENM, highlighting their different advantages and limitations.
-To explain these two procedures, I will use simulated data for a virtual species, *Equus unicornis*.
+To explain these two procedures, I will use simulated data for a virtual species.
+The data for this species is stored in `virtual.csv`.
 
 ```{r gen-data, fig.width=5, fig.height=4, fig.align='center'}
-set.seed(123)
-tavg <- seq(-20, 50, length.out = 1e2)
-prec <- seq(0, 5e3, length.out = 1e2)
-suit <- matrix(NA, nrow = length(unique(tavg)), ncol = length(unique(prec)))
-for (x in tavg) {
-  for (y in prec) {
-    i <- which(tavg == x)
-    j <- which(prec == y)
-    suit[i, j] <- l(x, 10, 5, 12) * l(y, 2000, 500, 1000)
-  }
-}
-occ <- rbinom(suit, size = 1, prob = suit)
-tavg <- rep(tavg, each = 1e2)
-prec <- rep(prec, 1e2)
-d <- data.frame(tavg, prec, occ)
-d <- d[!is.na(d$occ), ]
-d <- unique(d)
-d <- d[sample(nrow(d), 500), ]
+d <- read.csv("../data/virtual.csv")
 head(d)
 ```
 
 This dataframe has three columns.
-`tavg` and `prec` are the average temperature and precipitation, respectively.
+`BIO01` and `BIO12` are the average temperature and precipitation, respectively.
 `occ` is the occurrence status, namely if the species has been observed at that environmental conditions (`1`) or not (`0`).
 
 ### GLM
@@ -134,30 +132,48 @@ The quadratic curve assures the niche is convex, even though it does not allow a
 In R, this is achieved using the following specifications.
 
 ```{r glm, fig.width=5, fig.height=4, fig.align='center'}
-enm <- glm(occ ~ tavg + I(tavg^2), data = d, family = "binomial")
-plot(
-  sort(d$tavg),
-  predict(enm, type = "response")[order(d$tavg)],
-  type = "l", lwd = 2, col = "tomato",
-  xlab = "Average temperature",
-  ylab = "Suitability"
-)
-lines(
-  sort(d$tavg),
-  l(sort(d$tavg), 10, 5, 12) * max(predict(enm, type = "response")),
-  lwd = 2,
-  col = "dodgerblue"
+enm <- glm(
+  occ ~ poly(BIO01, 2, raw = TRUE) + poly(BIO12, 2, raw = TRUE),
+  data = d,
+  family = binomial("logit")
 )
 ```
 
 ::: {.callout-note}
-The syntax `I(tavg^2)` makes R consider the quadratic term explicitly, rather than squaring the values of tavg.
+The syntax `poly(x, n, raw = TRUE)` is used in _R_ to fit a polynomial of degree `n` to `x`. `raw = TRUE` makes sure the actual polynomial of `x` are used, and not a transformed version of them.
 :::
 
-You can see that the actual niche (blue) is not symmetrical, but the inferred niche (red) is.
+We can the plot this inferred niche on top of the actual niche.
+
+```{r glm-inferred, fig.width=5, fig.height=4, fig.align='center'}
+z_inferred <- z
+
+# use `x` and `y` generated before
+for (j in seq_along(x)) {
+  z_inferred[j, ] <- predict(
+    enm, 
+    newdata = data.frame(BIO01 = x[j], BIO12 = y),
+    type = "response"
+  )
+}
+
+image(
+  x, y, z_inferred,
+  xlab = "BIO01",
+  ylab = "BIO12",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(
+  x, y, z,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2)
+)
+```
+
+The colors now show the inferred niche using `glm()` and the contours the actual niche.
+You can see that the actual niche is not symmetrical, but the inferred niche is.
 This is a common bias of GLM ENM.
 However, for its simplicity, a GLM ENM performs reasonably well at capturing the optimal environmental value and the general decline of suitability away from it.
-
 
 ### Random Forest (RF)
 
@@ -170,30 +186,45 @@ In R, RF is achieved using the package `randomForest` with the following specifi
 library(randomForest)
 
 enm <- randomForest(
-  as.factor(occ) ~ tavg,
-  nodesize = 20,
+  occ ~ BIO01 + BIO12,
   data = d
-)
-plot(
-  sort(d$tavg),
-  predict(enm, type = "prob")[order(d$tavg), 2],
-  type = "l", lwd = 2, col = "tomato",
-  xlab = "Average temperature",
-  ylab = "Suitability"
-)
-lines(
-  sort(d$tavg),
-  l(sort(d$tavg), 10, 5, 12) * max(predict(enm, type = "prob")[order(d$tavg), 2]),
-  lwd = 2,
-  col = "dodgerblue"
 )
 ```
 
 ::: {.callout-note}
-The syntax `as.factor(occ)` makes `randomForest()` to consider a classification, rather than a regression, problem.
+This throws a warning that can be silenced by specifying `as.factor(occ)`, which makes `randomForest()` to consider a classification, rather than a regression, problem.
+However, we do not want this.
 :::
 
-You can see that the niche is very jagged.
+```{r rf-inferred, fig.width=5, fig.height=4, fig.align='center'}
+# decrease a bit the resolution to speed it up
+x <- seq(4, 22, length.out = 100)
+y <- seq(0, 2000, length.out = 100)
+z <- matrix(NA, nrow = length(y), ncol = length(x))
+z_inferred <- matrix(0, nrow = length(y), ncol = length(x))
+for (j in seq_along(x)) {
+  z[j, ] <- l(x[j], mu[1], sigl[1], sigr[1]) * l(y, mu[2], sigl[2], sigr[2])
+  z_inferred[j, ] <- predict(
+    enm, 
+    newdata = data.frame(BIO01 = x[j], BIO12 = y),
+    type = "response"
+  )
+}
+
+image(
+  x, y, z_inferred,
+  xlab = "BIO01",
+  ylab = "BIO12",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(
+  x, y, z,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2)
+)
+```
+
+You can see that the niche inferred by RF (colors) is very jagged.
 This is due to how RF works internally.
 We will not explain why this happens in this course, but we will highlight this feature of RF and discuss its implications several times.
-However, you can see that the RF model (red) follows, more or less, the shape of the actual niche (blue).
+However, you can see that the predictions from the RF model follows, more or less, the shape of the actual niche (contour lines).

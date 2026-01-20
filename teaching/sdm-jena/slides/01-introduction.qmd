@@ -45,7 +45,7 @@ The only package that we will use is `terra`.
 You might want to install also `codetools`, which performs checks on the C++ code of `terra`.
 
 ```{r, eval=FALSE}
-install.packages(c("codetools", "terra"))
+install.packages(c("codetools", "terra", "randomForest"))
 ```
 
 ::: {.callout-note}

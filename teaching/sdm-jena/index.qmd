@@ -1,6 +1,7 @@
 ---
-title: "Introduction to GIS with R"
-subtitle: "Spatial data analysis using sf, terra, and friends"
+title: "Species Distribution Models"
+subtitle: "An introductory course at SFU Jena"
+author: "Emilio Berti"
 ---
 
 ## Course overview
@@ -13,7 +14,7 @@ This course assumes basic R knowledge.
 
 In the first \# days, etc.
 
-::: {.callout-important}
+::: {.callout-note}
 A basic knowledge of Geographic Information Systems is required for ENM/SDM.
 I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.
 

@@ -1,0 +1,177 @@
+---
+title: "What are ENM/SDM and why do we use them?"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+# Generalized Linear Model (GLM)
+
+
+## Virtual species niche
+
+```{r niche, eval=TRUE, echo=TRUE}
+library(terra)
+set.seed(123)
+
+niche <- function(x, mu, sigl, sigr) {
+  x <- x[!is.na(x)]
+  out <- rep(NA, length(x))
+  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
+  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
+  return(out)
+}
+
+# actual niche
+mu <- c(12, 800)
+sigl <- c(3, 300)
+sigr <- c(4, 500)
+```
+
+## Virtual species occurrence data
+
+```{r gendata, eval=TRUE, echo=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
+# load climate
+roi <- ext(-13, 33, 33, 62)
+r <- rast(c("../data/wc2.1_10m_bio_1.tif", "../data/wc2.1_10m_bio_12.tif")) |>
+  crop(roi)
+
+names(r) <- c("BIO01", "BIO12")
+r[is.na(r)] <- -9999
+
+# niche
+vals <- values(r)
+niche_bio1 <- niche(vals[, 1], mu[1], sigl[1], sigr[1])
+niche_bio12 <- niche(vals[, 2], mu[2], sigl[2], sigr[2])
+suit <- r[[1]]
+values(suit) <- niche_bio1 * niche_bio12
+suit[r[[1]] == -9999] <- NA
+plot(suit, col = hcl.colors(100, "Fall", rev = TRUE))
+
+# sample occurrence
+pres <- spatSample(
+  suit,
+  size = 1000,
+  as.points = TRUE,
+  method = "weights"
+)
+pres$occ <- 1
+abs <- spatSample(
+  1 - suit,
+  size = 1000,
+  as.points = TRUE,
+  method = "weights"
+)
+abs$occ <- 0
+occ <- rbind(pres, abs)
+points(occ)
+```
+
+## Virtual species environmental data
+
+A data ready for ENM/SDM usually looks like this:
+
+```{r virtual-gbif, echo=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
+# frame
+d <- extract(r, occ, ID = FALSE)
+d$occ <- occ$occ
+d[sample(nrow(d), 5), ]
+write.csv(d, "../data/virtual.csv", row.names = FALSE)
+```
+
+## Fitting GLM
+
+In _R_, `glm(<formula>, <data>, family = binomial("logit")` fits a GLM to binary (0/1) data.
+
+`logit` is the inverse function of the logistic equation: $log \left( \frac{p}{1-p} \right)$, where $p$ is a probability.
+
+```{r virtual-glm, echo=TRUE, fig.width=4, fig.height=2.5, fig.align='center'}
+m <- glm(
+  occ ~ poly(BIO01, 2, raw = TRUE) + poly(BIO12, 2, raw = TRUE),
+  data = d,
+  family = binomial("logit")
+)
+```
+
+In _R_ `I(x^n)` means *as is*, i.e. it does not square the value, it evaluates the polynomial.
+
+## Inspecting fitted GLM
+
+```{r inspect-glm, echo=TRUE, fig.width=4, fig.height=2.5, fig.align='center'}
+summary(m)$coefficients
+```
+
+## Niche inferred by GLM
+
+```{r inferred-glm, echo=TRUE, eval=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
+x <- seq(4, 22, length.out = 50)
+y <- seq(0, 2000, length.out = 50)
+z <- matrix(NA, nrow = length(y), ncol = length(x))
+z_inferred <- z
+
+for (j in seq_along(x)) {
+  z[j, ] <- niche(x[j], mu[1], sigl[1], sigr[1]) * 
+    niche(y, mu[2], sigl[2], sigr[2])
+  z_inferred[j, ] <- predict(
+    m, 
+    newdata = data.frame(BIO01 = x[j], BIO12 = y),
+    type = "response"
+  )
+}
+```
+
+## Niche inferred by GLM
+
+```{r inferred-glm-plot, echo=TRUE, eval=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
+image(
+  x, y, z,
+  xlab = "BIO01",
+  ylab = "BIO12",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(
+  x, y, z,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2),
+  lwd = 2
+)
+contour(
+  x, y, z_inferred,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2),
+  col = "white", lwd = 2
+)
+```
+
+## Niche inferred by GLM
+
+Symmetrical, but not that bad in this case.
+
+```{r inferred-glm-silent, echo=FALSE, eval=TRUE, fig.width=4, fig.height=4, fig.align='center'}
+x <- seq(4, 22, length.out = 50)
+y <- seq(0, 2000, length.out = 50)
+z <- matrix(NA, nrow = length(y), ncol = length(x))
+z_inferred <- matrix(NA, nrow = length(y), ncol = length(x))
+
+for (j in seq_along(x)) {
+  z[j, ] <- niche(x[j], mu[1], sigl[1], sigr[1]) * niche(y, mu[2], sigl[2], sigr[2])
+  z_inferred[j, ] <- predict(
+    m, 
+    newdata = data.frame(BIO01 = x[j], BIO12 = y),
+    type = "response"
+  )
+}
+
+image(
+  x, y, z,
+  xlab = "BIO01",
+  ylab = "BIO12",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(x, y, z, add = TRUE, levels = seq(0.1, 1, by = 0.2), lwd = 2)
+contour(x, y, z_inferred, add = TRUE, levels = seq(0.1, 1, by = 0.2), col = "white", lwd = 2)
+```

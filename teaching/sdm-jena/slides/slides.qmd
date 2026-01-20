@@ -7,9 +7,10 @@ subtitle: "Spatial data analysis using sf, terra, and friends"
 
 Below are all the lecture slides. Click to open each one:
 
-- [Introduction](01-introduction.qmd)
+- [Introduction](01-introduction.qmd).
 
 ---
 
-- [Background](02-background.qmd)
+- [Theory](02-background.qmd).
+- [Ecological Niche Modeling with GLM](03-glm.qmd).
 

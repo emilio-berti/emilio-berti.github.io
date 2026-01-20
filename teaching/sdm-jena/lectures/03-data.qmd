@@ -1,0 +1,41 @@
+---
+title: "Data for ENM/SDM"
+author: "Emilio Berti"
+format:
+  html: 
+    code-fold: true
+  pdf: default
+---
+
+Two types of data are required for ENM/SDM:
+
+  1. Species occurrence data.
+  2. Environmental data.
+
+## Species occurrence data
+
+Species occurrence data record the occurrence of species geographically.
+The most known source of occurrence data are the Global [Biodiversity Information Facility (GBIF)](https://www.gbif.org/) and [iNaturalist](https://www.inaturalist.org/).
+
+::: {.callout-note}
+GBIF is a data *aggregator*, pulling data also from iNaturalist.
+:::
+
+Occurrence data usually record only the presence of species, i.e. the species was detected at that location, due to the absence of species being extremely difficult to record.
+However, because most ENMs require presence **and** absence data, absences are usually simulated assuming an underlying ecological process.
+We will cover this in more detail in the subsequent sections.
+
+## Environmental data
+
+ENM/SDM usually investigate the effect of climatic variables on species distribution.
+Although other environmental covariates can be included, such as pH, landcover type, etc., this course focuses only on climatic variables, which are always accounted for in ENM/SDM.
+Climate is the probability density function of weather events, such as average, minimum, and maximum temperature (K) and precipitation (mm).
+Because many centers and research institutes model climate, climatic data can be accessed from a large variety of sources.
+In addition, bioclimatic variables are often derived from raw climate data and aggregated into long-term (e.g., 30 years) averages.
+These *bioclimatic normals* are often the climatic layers used in ENM/SDM.
+Some of the most used databases for bioclimatic normals are [WorldClim](https://www.worldclim.org/), [CHELSA](https://www.chelsa-climate.org/), and [PRISM](https://www.prism.oregonstate.edu/).
+
+::: {.callout-note}
+Climate data differ widely in how they are derived.
+They are not inter-changeable and often lead to different results.
+:::

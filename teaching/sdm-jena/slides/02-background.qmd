@@ -9,9 +9,51 @@ format:
     aspectratio: 43
 ---
 
-## Background
+## The why SDMs
 
-ENM/SDM 
+Species Distribution Models (SDMs) are projections of species geographic ranges, i.e. where the species are found.
+
+Among other applications, SDMs are used for:
+
+  1. Understand what limits species' distribution.
+  2. Project how they will change under future climate.
+  3. Plan conservation and management, e.g. where to establish new protected areas.
+
+## A brief history of SDMs
+
+  - 1807: Essay on the Geography of Plants (Humboldt).
+  - 1967: The theory of island biogeography (MacArthur & Wilson)
+  - 1990s: Infancy of quantitative SDMs.
+  - 2000s: SDMs as a recognized field.
+  - 2010s: Boom of SDMs.
+  - 2020s: Overflow of SDMs.
+
+## The basic workflow
+
+Starting from data, to obtain the *projected* distribution of one species:
+
+  1. Ecological Niche Model (ENM): Model the ecological requirements of species.
+  2. SDM: Project these requirements into geographic space.
+
+Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+
+## The basic workflow
+
+Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+
+Given some data, ENM is a flexible module. 
+
+SDM is usually much more constrained: Meta-population dynamics and other spatial processes.
+
+## The basic workflow
+
+Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+
+ENM: Environmental processes.
+ENM is hard due to data limitations.
+
+SDM: Spatial processes
+SDM is hard due to complexity and lack of theory.
 
 # Theory Primer
 
@@ -21,7 +63,7 @@ ENM try to reconstruct the ecological (climatic) niche of a species.
 
 Theory suggests the niche must be convex.
 
-```{r niche-symm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
+```{r niche-symm, echo=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
 l <- function(x, mu, sigl, sigr) {
   out <- rep(NA, length(x))
   out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
@@ -40,15 +82,9 @@ plot(
 
 ## Ecological Niche Modeling (ENM)
 
-Theory suggests the niche must be convex and potentially not symmetrical
+Theory suggests the niche must be convex and not symmetrical
 
 ```{r niche-asymm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
-l <- function(x, mu, sigl, sigr) {
-  out <- rep(NA, length(x))
-  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
-  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
-  return(out)
-}
 x <- seq(-10, 40, length.out = 1e3)
 par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
 plot(
@@ -64,12 +100,6 @@ plot(
 Example of non-symmetrical, convex 2D niche.
 
 ```{r niche-2d, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
-l <- function(x, mu, sigl, sigr) {
-  out <- rep(NA, length(x))
-  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
-  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
-  return(out)
-}
 x <- seq(-10, 40, length.out = 1e2)
 y <- seq(300, 5000, length.out = 1e2)
 z <- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))
@@ -80,7 +110,7 @@ for (X in unique(x)) {
     z[i, j] <- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)
   }
 }
-image(z, axes = FALSE, col = hcl.colors(100, "Blues", rev = TRUE))
+image(z, axes = FALSE, col = hcl.colors(100, "Fall", rev = TRUE))
 contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
 axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
 axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
@@ -115,13 +145,14 @@ p <- terra::vect(
 p <- terra::convHull(p)
 p <- terra::densify(p, interval = 1e3)
 par(mfrow = c(1, 2), mar = c(4, 4, 2, 2))
-image(z, axes = FALSE, col = hcl.colors(100, "Blues", rev = TRUE))
+layout(matrix(c(1, 1, 2), ncol = 3))
+image(z, axes = FALSE, col = hcl.colors(100, "Fall", rev = TRUE))
 contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
 axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
 axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
 title(xlab = "Temperature", ylab = "Precipitation")
 terra::plot(
-  w, fun = \() terra::polys(p, col = "tomato2"),
+  w, fun = \() terra::polys(p, col = "green3"),
   mar = c(0, 0, 0, 0)
 )
 ```
