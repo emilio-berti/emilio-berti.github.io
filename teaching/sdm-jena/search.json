@@ -1,52 +1,94 @@
 [
   {
-    "objectID": "labs/01-GIS-lab.html",
-    "href": "labs/01-GIS-lab.html",
-    "title": "Exercice 1",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Species Distribution Models",
     "section": "",
-    "text": "# Packages used throughout the course\nc(\"sf\", \"terra\", \"tmap\", \"ggplot2\")\n\n[1] \"sf\"      \"terra\"   \"tmap\"    \"ggplot2\""
+    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nNote\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI give a course at iDiv that you can access here. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
   },
   {
-    "objectID": "labs/01-GIS-lab.html#software",
-    "href": "labs/01-GIS-lab.html#software",
-    "title": "Exercice 1",
+    "objectID": "index.html#course-overview",
+    "href": "index.html#course-overview",
+    "title": "Species Distribution Models",
     "section": "",
-    "text": "# Packages used throughout the course\nc(\"sf\", \"terra\", \"tmap\", \"ggplot2\")\n\n[1] \"sf\"      \"terra\"   \"tmap\"    \"ggplot2\""
+    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nNote\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI give a course at iDiv that you can access here. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
+  },
+  {
+    "objectID": "index.html#learning-objectives",
+    "href": "index.html#learning-objectives",
+    "title": "Species Distribution Models",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nUnderstand the theory behind ENM/SDM.\nPerform ENM/SDM in R.\nApply ENM/SDM to real data.\nProduce maps."
+  },
+  {
+    "objectID": "index.html#course-structure",
+    "href": "index.html#course-structure",
+    "title": "Species Distribution Models",
+    "section": "Course structure",
+    "text": "Course structure\n\nLectures\n\n01 – Introduction\n\n\n\nLabs\n\nLab 1 – R & spatial data\n\n\n\nSlides\n\nList all Slides"
+  },
+  {
+    "objectID": "index.html#software",
+    "href": "index.html#software",
+    "title": "Species Distribution Models",
+    "section": "Software",
+    "text": "Software\nThe only package that we will use is terra. You might want to install also codetools, which performs checks on the C++ code of terra.\n\ninstall.packages(c(\"codetools\", \"terra\"))\n\n\n\n\n\n\n\nNote\n\n\n\nterra is still in active development and some functionalities change with newer releases."
+  },
+  {
+    "objectID": "lectures/03-data.html",
+    "href": "lectures/03-data.html",
+    "title": "Data for ENM/SDM",
+    "section": "",
+    "text": "Two types of data are required for ENM/SDM:"
+  },
+  {
+    "objectID": "lectures/03-data.html#species-occurrence-data",
+    "href": "lectures/03-data.html#species-occurrence-data",
+    "title": "Data for ENM/SDM",
+    "section": "Species occurrence data",
+    "text": "Species occurrence data\nSpecies occurrence data record the occurrence of species geographically. The most known source of occurrence data are the Global Biodiversity Information Facility (GBIF) and iNaturalist.\n\n\n\n\n\n\nNote\n\n\n\nGBIF is a data aggregator, pulling data also from iNaturalist.\n\n\nOccurrence data usually record only the presence of species, i.e. the species was detected at that location, due to the absence of species being extremely difficult to record. However, because most ENMs require presence and absence data, absences are usually simulated assuming an underlying ecological process. We will cover this in more detail in the subsequent sections."
+  },
+  {
+    "objectID": "lectures/03-data.html#environmental-data",
+    "href": "lectures/03-data.html#environmental-data",
+    "title": "Data for ENM/SDM",
+    "section": "Environmental data",
+    "text": "Environmental data\nENM/SDM usually investigate the effect of climatic variables on species distribution. Although other environmental covariates can be included, such as pH, landcover type, etc., this course focuses only on climatic variables, which are always accounted for in ENM/SDM. Climate is the probability density function of weather events, such as average, minimum, and maximum temperature (K) and precipitation (mm). Because many centers and research institutes model climate, climatic data can be accessed from a large variety of sources. In addition, bioclimatic variables are often derived from raw climate data and aggregated into long-term (e.g., 30 years) averages. These bioclimatic normals are often the climatic layers used in ENM/SDM. Some of the most used databases for bioclimatic normals are WorldClim, CHELSA, and PRISM.\n\n\n\n\n\n\nNote\n\n\n\nClimate data differ widely in how they are derived. They are not inter-changeable and often lead to different results."
   },
   {
     "objectID": "lectures/02-theory.html",
     "href": "lectures/02-theory.html",
     "title": "Theory of ENM/SDM",
     "section": "",
-    "text": "ENM relates one or more environmental variables, e.g. temperature and precipitation, to the suitability of species. The range and shape of how this suitability changes with the variables is called the environmental niche of the species. For example, the figure below shows the thermal niche of a species.\n\n\nCode\nl &lt;- function(x, mu, sigl, sigr) {\n  x[is.na(x)] &lt;- -9999\n  out &lt;- rep(NA, length(x))\n  out[x &lt; mu] &lt;- exp(- ((x[x &lt; mu] - mu) / sqrt(2) / sigl) ^ 2)\n  out[x &gt;= mu] &lt;- exp(- ((x[x &gt;= mu] - mu) / sqrt(2) / sigr) ^ 2)\n  out[x == -9999] &lt;- NA\n  return(out)\n}\nx &lt;- seq(0, 30, length.out = 1e3)\nplot(\n  x, l(x, 10, 3, 3),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nTheory suggests that the niche must be convex, i.e. that the suitability between two points along an environmental gradient must be larger or equal to the value of the points. The curve shown above is an example of a convex niche. The niche is usually also not symmetrical, as biological processes are affected differently by extreme cold and heat. An example of a convex asymmetric niche is shown below.\n\n\nCode\nplot(\n  x, l(x, 10, 3, 1),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nSpecies usually respond to more than one environmental covariate, making the niche multidimensional. An example of a non-symmetrical convex 2D niche is shown below.\n\n\nCode\nx &lt;- seq(-10, 40, length.out = 1e2)\ny &lt;- seq(300, 5000, length.out = 1e2)\nz &lt;- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))\nfor (X in unique(x)) {\n  for (Y in unique(y)) {\n    i &lt;- which(unique(x) == X)\n    j &lt;- which(unique(y) == Y)\n    z[i, j] &lt;- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)\n  }\n}\nimage(z, axes = FALSE, col = hcl.colors(100, \"Blues\", rev = TRUE))\ncontour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))\naxis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))\naxis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))\ntitle(xlab = \"Temperature\", ylab = \"Precipitation\")"
+    "text": "ENM relates one or more environmental variables, e.g. temperature and precipitation, to the suitability of species. The range and shape of how this suitability changes with the variables is called the environmental niche of the species. For example, the figure below shows the thermal niche of a species.\n\n\nCode\nl &lt;- function(x, mu, sigl, sigr) {\n  x[is.na(x)] &lt;- -9999\n  out &lt;- rep(NA, length(x))\n  out[x &lt; mu] &lt;- exp(- ((x[x &lt; mu] - mu) / sqrt(2) / sigl) ^ 2)\n  out[x &gt;= mu] &lt;- exp(- ((x[x &gt;= mu] - mu) / sqrt(2) / sigr) ^ 2)\n  out[x == -9999] &lt;- NA\n  return(out)\n}\nx &lt;- seq(0, 30, length.out = 1e3)\nplot(\n  x, l(x, 10, 3, 3),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nTheory suggests that the niche must be convex, i.e. that the suitability between two points along an environmental gradient must be larger or equal to the value of the points. The curve shown above is an example of a convex niche. The niche is usually also not symmetrical, as biological processes are affected differently by extreme cold and heat. An example of a convex asymmetric niche is shown below.\n\n\nCode\nplot(\n  x, l(x, 10, 3, 1),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nSpecies usually respond to more than one environmental covariate, making the niche multidimensional. An example of a non-symmetrical convex 2D niche is shown below.\n\n\nCode\n# actual niche\nmu &lt;- c(12, 800)\nsigl &lt;- c(3, 300)\nsigr &lt;- c(4, 500)\n\nx &lt;- seq(4, 22, length.out = 500)\ny &lt;- seq(0, 2000, length.out = 500)\nz &lt;- matrix(NA, nrow = length(y), ncol = length(x))\nfor (j in seq_along(x)) {\n  z[j, ] &lt;- l(x[j], mu[1], sigl[1], sigr[1]) * l(y, mu[2], sigl[2], sigr[2])\n}\nimage(\n  x, y, z,\n  xlab = \"Temperature\",\n  ylab = \"Precipitation\",\n  col = hcl.colors(100, \"Fall\", rev = TRUE)\n)\ncontour(\n  x, y, z,\n  add = TRUE,\n  levels = seq(0.1, 1, by = 0.2)\n)"
   },
   {
     "objectID": "lectures/02-theory.html#ecological-niche-modeling-enm",
     "href": "lectures/02-theory.html#ecological-niche-modeling-enm",
     "title": "Theory of ENM/SDM",
     "section": "",
-    "text": "ENM relates one or more environmental variables, e.g. temperature and precipitation, to the suitability of species. The range and shape of how this suitability changes with the variables is called the environmental niche of the species. For example, the figure below shows the thermal niche of a species.\n\n\nCode\nl &lt;- function(x, mu, sigl, sigr) {\n  x[is.na(x)] &lt;- -9999\n  out &lt;- rep(NA, length(x))\n  out[x &lt; mu] &lt;- exp(- ((x[x &lt; mu] - mu) / sqrt(2) / sigl) ^ 2)\n  out[x &gt;= mu] &lt;- exp(- ((x[x &gt;= mu] - mu) / sqrt(2) / sigr) ^ 2)\n  out[x == -9999] &lt;- NA\n  return(out)\n}\nx &lt;- seq(0, 30, length.out = 1e3)\nplot(\n  x, l(x, 10, 3, 3),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nTheory suggests that the niche must be convex, i.e. that the suitability between two points along an environmental gradient must be larger or equal to the value of the points. The curve shown above is an example of a convex niche. The niche is usually also not symmetrical, as biological processes are affected differently by extreme cold and heat. An example of a convex asymmetric niche is shown below.\n\n\nCode\nplot(\n  x, l(x, 10, 3, 1),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nSpecies usually respond to more than one environmental covariate, making the niche multidimensional. An example of a non-symmetrical convex 2D niche is shown below.\n\n\nCode\nx &lt;- seq(-10, 40, length.out = 1e2)\ny &lt;- seq(300, 5000, length.out = 1e2)\nz &lt;- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))\nfor (X in unique(x)) {\n  for (Y in unique(y)) {\n    i &lt;- which(unique(x) == X)\n    j &lt;- which(unique(y) == Y)\n    z[i, j] &lt;- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)\n  }\n}\nimage(z, axes = FALSE, col = hcl.colors(100, \"Blues\", rev = TRUE))\ncontour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))\naxis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))\naxis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))\ntitle(xlab = \"Temperature\", ylab = \"Precipitation\")"
+    "text": "ENM relates one or more environmental variables, e.g. temperature and precipitation, to the suitability of species. The range and shape of how this suitability changes with the variables is called the environmental niche of the species. For example, the figure below shows the thermal niche of a species.\n\n\nCode\nl &lt;- function(x, mu, sigl, sigr) {\n  x[is.na(x)] &lt;- -9999\n  out &lt;- rep(NA, length(x))\n  out[x &lt; mu] &lt;- exp(- ((x[x &lt; mu] - mu) / sqrt(2) / sigl) ^ 2)\n  out[x &gt;= mu] &lt;- exp(- ((x[x &gt;= mu] - mu) / sqrt(2) / sigr) ^ 2)\n  out[x == -9999] &lt;- NA\n  return(out)\n}\nx &lt;- seq(0, 30, length.out = 1e3)\nplot(\n  x, l(x, 10, 3, 3),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nTheory suggests that the niche must be convex, i.e. that the suitability between two points along an environmental gradient must be larger or equal to the value of the points. The curve shown above is an example of a convex niche. The niche is usually also not symmetrical, as biological processes are affected differently by extreme cold and heat. An example of a convex asymmetric niche is shown below.\n\n\nCode\nplot(\n  x, l(x, 10, 3, 1),\n  type = \"l\", lwd = 2, col = \"dodgerblue3\",\n  xlab = \"Temperature\", \n  ylab = \"Suitability\"\n)\n\n\n\n\n\n\n\n\n\nSpecies usually respond to more than one environmental covariate, making the niche multidimensional. An example of a non-symmetrical convex 2D niche is shown below.\n\n\nCode\n# actual niche\nmu &lt;- c(12, 800)\nsigl &lt;- c(3, 300)\nsigr &lt;- c(4, 500)\n\nx &lt;- seq(4, 22, length.out = 500)\ny &lt;- seq(0, 2000, length.out = 500)\nz &lt;- matrix(NA, nrow = length(y), ncol = length(x))\nfor (j in seq_along(x)) {\n  z[j, ] &lt;- l(x[j], mu[1], sigl[1], sigr[1]) * l(y, mu[2], sigl[2], sigr[2])\n}\nimage(\n  x, y, z,\n  xlab = \"Temperature\",\n  ylab = \"Precipitation\",\n  col = hcl.colors(100, \"Fall\", rev = TRUE)\n)\ncontour(\n  x, y, z,\n  add = TRUE,\n  levels = seq(0.1, 1, by = 0.2)\n)"
   },
   {
     "objectID": "lectures/02-theory.html#species-distribution-modeling-sdm",
     "href": "lectures/02-theory.html#species-distribution-modeling-sdm",
     "title": "Theory of ENM/SDM",
     "section": "Species Distribution Modeling (SDM)",
-    "text": "Species Distribution Modeling (SDM)\nSDMs project ENMs from an environmental space to a geographical area. Its nuances are mainly in achieving this efficiently using GIS software and highlighting uncertainty of projections due to model extrapolation. For example, projecting the second niche shown in this page onto Europe gives the projected suitability distribution shown below.\n\n\nCode\nlibrary(terra)\n\ntavg &lt;- rast(\"../data/wc_tavg.tif\")\nniche &lt;- app(tavg, fun = function(x) l(x, 10, 3, 1))\nw &lt;- niche\nw[!is.na(w)] &lt;- 1\nw &lt;- as.polygons(w)\n\n# SDM\nplot(\n  crop(niche, ext(-15, 45, 25, 75)),\n  col = hcl.colors(100, \"Blues\", rev = TRUE),\n  fun = \\() lines(w),\n  axes = FALSE,\n  mar = c(2, 0, 1, 0)\n)\n\n\n\n\n\n\n\n\n\nGenerally speaking, the hard part of ENM/SDM is the ENM. Once the niche of inferred, projecting in geographic space is relatively trivial."
+    "text": "Species Distribution Modeling (SDM)\nSDMs project ENMs from an environmental space to a geographical area. Its nuances are mainly in achieving this efficiently using GIS software and highlighting uncertainty of projections due to model extrapolation. For example, projecting the last 2D niche shown in this page onto Europe gives the projected suitability distribution shown below.\n\n\nCode\nlibrary(terra)\n\nroi &lt;- ext(-13, 33, 33, 62) # Europe\nr &lt;- rast(c(\"../data/wc2.1_10m_bio_1.tif\", \"../data/wc2.1_10m_bio_12.tif\")) |&gt; # load rasters\n  crop(roi) # crop to Europe\nw &lt;- r[[1]]\nw[!is.na(w)] &lt;- 1\nw &lt;- as.polygons(w)\n\nvals &lt;- values(r)\nl1 &lt;- l(vals[, 1], mu[1], sigl[1], sigr[1]) # first component of the niche\nl2 &lt;- l(vals[, 2], mu[2], sigl[2], sigr[2]) # second component of the niche\nsdm &lt;- r[[1]]\nnames(sdm) &lt;- \"\"\nvalues(sdm) &lt;- l1 * l2 # multiply two components\nplot(\n  sdm,\n  col = hcl.colors(100, \"Fall\", rev = TRUE),\n  fun = \\() lines(w),\n  axes = FALSE,\n  mar = c(2, 0, 1, 0)\n)\n\n\n\n\n\n\n\n\n\nGenerally speaking, the hard part of ENM/SDM is the ENM. Once the niche of inferred, projecting in geographic space is relatively trivial."
   },
   {
     "objectID": "lectures/02-theory.html#modeling-the-niche",
     "href": "lectures/02-theory.html#modeling-the-niche",
     "title": "Theory of ENM/SDM",
     "section": "Modeling the niche",
-    "text": "Modeling the niche\nEcological Niche Modeling is a general term that applies to many types of models, all of which try to infer the niche of species. In this course, we will focus on two ENM frameworks, one relying on a generalized linear model (GLM) and one on the Random Forest (RF) algorithm (Breiman 2001). I chose GLM and RF because they represent two extremes of algorithms used in ENM, highlighting their different advantages and limitations. To explain these two procedures, I will use simulated data for a virtual species, Equus unicornis.\n\n\nCode\nset.seed(123)\ntavg &lt;- seq(-20, 50, length.out = 1e2)\nprec &lt;- seq(0, 5e3, length.out = 1e2)\nsuit &lt;- matrix(NA, nrow = length(unique(tavg)), ncol = length(unique(prec)))\nfor (x in tavg) {\n  for (y in prec) {\n    i &lt;- which(tavg == x)\n    j &lt;- which(prec == y)\n    suit[i, j] &lt;- l(x, 10, 5, 12) * l(y, 2000, 500, 1000)\n  }\n}\nocc &lt;- rbinom(suit, size = 1, prob = suit)\ntavg &lt;- rep(tavg, each = 1e2)\nprec &lt;- rep(prec, 1e2)\nd &lt;- data.frame(tavg, prec, occ)\nd &lt;- d[!is.na(d$occ), ]\nd &lt;- unique(d)\nd &lt;- d[sample(nrow(d), 500), ]\nhead(d)\n\n\n          tavg     prec occ\n3971  7.575758 3535.354   0\n4884 13.939394 4191.919   0\n7881 35.151515 4040.404   0\n5156 16.060606 2777.778   1\n8238 37.979798 1868.687   0\n6962 28.787879 3080.808   0\n\n\nThis dataframe has three columns. tavg and prec are the average temperature and precipitation, respectively. occ is the occurrence status, namely if the species has been observed at that environmental conditions (1) or not (0).\n\nGLM\nThe simples GLM uses a quadratic curve and a binary (binomial) response. The quadratic curve assures the niche is convex, even though it does not allow asymmetric curves. In R, this is achieved using the following specifications.\n\n\nCode\nenm &lt;- glm(occ ~ tavg + I(tavg^2), data = d, family = \"binomial\")\nplot(\n  sort(d$tavg),\n  predict(enm, type = \"response\")[order(d$tavg)],\n  type = \"l\", lwd = 2, col = \"tomato\",\n  xlab = \"Average temperature\",\n  ylab = \"Suitability\"\n)\nlines(\n  sort(d$tavg),\n  l(sort(d$tavg), 10, 5, 12) * max(predict(enm, type = \"response\")),\n  lwd = 2,\n  col = \"dodgerblue\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe syntax I(tavg^2) makes R consider the quadratic term explicitly, rather than squaring the values of tavg.\n\n\nYou can see that the actual niche (blue) is not symmetrical, but the inferred niche (red) is. This is a common bias of GLM ENM. However, for its simplicity, a GLM ENM performs reasonably well at capturing the optimal environmental value and the general decline of suitability away from it.\n\n\nRandom Forest (RF)\nRF is a powerful machine-learning algorithm that has been applied to ENM for several decades. RF has its advantages, but has a major issue: the niche is rarely convex. In fact, in most cases, the niche will be concave (the opposite of convex). In R, RF is achieved using the package randomForest with the following specifications.\n\n\nCode\nlibrary(randomForest)\n\nenm &lt;- randomForest(\n  as.factor(occ) ~ tavg,\n  nodesize = 20,\n  data = d\n)\nplot(\n  sort(d$tavg),\n  predict(enm, type = \"prob\")[order(d$tavg), 2],\n  type = \"l\", lwd = 2, col = \"tomato\",\n  xlab = \"Average temperature\",\n  ylab = \"Suitability\"\n)\nlines(\n  sort(d$tavg),\n  l(sort(d$tavg), 10, 5, 12) * max(predict(enm, type = \"prob\")[order(d$tavg), 2]),\n  lwd = 2,\n  col = \"dodgerblue\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe syntax as.factor(occ) makes randomForest() to consider a classification, rather than a regression, problem.\n\n\nYou can see that the niche is very jagged. This is due to how RF works internally. We will not explain why this happens in this course, but we will highlight this feature of RF and discuss its implications several times. However, you can see that the RF model (red) follows, more or less, the shape of the actual niche (blue)."
+    "text": "Modeling the niche\nEcological Niche Modeling is a general term that applies to many types of models, all of which try to infer the niche of species. In this course, we will focus on two ENM frameworks, one relying on a generalized linear model (GLM) and one on the Random Forest (RF) algorithm (Breiman 2001). I chose GLM and RF because they represent two extremes of algorithms used in ENM, highlighting their different advantages and limitations. To explain these two procedures, I will use simulated data for a virtual species. The data for this species is stored in virtual.csv.\n\n\nCode\nd &lt;- read.csv(\"../data/virtual.csv\")\nhead(d)\n\n\n      BIO01 BIO12 occ\n1  9.987156   897   1\n2  9.333240   472   1\n3  9.853782   663   1\n4  7.313562  1025   1\n5  6.567688   689   1\n6 11.305479   807   1\n\n\nThis dataframe has three columns. BIO01 and BIO12 are the average temperature and precipitation, respectively. occ is the occurrence status, namely if the species has been observed at that environmental conditions (1) or not (0).\n\nGLM\nThe simples GLM uses a quadratic curve and a binary (binomial) response. The quadratic curve assures the niche is convex, even though it does not allow asymmetric curves. In R, this is achieved using the following specifications.\n\n\nCode\nenm &lt;- glm(\n  occ ~ poly(BIO01, 2, raw = TRUE) + poly(BIO12, 2, raw = TRUE),\n  data = d,\n  family = binomial(\"logit\")\n)\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe syntax poly(x, n, raw = TRUE) is used in R to fit a polynomial of degree n to x. raw = TRUE makes sure the actual polynomial of x are used, and not a transformed version of them.\n\n\nWe can the plot this inferred niche on top of the actual niche.\n\n\nCode\nz_inferred &lt;- z\n\n# use `x` and `y` generated before\nfor (j in seq_along(x)) {\n  z_inferred[j, ] &lt;- predict(\n    enm, \n    newdata = data.frame(BIO01 = x[j], BIO12 = y),\n    type = \"response\"\n  )\n}\n\nimage(\n  x, y, z_inferred,\n  xlab = \"BIO01\",\n  ylab = \"BIO12\",\n  col = hcl.colors(100, \"Fall\", rev = TRUE)\n)\ncontour(\n  x, y, z,\n  add = TRUE,\n  levels = seq(0.1, 1, by = 0.2)\n)\n\n\n\n\n\n\n\n\n\nThe colors now show the inferred niche using glm() and the contours the actual niche. You can see that the actual niche is not symmetrical, but the inferred niche is. This is a common bias of GLM ENM. However, for its simplicity, a GLM ENM performs reasonably well at capturing the optimal environmental value and the general decline of suitability away from it.\n\n\nRandom Forest (RF)\nRF is a powerful machine-learning algorithm that has been applied to ENM for several decades. RF has its advantages, but has a major issue: the niche is rarely convex. In fact, in most cases, the niche will be concave (the opposite of convex). In R, RF is achieved using the package randomForest with the following specifications.\n\n\nCode\nlibrary(randomForest)\n\nenm &lt;- randomForest(\n  occ ~ BIO01 + BIO12,\n  data = d\n)\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis throws a warning that can be silenced by specifying as.factor(occ), which makes randomForest() to consider a classification, rather than a regression, problem. However, we do not want this.\n\n\n\n\nCode\n# decrease a bit the resolution to speed it up\nx &lt;- seq(4, 22, length.out = 100)\ny &lt;- seq(0, 2000, length.out = 100)\nz &lt;- matrix(NA, nrow = length(y), ncol = length(x))\nz_inferred &lt;- matrix(0, nrow = length(y), ncol = length(x))\nfor (j in seq_along(x)) {\n  z[j, ] &lt;- l(x[j], mu[1], sigl[1], sigr[1]) * l(y, mu[2], sigl[2], sigr[2])\n  z_inferred[j, ] &lt;- predict(\n    enm, \n    newdata = data.frame(BIO01 = x[j], BIO12 = y),\n    type = \"response\"\n  )\n}\n\nimage(\n  x, y, z_inferred,\n  xlab = \"BIO01\",\n  ylab = \"BIO12\",\n  col = hcl.colors(100, \"Fall\", rev = TRUE)\n)\ncontour(\n  x, y, z,\n  add = TRUE,\n  levels = seq(0.1, 1, by = 0.2)\n)\n\n\n\n\n\n\n\n\n\nYou can see that the niche inferred by RF (colors) is very jagged. This is due to how RF works internally. We will not explain why this happens in this course, but we will highlight this feature of RF and discuss its implications several times. However, you can see that the predictions from the RF model follows, more or less, the shape of the actual niche (contour lines)."
   },
   {
     "objectID": "lectures/lectures.html",
     "href": "lectures/lectures.html",
     "title": "Lectures",
     "section": "",
-    "text": "What are ENM/SDM and why do we use them?\n\n\n\n\n\n\n\n\n\n\nTheory of ENM/SDM\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "What are ENM/SDM and why do we use them?\n\n\n\n\n\n\n\n\n\n\nTheory of ENM/SDM\n\n\n\n\n\n\n\n\n\n\nData for ENM/SDM\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "lectures/01-background.html",
@@ -63,45 +105,24 @@
     "text": "The goal of Ecological Niche Modeling (ENM) is to infer the ecological niche of species. A typical set of questions that ENM tries to answer is:\n\nWhat is the optimal temperature for this species?\nWhat is the range of temperature that this species can tolerate?\nWhat is the minimum level of precipitation that this species need to survive?\nIs this species limited by temperature of precipitation?\n\nENM works entirely in environmental space. Species Distribution Modeling (SDM) is the projection of a ENM into geographical space. The workflow of SDM is always to first perform an ENM and then to use this to achieve a SDM.\nThe applications of ENM/SDM are varied. Insights from ENM when employed alone (i.e. without an SDM) are useful mostly for academic and research purposes. In addition to these, SDM have conservation applications. For instance, SDM can project future biodiversity changes (Sinclair, White, and Newell 2010), highlight species particularly sensitive to future climate changes (Zurell et al. 2023), and help designing protected areas and guide policy making (Villero et al. 2017)."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Introduction to GIS with R",
+    "objectID": "labs/01-GIS-lab.html",
+    "href": "labs/01-GIS-lab.html",
+    "title": "Exercice 1",
     "section": "",
-    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nImportant\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI give a course at iDiv that you can access here. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
+    "text": "# Packages used throughout the course\nc(\"sf\", \"terra\", \"tmap\", \"ggplot2\")\n\n[1] \"sf\"      \"terra\"   \"tmap\"    \"ggplot2\""
   },
   {
-    "objectID": "index.html#course-overview",
-    "href": "index.html#course-overview",
-    "title": "Introduction to GIS with R",
+    "objectID": "labs/01-GIS-lab.html#software",
+    "href": "labs/01-GIS-lab.html#software",
+    "title": "Exercice 1",
     "section": "",
-    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nImportant\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI give a course at iDiv that you can access here. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
-  },
-  {
-    "objectID": "index.html#learning-objectives",
-    "href": "index.html#learning-objectives",
-    "title": "Introduction to GIS with R",
-    "section": "Learning objectives",
-    "text": "Learning objectives\n\nUnderstand the theory behind ENM/SDM.\nPerform ENM/SDM in R.\nApply ENM/SDM to real data.\nProduce maps."
-  },
-  {
-    "objectID": "index.html#course-structure",
-    "href": "index.html#course-structure",
-    "title": "Introduction to GIS with R",
-    "section": "Course structure",
-    "text": "Course structure\n\nLectures\n\n01 – Introduction\n\n\n\nLabs\n\nLab 1 – R & spatial data\n\n\n\nSlides\n\nList all Slides"
-  },
-  {
-    "objectID": "index.html#software",
-    "href": "index.html#software",
-    "title": "Introduction to GIS with R",
-    "section": "Software",
-    "text": "Software\nThe only package that we will use is terra. You might want to install also codetools, which performs checks on the C++ code of terra.\n\ninstall.packages(c(\"codetools\", \"terra\"))\n\n\n\n\n\n\n\nNote\n\n\n\nterra is still in active development and some functionalities change with newer releases."
+    "text": "# Packages used throughout the course\nc(\"sf\", \"terra\", \"tmap\", \"ggplot2\")\n\n[1] \"sf\"      \"terra\"   \"tmap\"    \"ggplot2\""
   },
   {
     "objectID": "slides/slides.html",
     "href": "slides/slides.html",
     "title": "Slides",
     "section": "",
-    "text": "Below are all the lecture slides. Click to open each one:\n\nIntroduction\n\n\n\nBackground"
+    "text": "Below are all the lecture slides. Click to open each one:\n\nIntroduction.\n\n\n\nTheory.\nEcological Niche Modeling with GLM."
   }
 ]
