@@ -1,0 +1,93 @@
+---
+title: "Fitting ENM"
+subtitle: "Random Forest"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+```{r setup, echo=FALSE}
+niche <- function(x, mu, sigl, sigr) {
+  x <- x[!is.na(x)]
+  out <- rep(NA, length(x))
+  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
+  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
+  return(out)
+}
+
+mu <- c(12, 800)
+sigl <- c(3, 300)
+sigr <- c(4, 500)
+```
+
+## How Random Forest works
+
+  1. Create $n$ decision trees.
+  2. Average or majority voting across all trees.
+
+![Conceptual representation of Random Forest algorithm](../figures/random-forest.png){width=50%}
+
+## Load virtual species
+
+Already created, just load it.
+
+```{r niche, eval=TRUE, echo=TRUE}
+d <- read.csv("../data/virtual.csv")
+head(d)
+```
+
+## Fitting Random Forest
+RF is a powerful machine-learning algorithm that has been applied extensively for ENM.
+
+In _R_, RF is achieved using the package `randomForest` with the following specifications.
+
+```{r rf}
+library(randomForest)
+
+enm <- randomForest(
+  occ ~ BIO01 + BIO12,
+  data = d
+)
+```
+
+::: {.callout-note}
+A warning can be silenced with `as.factor(occ)`, which makes `randomForest()` consider a classification. We do not want this.
+:::
+
+## Random Forest inferred niche
+
+```{r rf-inferred, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
+x <- seq(4, 22, length.out = 100)
+y <- seq(0, 2000, length.out = 100)
+z <- matrix(NA, nrow = length(y), ncol = length(x))
+z_inferred <- matrix(0, nrow = length(y), ncol = length(x))
+for (j in seq_along(x)) {
+  z[j, ] <- niche(x[j], mu[1], sigl[1], sigr[1]) * niche(y, mu[2], sigl[2], sigr[2])
+  z_inferred[j, ] <- predict(
+    enm, 
+    newdata = data.frame(BIO01 = x[j], BIO12 = y),
+    type = "response"
+  )
+}
+image(
+  x, y, z_inferred,
+  xlab = "BIO01",
+  ylab = "BIO12",
+  col = hcl.colors(100, "Fall", rev = TRUE)
+)
+contour(
+  x, y, z,
+  add = TRUE,
+  levels = seq(0.1, 1, by = 0.2)
+)
+```
+
+Predictions from the RF model (colors) kinda match the actual niche (black lines).
+
+The niche inferred by RF is very jagged.
+
+This is due to how RF works internally and can only be partly fixed.

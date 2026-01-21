@@ -1,5 +1,6 @@
 ---
-title: "What are ENM/SDM and why do we use them?"
+title: "Fitting ENM"
+subtitle: "Generalized Linear Model"
 author: "Emilio Berti"
 format:
   beamer:
@@ -8,9 +9,6 @@ format:
     incremental: false
     aspectratio: 43
 ---
-
-# Generalized Linear Model (GLM)
-
 
 ## Virtual species niche
 

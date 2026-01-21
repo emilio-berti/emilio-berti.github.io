@@ -73,7 +73,6 @@ contour(
 )
 ```
 
-
 ## Species Distribution Modeling (SDM)
 
 SDMs project ENMs from an environmental space to a geographical area.
@@ -121,7 +120,7 @@ d <- read.csv("../data/virtual.csv")
 head(d)
 ```
 
-This dataframe has three columns.
+This data frame has three columns.
 `BIO01` and `BIO12` are the average temperature and precipitation, respectively.
 `occ` is the occurrence status, namely if the species has been observed at that environmental conditions (`1`) or not (`0`).
 
