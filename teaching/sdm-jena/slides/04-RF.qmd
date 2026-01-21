@@ -60,7 +60,7 @@ A warning can be silenced with `as.factor(occ)`, which makes `randomForest()` co
 
 ## Random Forest inferred niche
 
-```{r rf-inferred, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
+```{r rf-inferred, echo=FALSE, fig.width=3, fig.height=3, fig.align='center'}
 x <- seq(4, 22, length.out = 100)
 y <- seq(0, 2000, length.out = 100)
 z <- matrix(NA, nrow = length(y), ncol = length(x))
