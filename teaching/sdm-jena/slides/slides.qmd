@@ -14,3 +14,7 @@ Below are all the lecture slides. Click to open each one:
 - [Theory](02-background.qmd).
 - [Ecological Niche Modeling with GLM](03-glm.qmd).
 - [Ecological Niche Modeling with Random Forest](04-RF.qmd).
+
+---
+
+- [Preparing data for ENM/SDM](06-preparing-data.qmd)

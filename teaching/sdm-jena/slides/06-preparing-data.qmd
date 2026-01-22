@@ -1,0 +1,304 @@
+---
+title: "Preparing data for ENM/SDM"
+subtitle: "Species and climate data"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+## Data types
+
+  - Species occurrence (0/1; absences/presence) data. Usually a `data.frame`.
+  - Environmental (climatic) data. Usually a `SpatRaster`.
+
+# Species data
+
+## Species occurrence data
+
+_Podarcis muralis_ (Laurenti, 1768) from GBIF: [https://doi.org/10.15468/dl.x74f4b](https://doi.org/10.15468/dl.x74f4b). Filters:
+
+  - The coordinate uncertainty of the records must be $\leq 5 km$.
+  - The year of the record must be $\geq 1970$ and $\leq 2000$.
+
+![The common wall lizard _Podarcis muralis_.](../figures/lizard.png){width=80%}
+
+## Species occurrence data
+
+Load GBIF data into R.
+
+```{r load-gbif}
+library(terra)
+
+gbif <- read.csv(
+  "../data/0002051-260120142942310.csv",
+  sep = "\t"
+)
+```
+
+::: {.callout-note}
+`sep = "\t"` specifies that the separator of the columns is a `TAB`, which is the standard used by GBIF.
+:::
+
+This data frame has many columns that we do not need.
+
+## Drop duplicates
+
+Keep only long/lat columns and drop duplicate coordinates.
+
+```{r select-gbif, fig.width=4, fig.height=3, fig.align='center'}
+gbif <- gbif[, c("decimalLongitude", "decimalLatitude")]
+gbif <- unique(gbif)
+```
+
+```{r plot-gbif-1, fig.width=4, fig.height=3, fig.align='center', echo=FALSE}
+# load countries polygons
+# this is from rnaturalearth package, which is required by CoordinateCleaner
+country <- vect(rnaturalearth::countries110)
+
+# plot gbif records
+plot(crop(country, gbif))
+points(gbif, cex = .5, col = "dodgerblue")
+```
+
+::: {.callout-warning}
+This is an European species.
+:::
+*George Rau, a boy [...] returned from a family vacation to northern Italy.*
+
+## Check for coordinate issues
+
+The package `CoordinateCleaner` performs several quality checks on GBIF data and flags potential inaccuracies.
+
+```{r coordiante-cleaner, fig.width=4, fig.height=3, fig.align='center'}
+library(CoordinateCleaner)
+
+flags <- clean_coordinates(
+  gbif,
+  species = NULL,
+  tests = c(
+    "capitals", "centroids", "equal", "gbif",
+    "institutions", "seas", "zeros"
+  )
+)
+```
+
+The data frame `flags` contains the column `.summary` with value `TRUE/FALSE`.
+
+## Remove coordinates with issues
+
+Retain only GBIF records that have `.summary = TRUE`.
+
+```{r filter-gbif, fig.width=4, fig.height=3, fig.align='center'}
+gbif <- gbif[flags$.summary, ]
+```
+
+```{r plot-gbif-2, fig.width=4, fig.height=3, fig.align='center', echo=FALSE}
+country <- vect(rnaturalearth::countries110)
+plot(crop(country, gbif))
+points(gbif, cex = .5, col = "dodgerblue")
+```
+
+There are still points in the USA, which we want to remove manually.
+
+## Remove coordinates manually
+
+We can remove inaccuracies manually.
+
+```{r manual-clean-gbif, fig.width=4, fig.height=3, fig.align='center'}
+gbif <- gbif[gbif$decimalLongitude >= -20, ]
+```
+
+```{r plot-gbif-3, fig.width=4, fig.height=2.5, fig.align='center', echo=FALSE}
+country <- vect(rnaturalearth::countries110)
+plot(crop(country, gbif))
+points(gbif, cex = .5, col = "dodgerblue")
+```
+
+We have now a data frame of cleaned occurrences from GBIF.
+
+## Pseudo-absences
+
+ - Generally, we need both presences and absences of species for ENM.
+ - We need to generate some *pseudo-absences*, i.e. simulated absences, and add them to the data frame.
+ - We do not want absences in the same location (grid cell) of presences.
+
+## Pseudo-absences
+
+Define the sampling region.
+
+```{r absences-1, fig.width=4, fig.height=3, fig.align='center'}
+# data frame as SpatVector
+gbif <- vect(
+  gbif,
+  geom = c("decimalLongitude", "decimalLatitude"),
+  crs = "EPSG:4326"
+)
+
+# (convex) hull inscribing all known occurrences
+hull <- convHull(gbif)
+```
+
+## Pseudo-absences
+
+Rasterize GBIF data to a 0 (at least one record) 1 (no records) layer.
+
+```{r absences-2, fig.width=4, fig.height=3, fig.align='center'}
+# load one climate layer as template of the grid cell
+grid <- rast("../data/wc2.1_10m_bio_1.tif") |> crop(hull)
+
+# create a raster with 
+# - 0 if there is a gbif record in that cell
+# - 1 if not
+# - NA for sea cells
+r <- rasterize(gbif, grid, fun = \(x) 0, background = 1)
+r[is.na(grid)] <- NA
+
+# remove areas outside the polygon inscribing all GBIF records
+r <- mask(r, hull)
+```
+
+## Pseudo-absences
+
+Sample within the area excluding cells with at least one presence.
+
+```{r absences-3, fig.width=4, fig.height=3, fig.align='center'}
+# sample absences
+abs <- spatSample(
+  r,
+  length(gbif),       # n(abs) = n(pres)
+  as.points = TRUE,   # return a SpatVector
+  method = "weights", # trick to remove cells with a record (weight = r = 0)
+  values = FALSE      # we do not care about the values of the grid template
+)
+```
+
+## Finalize species occurrence data 
+
+Stitch the two SpatVector together.
+
+```{r join-dummy, fig.width=4, fig.height=3, fig.align='center', eval=FALSE}
+gbif$occ <- 1 # presence
+abs$occ <- 0  # absence
+
+# combine into one SpatVector
+p <- rbind(gbif, abs)
+```
+
+```{r join, fig.width=4, fig.height=2.5, fig.align='center', echo=FALSE}
+p <- vect("../data/sp.shp")
+country <- vect(rnaturalearth::countries110)
+
+plot(
+  p,
+  "occ",                           # color by `occ`
+  col = c("tomato", "dodgerblue"), # color palette
+  cex = 0.3,
+  fun = \() lines(country)         # outline of countries
+)
+```
+
+`p` is a SpatVector with 0/1 (absence/presence) information.
+We will use `p` to extract climatic variables.
+
+# Climate data
+
+## Climate data
+
+ - WorldClim bioclimatic variables. 
+ - Many others are available, but WorldClim is easy to start with.
+ - Bioclimatic variables are derived temperature and precipitation variables that have the strongest influence on species.
+ - A list of all of them can be found at [https://www.worldclim.org/data/bioclim.html](https://www.worldclim.org/data/bioclim.html).
+
+## Climate data
+
+Load eight bioclimatic variables.
+
+```{r load-worldclim, fig.width=4, fig.height=3, fig.align='center'}
+# list of files of bioclimatic variables
+ff <- list.files(
+  "../data",         # where the files are
+  pattern = "wc2.1", # wc = WorldClim
+  full.names = TRUE  # full path
+)
+
+# load them into memory
+climate <- rast(ff)
+climate
+plot(climate, col = hcl.colors(100, "Spectral", rev = TRUE))
+```
+
+## Extract climate
+
+Extract the values of climate at the species occurrence locations using `p`.
+
+```{r extract-worldclim, fig.width=4, fig.height=3, fig.align='center', eval=FALSE}
+d <- extract(climate, p, ID = FALSE, cell = TRUE)
+```
+
+```{r extract-worldclim-dummy, fig.width=4, fig.height=2.5, fig.align='center', echo=FALSE}
+p <- vect("../data/sp.shp")
+country <- vect(rnaturalearth::countries110)
+climate <- rast(ff)
+d <- extract(climate, p, ID = FALSE, cell = TRUE)
+```
+
+
+::: {.callout-tip}
+`cell = TRUE` return also the ID of the cell of the raster where the records are found. This is useful to keep only one record per grid cell.
+:::
+
+## Assign species occurrences
+
+Assign the occurrence status (presence/absence) to this data frame.
+
+```{r final, fig.width=4, fig.height=3, fig.align='center'}
+d$occ <- p$occ
+```
+
+## Drop duplicates
+
+Drop duplicate records, i.e. multiple records for the same grid cell.
+
+```{r unique-worldclim, fig.width=4, fig.height=3, fig.align='center'}
+# drop rows with duplicated cells
+d <- d[!duplicated(d$cell), ]
+
+# drop the `cell` column
+d <- d[, -which(names(d) == "cell")]
+```
+
+## Balance absences and presences
+
+Finally, make sure to have more or less the same number of presences and absences.
+
+```{r prevalence, fig.width=4, fig.height=3, fig.align='center'}
+table(d$occ) # not balanced
+# subsample
+n <- table(d$occ)[["1"]]
+index_pres <- which(d$occ == 1)
+index_abs <- which(d$occ == 0)
+d <- d[c(index_pres, sample(index_abs, n)), ]
+table(d$occ) # balanced
+```
+
+We have now a data frame obtained from GBIF that is ready to be used for ENM/SDM.
+
+## Workflow
+
+Occurrence data
+
+  1. Download GBIF data.
+  2. Filter and clean GBIF data.
+  3. Sample absences (if needed).
+
+Climate data
+
+  1. Download climate data.
+  2. Extract values for occurrence data.
+  3. Drop duplicates.
+
+Occurrence + climate data $\rightarrow$ ENM.

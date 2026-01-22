@@ -31,7 +31,7 @@ gbif <- read.csv("../data/0002051-260120142942310.csv", sep = "\t")
 :::
 
 This data frame has many columns that we do not need.
-We retain only the longitude and latitude columns and convert drop all duplicate coordinates.
+We retain only the longitude and latitude columns and drop duplicate coordinates.
 
 ```{r select-gbif, fig.width=4, fig.height=3, fig.align='center'}
 gbif <- gbif[, c("decimalLongitude", "decimalLatitude")]
@@ -46,10 +46,8 @@ plot(crop(country, gbif))
 points(gbif, cex = .5, col = "dodgerblue")
 ```
 
-You can tell there is something wrong with this data, as this is a species found only in Europe, but we have points in the USA.
-This can be due to a variety of reasons, such as mistakes in the sampling and data preparation.
+GBIF data is known to have inaccuracies and should always be checked for coordinate errors.
 For example, sometimes the reported coordinates are not where the species was found, but of the museum where the specimen is stored.
-
 The package `CoordinateCleaner` performs several quality checks on GBIF data and flags potential inaccuracies.
 
 ```{r coordiante-cleaner, fig.width=4, fig.height=3, fig.align='center'}
@@ -72,8 +70,11 @@ plot(crop(country, gbif))
 points(gbif, cex = .5, col = "dodgerblue")
 ```
 
-There are still points in the USA, which we know cannot be correct.
-We can remove those manually.
+There are still points in the USA, which we want to remove manually.
+
+::: {.callout-note}
+The Wikipedia page of this species clarifies why there are detection in North America: *It is referred to locally in the Cincinnati/Northern Kentucky area as the "Lazarus lizard", as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy's). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.*
+:::
 
 ```{r manual-clean-gbif, fig.width=4, fig.height=3, fig.align='center'}
 gbif <- gbif[gbif$decimalLongitude >= -20, ]
@@ -94,8 +95,6 @@ In doing so, however, we do not want to sample an absence in the same grid cell 
 The code below show how to generate pseudo-absences following this approach.
 
 ```{r absences, fig.width=4, fig.height=3, fig.align='center'}
-library(terra)
-
 # data frame as SpatVector
 gbif <- vect(
   gbif,
@@ -131,9 +130,7 @@ abs <- spatSample(
 
 We can now stitch the two SpatVector together.
 
-```{r join, fig.width=4, fig.height=3, fig.align='center'}
-library(terra)
-
+```{r join-dummy, fig.width=4, fig.height=3, fig.align='center', eval=FALSE}
 gbif$occ <- 1 # presence
 abs$occ <- 0  # absence
 
@@ -147,11 +144,18 @@ plot(
   cex = 0.3,
   fun = \() lines(country)         # outline of countries
 )
+```
 
-d <- data.frame(
-  lon = crds(p)[, 1],
-  lat = crds(p)[, 2],
-  occ = p$occ
+```{r join, fig.width=4, fig.height=3, fig.align='center', echo=FALSE}
+p <- vect("../data/sp.shp")
+country <- vect(rnaturalearth::countries110)
+
+plot(
+  p,
+  "occ",                           # color by `occ`
+  col = c("tomato", "dodgerblue"), # color palette
+  cex = 0.3,
+  fun = \() lines(country)         # outline of countries
 )
 ```
 
@@ -166,8 +170,6 @@ A list of all of them can be found at [https://www.worldclim.org/data/bioclim.ht
 Load eight bioclimatic variables.
 
 ```{r load-worldclim, fig.width=4, fig.height=3, fig.align='center'}
-library(terra)
-
 # list of files of bioclimatic variables
 ff <- list.files(
   "../data",         # where the files are
