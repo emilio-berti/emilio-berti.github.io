@@ -1,11 +1,96 @@
 ---
-title: "Preparing data for ENM/SDM"
+title: "Running our first ENM/SDM"
 author: "Emilio Berti"
 format:
   html: 
     code-fold: show
   pdf: default
 ---
+
+Let's start by loading the species and climate data that we prepared in the previous section.
+
+```{r load data}
+d <- read.csv("data/occurrences.csv")
+head(d)
+```
+
+Bioclimatic variables are usually highly correlated with each others and only a subset of them should be used for train an ecological niche model.
+Variable selection can be performed with the usual statistical tricks or, even better, can be informed by the biology of the species.
+Let's start simple and only consider average temperature (`BIO01`) and total precipitation (`BIO12`) to train an ENM using `glm()`.
+
+```{r first-glm}
+enm_01_12 <- glm(
+  occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + poly(wc2.1_10m_bio_12, 2, raw = TRUE),
+  data = d,
+  family = "poisson"
+)
+```
+
+We can test how well these variables explain the distribution of the species by building another ENM with different variables and comparing it with the model above.
+Let's use the minimum temperature of the coldest month (`BIO06`) and the precipitation of the driest month (`BIO14`) instead.
+
+```{r second-glm}
+enm_06_14 <- glm(
+  occ ~ poly(wc2.1_10m_bio_6, 2, raw = TRUE) + poly(wc2.1_10m_bio_14, 2, raw = TRUE),
+  data = d,
+  family = "poisson"
+)
+```
+
+We can compared the two models by AIC, with the best most having the lowest AIC.
+
+```{r aic}
+AIC(enm_01_12, enm_06_14)
+```
+
+The model with the second set of variables explain the distribution of the species better than the first model.
+
+```{r sdm}
+ff <- list.files("../data", pattern = ".tif")
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62)
+r <- crop(r, roi)
+sdm <- predict(r, enm_06_14, type = "response")
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+
+suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
+
+threshold <- seq(0.1, 0.9, by = 0.001)
+tss <- rep(NA, length(threshold))
+for (i in seq_along(threshold)) {
+  p <- ifelse(suit > threshold[i], 1, 0)
+  TP <- sum(p == 1 & d$occ == 1)
+  FP <- sum(p == 1 & d$occ == 0)
+  FN <- sum(p == 0 & d$occ == 1)
+  TN <- sum(p == 0 & d$occ == 0)
+  # confusion <- matrix(
+  #   c(TP, FP, FN, TN),
+  #   2, 2, byrow = TRUE,
+  #   dimnames = list(
+  #     c("Pred 1", "Pred 0"),
+  #     c("Obs 1", "Obs 0")
+  #   )
+  # )
+  sens <- TP / (TP + FN)
+  spec <- TN / (TN + FP)
+  tss[i] <- sens + spec - 1
+}
+th <- threshold[which.max(tss)]
+plot(threshold, tss, type = "l", xlab = "Threshold value", ylab = "TSS")
+abline(v = th, lty = 2)
+p <- ifelse(suit > th, 1, 0)
+TP <- sum(p == 1 & d$occ == 1)
+FP <- sum(p == 1 & d$occ == 0)
+FN <- sum(p == 0 & d$occ == 1)
+TN <- sum(p == 0 & d$occ == 0)
+sens <- TP / (TP + FN)
+spec <- TN / (TN + FP)
+TSS <- sens + spec - 1
+TSS
+
+sdm_bin <- ifel(sdm >= th, 1, 0)
+plot(sdm_bin)
+```
 
 ## Species occurrence data
 
@@ -185,7 +270,7 @@ climate
 Using `p`, we extract the values of the grid cells of `climate` for the occurrence data.
 
 ```{r extract-worldclim, fig.width=4, fig.height=3, fig.align='center'}
-d <- extract(climate, p, ID = FALSE, cell = TRUE, xy = TRUE)
+d <- extract(climate, p, ID = FALSE, cell = TRUE)
 ```
 
 ::: {.callout-tip}
@@ -204,6 +289,9 @@ Then, drop duplicate records, i.e. multiple records for the same grid cell.
 # drop rows with duplicated cells
 d <- d[!duplicated(d$cell), ]
 
+# drop the `cell` column
+d <- d[, -which(names(d) == "cell")]
+
 head(d)
 ```
 
@@ -220,8 +308,6 @@ index_abs <- which(d$occ == 0)
 d <- d[c(index_pres, sample(index_abs, n)), ]
 
 table(d$occ) # balanced
-
-write.csv(d, "../data/occurrences.csv", row.names = FALSE)
 ```
 
 We have now a data frame obtained from GBIF that is ready to be used for ENM/SDM.
