@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,10 +73,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-bbcadbdd5519bef2a20589d010cdeeca.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-34d9182bd29975a7c5a3ee8d293a3d0b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -313,7 +313,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The Wikipedia page of this species clarifies why there are detection in North America: <em>It is referred to locally in the Cincinnati/Northern Kentucky area as the “Lazarus lizard”, as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy’s). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.</em></p>
+<p>The Wikipedia page of this species clarifies why there are detection in North America: <em>It is referred to locally in the Cincinnati/Northern Kentucky area as the “Lazarus lizard”, as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.</em></p>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
@@ -441,7 +441,7 @@ max values  :    30.98764,       11191,        2381,         484,    229.0017,  
 <div class="cell" data-layout-align="center">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">extract</span>(climate, p, <span class="at">ID =</span> <span class="cn">FALSE</span>, <span class="at">cell =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">extract</span>(climate, p, <span class="at">ID =</span> <span class="cn">FALSE</span>, <span class="at">cell =</span> <span class="cn">TRUE</span>, <span class="at">xy =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -471,10 +471,7 @@ Tip
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drop rows with duplicated cells</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="sc">!</span><span class="fu">duplicated</span>(d<span class="sc">$</span>cell), ]</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># drop the `cell` column</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[, <span class="sc">-</span><span class="fu">which</span>(<span class="fu">names</span>(d) <span class="sc">==</span> <span class="st">"cell"</span>)]</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  wc2.1_10m_bio_1 wc2.1_10m_bio_12 wc2.1_10m_bio_13 wc2.1_10m_bio_14
@@ -484,13 +481,13 @@ Tip
 4       10.599990              633               61               44
 5       10.302510              632               58               45
 6        2.760979              549               68               27
-  wc2.1_10m_bio_15 wc2.1_10m_bio_4 wc2.1_10m_bio_5 wc2.1_10m_bio_6 occ
-1        25.683231        686.3660        32.04650         2.11375   1
-2        21.440331        589.9808        25.82825        -0.33375   1
-3        18.089415        578.0707        22.92975        -2.12900   1
-4         9.118695        567.0883        23.99325         0.50650   1
-5         8.751935        560.5479        23.76875         0.34775   1
-6        30.307224        617.9191        15.89150        -8.37175   1</code></pre>
+  wc2.1_10m_bio_15 wc2.1_10m_bio_4 wc2.1_10m_bio_5 wc2.1_10m_bio_6   cell occ
+1        25.683231        686.3660        32.04650         2.11375 620998   1
+2        21.440331        589.9808        25.82825        -0.33375 621014   1
+3        18.089415        578.0707        22.92975        -2.12900 618853   1
+4         9.118695        567.0883        23.99325         0.50650 538936   1
+5         8.751935        560.5479        23.76875         0.34775 534618   1
+6        30.307224        617.9191        15.89150        -8.37175 562745   1</code></pre>
 </div>
 </div>
 <p>Finally, make sure to have more or less the same number of presences and absences.</p>
@@ -520,6 +517,10 @@ Tip
    0    1 
 1644 1644 </code></pre>
 </div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(d, <span class="st">"../data/occurrences.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <p>We have now a data frame obtained from GBIF that is ready to be used for ENM/SDM.</p>
 

@@ -73,7 +73,7 @@ points(gbif, cex = .5, col = "dodgerblue")
 There are still points in the USA, which we want to remove manually.
 
 ::: {.callout-note}
-The Wikipedia page of this species clarifies why there are detection in North America: *It is referred to locally in the Cincinnati/Northern Kentucky area as the "Lazarus lizard", as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy's). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.*
+The Wikipedia page of this species clarifies why there are detection in North America: *It is referred to locally in the Cincinnati/Northern Kentucky area as the "Lazarus lizard", as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.*
 :::
 
 ```{r manual-clean-gbif, fig.width=4, fig.height=3, fig.align='center'}
@@ -184,7 +184,20 @@ climate
 
 Using `p`, we extract the values of the grid cells of `climate` for the occurrence data.
 
-```{r extract-worldclim, fig.width=4, fig.height=3, fig.align='center'}
+```{r extract-worldclim-dummy, fig.width=4, fig.height=3, fig.align='center', eval=FALSE}
+d <- extract(climate, p, ID = FALSE, cell = TRUE, xy = TRUE)
+```
+
+```{r extract-worldclim, fig.width=4, fig.height=3, fig.align='center', echo=FALSE}
+ff <- list.files(
+  "../data",         # where the files are
+  pattern = "wc2.1", # wc = WorldClim
+  full.names = TRUE  # full path
+)
+
+# load them into memory
+climate <- rast(ff)
+p <- vect("../data/sp.shp")
 d <- extract(climate, p, ID = FALSE, cell = TRUE, xy = TRUE)
 ```
 

@@ -7,33 +7,40 @@ format:
   pdf: default
 ---
 
-Let's start by loading the species and climate data that we prepared in the previous section.
+We can now model the ecological niche and the distribution of the species _Podarcis muralis_.
+
+## Species niche
+
+We start by loading the species and climate data that we prepared in the previous section.
 
 ```{r load data}
-d <- read.csv("data/occurrences.csv")
+d <- read.csv("../data/occurrences.csv")
 head(d)
 ```
 
-Bioclimatic variables are usually highly correlated with each others and only a subset of them should be used for train an ecological niche model.
+The column names `wc2.1_10m_bio_<id>` means that this is data from WorldClim (`wc`) at a resolution of 10 arc-minutes (`10m`) for bioclimatic variables (`<id>`).
+Bioclimatic variables are generally highly correlated with each others and only a subset of them should be used for train an ecological niche model.
 Variable selection can be performed with the usual statistical tricks or, even better, can be informed by the biology of the species.
-Let's start simple and only consider average temperature (`BIO01`) and total precipitation (`BIO12`) to train an ENM using `glm()`.
+Because I do not know the biology of the species, I build several competing ENMs and test which one is best using the Akaike information criterion (AIC).
+
+The first model considers only average temperature (`BIO01`) and total precipitation (`BIO12`) to train an ENM using `glm()`.
 
 ```{r first-glm}
 enm_01_12 <- glm(
   occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + poly(wc2.1_10m_bio_12, 2, raw = TRUE),
   data = d,
-  family = "poisson"
+  family = "binomial"
 )
 ```
 
 We can test how well these variables explain the distribution of the species by building another ENM with different variables and comparing it with the model above.
-Let's use the minimum temperature of the coldest month (`BIO06`) and the precipitation of the driest month (`BIO14`) instead.
+For example, we can use the minimum temperature of the coldest month (`BIO06`) and the precipitation of the driest month (`BIO14`) instead.
 
 ```{r second-glm}
 enm_06_14 <- glm(
   occ ~ poly(wc2.1_10m_bio_6, 2, raw = TRUE) + poly(wc2.1_10m_bio_14, 2, raw = TRUE),
   data = d,
-  family = "poisson"
+  family = "binomial"
 )
 ```
 
@@ -45,269 +52,182 @@ AIC(enm_01_12, enm_06_14)
 
 The model with the second set of variables explain the distribution of the species better than the first model.
 
-```{r sdm}
-ff <- list.files("../data", pattern = ".tif")
-r <- rast(file.path("..", "data", ff))
-roi <- ext(-13, 33, 33, 62)
-r <- crop(r, roi)
-sdm <- predict(r, enm_06_14, type = "response")
-plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+### Statistical dredging (optional and dangerous)
 
+There are packages to run each possible model starting from a full model and rank them according to AIC.
+The most popular package is `MuMIn`, which contains the function `dredge()` to perform this steps.
+Start with the full model, i.e. the most complex model, and pass this to `dredge()`.
+```{r dredge}
+# full model
+full_enm <- glm(
+  occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_12, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_13, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_14, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_15, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_5, 2, raw = TRUE) + 
+   poly(wc2.1_10m_bio_6, 2, raw = TRUE),
+  data = d,
+  family = "binomial"
+)
+
+# dredging
+options(na.action = "na.fail")   # required by MuMIn, don't think about it
+dr <- MuMIn::dredge(full_enm)
+head(dr)
+```
+
+This table contains all possible sub-models of `full_enm` (including also `full_enm`) as rows ranked by AICc.
+A model contains the variable if there is a `+` at that column.
+The column `weight` quantifies the support of that model.
+We see that the model in first row (lowest AICc) is strongly supported against all others and we can select only that as our ENM.
+This model is actually the full model as it contains all bioclimatic variables specified.
+
+## Species distribution
+
+When using `glm()`, `terra` makes it extremely easy to produce a SDM.
+We first need to load the raster layers of the bioclimatic variables.
+
+```{r sdm-load}
+library(terra)
+
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+```
+
+The `terra` function `predict(<raster>, model)` is all we need.
+
+```{r sdm-predict-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
+sdm <- predict(r, full_enm, type = "response")
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+```
+
+```{r sdm-predict, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, full_enm, type = "response")
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+```
+
+### Binary projections
+
+And we obtained the projected suitability of the species for Europe.
+Note that this is a continuous value, in this case representing the probability of detecting the species given climate.
+If we are interested in a binary map, e.g. showing the climatic range of the species, we need to binarize this continuous value into `0/1`.
+There are several approaches to achieve this, but here we consider only the approach using the true skill statistics (TSS), which is one of the most widely used.
+
+The main idea of the TSS approach is to pick a threshold value and set the cells of the map above to `0` if their values if less than this threshold and to `1` otherwise.
+These `0/1` values are then compared to the known occurrence of the species to calculate
+
+  - The number of occurrences correctly predicted as presences (true positives, TP).
+  - The number of occurrences incorrectly predicted as absences (false negatives, FN).
+  - The number of occurrences correctly as absences (true negatives, TN).
+  - The number of occurrences incorrectly presences (false positives, FP).
+
+TSS is defined as $TSS = \frac{TP\,TN - FP\,FN}{(TP+FN)(TN+FP)}$, which is a statistic balancing how well the model performs in predicting both presences and absences.
+TSS ranges from 0, for a model not better than random, to 1, for a model with perfect predictions.
+
+If we pick several threshold and calculate the TSS for each of them, the best threshold is the one that has highest TSS, which is also the TSS of our model predictions.
+
+```{r sdm-binary-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
+# extract the values from the continuous map
 suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
 
+# generate a gradient of threshold values
 threshold <- seq(0.1, 0.9, by = 0.001)
-tss <- rep(NA, length(threshold))
+tss <- rep(NA, length(threshold)) # empty vector for storage
+
+# iterate over threshold values
 for (i in seq_along(threshold)) {
   p <- ifelse(suit > threshold[i], 1, 0)
   TP <- sum(p == 1 & d$occ == 1)
   FP <- sum(p == 1 & d$occ == 0)
   FN <- sum(p == 0 & d$occ == 1)
   TN <- sum(p == 0 & d$occ == 0)
-  # confusion <- matrix(
-  #   c(TP, FP, FN, TN),
-  #   2, 2, byrow = TRUE,
-  #   dimnames = list(
-  #     c("Pred 1", "Pred 0"),
-  #     c("Obs 1", "Obs 0")
-  #   )
-  # )
   sens <- TP / (TP + FN)
   spec <- TN / (TN + FP)
   tss[i] <- sens + spec - 1
 }
-th <- threshold[which.max(tss)]
-plot(threshold, tss, type = "l", xlab = "Threshold value", ylab = "TSS")
+
+th <- threshold[which.max(tss)] # best threshold
+
+plot(
+  threshold, tss,
+  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
+  xlab = "Threshold value", ylab = "TSS"
+)
 abline(v = th, lty = 2)
-p <- ifelse(suit > th, 1, 0)
-TP <- sum(p == 1 & d$occ == 1)
-FP <- sum(p == 1 & d$occ == 0)
-FN <- sum(p == 0 & d$occ == 1)
-TN <- sum(p == 0 & d$occ == 0)
-sens <- TP / (TP + FN)
-spec <- TN / (TN + FP)
-TSS <- sens + spec - 1
-TSS
 
+# binarize the continuous map
 sdm_bin <- ifel(sdm >= th, 1, 0)
-plot(sdm_bin)
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
 ```
 
-## Species occurrence data
+```{r sdm-binary, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, full_enm, type = "response")
 
-We selected and downloaded the occurrence data for the species _Podarcis muralis_ (Laurenti, 1768) from GBIF: [https://doi.org/10.15468/dl.x74f4b](https://doi.org/10.15468/dl.x74f4b).
-I specified already some filters in the query from GBIF, namely:
+# extract the values from the continuous map
+suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
 
-  - The coordinate uncertainty of the records must be $\leq 5 km$.
-  - The year of the record must be $\geq 1970$ and $\leq 2000$.
+# generate a gradient of threshold values
+threshold <- seq(0.1, 0.9, by = 0.001)
+tss <- rep(NA, length(threshold)) # empty vector for storage
 
-The first filter removes records with high uncertainty, relatively to the spatial resolution of the climatic data we will use (ca. 12km).
-The second filter removes records outside the range of the climatic data we will use.
+# iterate over threshold values
+for (i in seq_along(threshold)) {
+  p <- ifelse(suit > threshold[i], 1, 0)
+  TP <- sum(p == 1 & d$occ == 1)
+  FP <- sum(p == 1 & d$occ == 0)
+  FN <- sum(p == 0 & d$occ == 1)
+  TN <- sum(p == 0 & d$occ == 0)
+  sens <- TP / (TP + FN)
+  spec <- TN / (TN + FP)
+  tss[i] <- sens + spec - 1
+}
 
-We load this data in R.
-
-```{r load-gbif}
-library(terra)
-
-gbif <- read.csv("../data/0002051-260120142942310.csv", sep = "\t")
-```
-
-::: {.callout-note}
-`sep = "\t"` specifies that the separator of the columns is a `TAB`, which is the standard used by GBIF.
-:::
-
-This data frame has many columns that we do not need.
-We retain only the longitude and latitude columns and drop duplicate coordinates.
-
-```{r select-gbif, fig.width=4, fig.height=3, fig.align='center'}
-gbif <- gbif[, c("decimalLongitude", "decimalLatitude")]
-gbif <- unique(gbif)
-
-# load countries polygons
-# this is from rnaturalearth package, which is required by CoordinateCleaner
-country <- vect(rnaturalearth::countries110)
-
-# plot gbif records
-plot(crop(country, gbif))
-points(gbif, cex = .5, col = "dodgerblue")
-```
-
-GBIF data is known to have inaccuracies and should always be checked for coordinate errors.
-For example, sometimes the reported coordinates are not where the species was found, but of the museum where the specimen is stored.
-The package `CoordinateCleaner` performs several quality checks on GBIF data and flags potential inaccuracies.
-
-```{r coordiante-cleaner, fig.width=4, fig.height=3, fig.align='center'}
-library(CoordinateCleaner)
-
-flags <- clean_coordinates(
-  gbif,
-  species = NULL,
-  tests = c("capitals", "centroids", "equal", "gbif", "institutions", "seas", "zeros")
-)
-```
-
-The data frame `flags` contains the column `.summary` with value `TRUE` if all tests did not find inaccuracies and `FALSE` if that data record failed at least one test.
-We use this to retain only GBIF records that have `.summary = TRUE`.
-
-```{r filter-gbif, fig.width=4, fig.height=3, fig.align='center'}
-gbif <- gbif[flags$.summary, ]
-
-plot(crop(country, gbif))
-points(gbif, cex = .5, col = "dodgerblue")
-```
-
-There are still points in the USA, which we want to remove manually.
-
-::: {.callout-note}
-The Wikipedia page of this species clarifies why there are detection in North America: *It is referred to locally in the Cincinnati/Northern Kentucky area as the "Lazarus lizard", as it was introduced to the area around 1950 by George Rau, a boy whose family owned the Lazarus department store chain (Lazarus has since been absorbed into Macy's). After he returned from a family vacation to northern Italy, he released about 10 of the reptiles near his Cincinnati home.*
-:::
-
-```{r manual-clean-gbif, fig.width=4, fig.height=3, fig.align='center'}
-gbif <- gbif[gbif$decimalLongitude >= -20, ]
-
-plot(crop(country, gbif))
-points(gbif, cex = .5, col = "dodgerblue")
-```
-
-We have now a data frame of cleaned occurrences from GBIF.
-
-### Pseudo-absences
-
-To be able to model the niche and the distribution of the species, we need also absences.
-We thus need to generate some *pseudo-absences*, i.e. simulated absences, and add them to the data frame.
-There are several ways to generate absences, but here we will focus only one one: randomly sampling the geographic area within the polygon inscribing all known occurrences.
-In doing so, however, we do not want to sample an absence in the same grid cell of a presence.
-
-The code below show how to generate pseudo-absences following this approach.
-
-```{r absences, fig.width=4, fig.height=3, fig.align='center'}
-# data frame as SpatVector
-gbif <- vect(
-  gbif,
-  geom = c("decimalLongitude", "decimalLatitude"),
-  crs = "EPSG:4326"
-)
-
-# (convex) hull inscribing all known occurrences
-hull <- convHull(gbif)
-
-# load one climate layer as template of the grid cell
-grid <- rast("../data/wc2.1_10m_bio_1.tif") |> crop(hull)
-
-# create a raster with 
-# - 0 if there is a gbif record in that cell
-# - 1 if not
-# - NA for sea cells
-r <- rasterize(gbif, grid, fun = \(x) 0, background = 1)
-r[is.na(grid)] <- NA
-
-# remove areas outside the polygon inscribing all GBIF records
-r <- mask(r, hull)
-
-# sample absences
-abs <- spatSample(
-  r,
-  length(gbif),       # n(abs) = n(pres)
-  as.points = TRUE,   # return a SpatVector
-  method = "weights", # trick to remove cells with a record (weight = r = 0)
-  values = FALSE      # we do not care about the values of the grid template
-)
-```
-
-We can now stitch the two SpatVector together.
-
-```{r join-dummy, fig.width=4, fig.height=3, fig.align='center', eval=FALSE}
-gbif$occ <- 1 # presence
-abs$occ <- 0  # absence
-
-# combine into one SpatVector
-p <- rbind(gbif, abs)
+th <- threshold[which.max(tss)] # best threshold
 
 plot(
-  p,
-  "occ",                           # color by `occ`
-  col = c("tomato", "dodgerblue"), # color palette
-  cex = 0.3,
-  fun = \() lines(country)         # outline of countries
+  threshold, tss,
+  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
+  xlab = "Threshold value", ylab = "TSS"
 )
+abline(v = th, lty = 2)
+
+# binarize the continuous map
+sdm_bin <- ifel(sdm >= th, 1, 0)
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
 ```
 
-```{r join, fig.width=4, fig.height=3, fig.align='center', echo=FALSE}
-p <- vect("../data/sp.shp")
-country <- vect(rnaturalearth::countries110)
+This binary map is quite incorrect for this species.
+According to the IUCN (<https://www.iucnredlist.org/species/61550/12514105>), this species is found also in most of Italy, all the Balkans, and part of Turkey, but is not found in the UK, the Low Countries, and most of Germany.
+Why do we get such bad projections compared to the known range from IUCN?
+We will answer this in a next lecture, but my general recommendation is to plot the detection points.
 
-plot(
-  p,
-  "occ",                           # color by `occ`
-  col = c("tomato", "dodgerblue"), # color palette
-  cex = 0.3,
-  fun = \() lines(country)         # outline of countries
-)
+```{r sdm-issue-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
+points(d[d$occ == 1, c("x", "y")], pch = 20, cex = .3)
 ```
 
-We can now use the SpatVector `p` to extract climatic variables.
+```{r sdm-issue, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, full_enm, type = "response")
+th <- threshold[which.max(tss)] # best threshold
+sdm_bin <- ifel(sdm >= th, 1, 0)
 
-## Climate data
-
-In this course, we always use the WorldClim bioclimatic variables to model the niche of species.
-Bioclimatic variables are derived from temperature and precipitation data and are considered to have the strongest influence on the distribution of species.
-A list of all of them can be found at [https://www.worldclim.org/data/bioclim.html](https://www.worldclim.org/data/bioclim.html).
-
-Load eight bioclimatic variables.
-
-```{r load-worldclim, fig.width=4, fig.height=3, fig.align='center'}
-# list of files of bioclimatic variables
-ff <- list.files(
-  "../data",         # where the files are
-  pattern = "wc2.1", # wc = WorldClim
-  full.names = TRUE  # full path
-)
-
-# load them into memory
-climate <- rast(ff)
-climate
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
+points(d[d$occ == 1, c("x", "y")], pch = 20, cex = .3)
 ```
 
-Using `p`, we extract the values of the grid cells of `climate` for the occurrence data.
-
-```{r extract-worldclim, fig.width=4, fig.height=3, fig.align='center'}
-d <- extract(climate, p, ID = FALSE, cell = TRUE)
-```
-
-::: {.callout-tip}
-`cell = TRUE` return also the ID of the cell of the raster where the records are found. This is useful to keep only one record per grid cell.
-:::
-
-We assign the occurrence status (presence/absence) to this data frame.
-
-```{r final, fig.width=4, fig.height=3, fig.align='center'}
-d$occ <- p$occ
-```
-
-Then, drop duplicate records, i.e. multiple records for the same grid cell.
-
-```{r unique-worldclim, fig.width=4, fig.height=3, fig.align='center'}
-# drop rows with duplicated cells
-d <- d[!duplicated(d$cell), ]
-
-# drop the `cell` column
-d <- d[, -which(names(d) == "cell")]
-
-head(d)
-```
-
-Finally, make sure to have more or less the same number of presences and absences.
-
-```{r prevalence, fig.width=4, fig.height=3, fig.align='center'}
-table(d$occ) # not balanced
-
-n <- table(d$occ)[["1"]]
-index_pres <- which(d$occ == 1)
-index_abs <- which(d$occ == 0)
-
-# subsample
-d <- d[c(index_pres, sample(index_abs, n)), ]
-
-table(d$occ) # balanced
-```
-
-We have now a data frame obtained from GBIF that is ready to be used for ENM/SDM.
+The selected detection records are geographically biased and likely the environmental (climatic) space is not well represented.

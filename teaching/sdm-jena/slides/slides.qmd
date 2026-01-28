@@ -18,3 +18,4 @@ Below are all the lecture slides. Click to open each one:
 ---
 
 - [Preparing data for ENM/SDM](06-preparing-data.qmd)
+- [Running the first ENM/SDM](07-first-sdm.qmd)

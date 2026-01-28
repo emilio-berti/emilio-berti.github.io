@@ -1,0 +1,312 @@
+---
+title: "Running the first ENM/SDM"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 43
+---
+
+# ENM
+
+## Data
+
+```{r load data}
+d <- read.csv("../data/occurrences.csv")
+head(d, n = 3)
+```
+
+## Data from previous example
+
+```{r, correlation, echo=FALSE, fig.height=3.2, fig.width=3.2, fig.align='center'}
+a <- d[, 1:2]
+names(a) <- c("BIO01", "BIO12")
+pairs(a, pch = 20, cex = .3, lower.panel = panel.smooth)
+```
+
+ - Bioclimatic variables are highly correlated with each others.
+ - A subset of them should be used for ENM/SDM.
+
+## Selecting variables
+
+Variable selection
+
+ - The usual statistical tricks ...
+ - Informed by the **biology** of the species.
+
+Because I do not know the biology of the species, I will use a statistical trick: Akaike information criterion (AIC).
+
+## ENM-1
+
+Average temperature (`BIO01`) and total precipitation (`BIO12`).
+
+```{r first-glm}
+enm_01_12 <- glm(
+  occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + 
+    poly(wc2.1_10m_bio_12, 2, raw = TRUE),
+  data = d,
+  family = "binomial"
+)
+```
+
+## ENM-2
+
+Minimum temperature of the coldest month (`BIO06`) and the precipitation of the driest month (`BIO14`).
+
+```{r second-glm}
+enm_06_14 <- glm(
+  occ ~ poly(wc2.1_10m_bio_6, 2, raw = TRUE) + 
+    poly(wc2.1_10m_bio_14, 2, raw = TRUE),
+  data = d,
+  family = "binomial"
+)
+```
+
+## ENM-1 vs ENM-2
+
+We can compare the two models by AIC, with the best model having the lowest AIC.
+
+```{r aic}
+AIC(enm_01_12, enm_06_14)
+```
+
+ENM-2 is more supported than ENM-1.
+
+## Always insepect the inferred niche
+
+Looking at AIC (or other stats) is only one side of the story.
+
+Always **always** inspect the inferred niche.
+
+The coefficients of the quadratic terms for the two ENMs are:
+
+```{r inspect, echo=FALSE}
+message("ENM-01_12")
+beta_01_12 <- coef(enm_01_12)
+beta2_01_12 <- beta_01_12[grepl(")2", names(beta_01_12))]
+names(beta2_01_12) <- gsub(
+  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
+  "",
+  names(beta2_01_12)
+)
+beta2_01_12
+
+message("ENM-06_14")
+beta_06_14 <- coef(enm_06_14)
+beta2_06_14 <- beta_06_14[grepl(")2", names(beta_06_14))]
+names(beta2_06_14) <- gsub(
+  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
+  "",
+  names(beta2_06_14)
+)
+beta2_06_14
+```
+
+ENM-2 is both statistically supported and theoretically valid.
+
+## Inferred niche of ENM-2
+
+```{r niche-code, eval=FALSE, echo=TRUE}
+newd <- expand.grid(
+  wc2.1_10m_bio_6 = seq(-20, 30),
+  wc2.1_10m_bio_14 = seq(0, 200, by = 5)
+)
+z <- predict(enm_06_14, newdata = newd, type = "response")
+z <- matrix(
+  z,
+  nrow = length(unique(newd$wc2.1_10m_bio_6)),
+  ncol = length(unique(newd$wc2.1_10m_bio_14))
+)
+image(
+  x = sort(unique(newd$wc2.1_10m_bio_6)),
+  y = sort(unique(newd$wc2.1_10m_bio_14)),
+  z = z,
+  col = hcl.colors(100, "Spectral", rev = TRUE),
+  xlab = "BIO6", ylab = "BIO14"
+)
+```
+
+## Inferred niche of ENM-2
+
+```{r niche-fig, fig.height=3.5, fig.width=3.5, fig.align='center', eval=TRUE, echo=FALSE}
+newd <- expand.grid(
+  wc2.1_10m_bio_6 = seq(-20, 30),
+  wc2.1_10m_bio_14 = seq(0, 200, by = 5)
+)
+z <- predict(enm_06_14, newdata = newd, type = "response")
+z <- matrix(
+  z,
+  nrow = length(unique(newd$wc2.1_10m_bio_6)),
+  ncol = length(unique(newd$wc2.1_10m_bio_14))
+)
+image(
+  x = sort(unique(newd$wc2.1_10m_bio_6)),
+  y = sort(unique(newd$wc2.1_10m_bio_14)),
+  z = z,
+  col = hcl.colors(100, "Spectral", rev = TRUE),
+  xlab = "BIO6", ylab = "BIO14"
+)
+```
+
+# SDM
+
+## Prepare rasters
+
+Load layers.
+
+```{r sdm-load}
+library(terra)
+
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+```
+
+## Project distribution
+
+`terra` function `predict(<raster>, model)`.
+
+```{r sdm-predict-dummy, eval=FALSE}
+sdm <- predict(r, enm_06_14, type = "response")
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+```
+
+```{r sdm-predict, fig.width=3.5, fig.height=3.5, fig.align='center', echo=FALSE}
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, enm_06_14, type = "response")
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+```
+
+## Binary projection
+
+If we are interested in a binary map, e.g. showing the climatic range of the species, we need to binarize this continuous value into `0/1`.
+
+True skill statistics (TSS).
+
+ 1. Pick a threshold value `th`.
+ 2. Set all cells $<th$ to `0`.
+ 3. Set all cells $\geq th$ to `w`.
+ 4. Calculate the TSS.
+ 5. Repeat for a different value of `th`.
+ 6. Report maximum TSS and use `th` for which $TSS = \max(TSS)$.
+
+$TSS = \frac{TP\,\times\,TN - FP\,\times\,FN}{(TP+FN)(TN+FP)}$
+
+## Binary projection
+
+```{r sdm-binary-dummy, eval=FALSE}
+suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
+threshold <- seq(0.1, 0.9, by = 0.001)
+tss <- rep(NA, length(threshold)) # empty vector for storage
+for (i in seq_along(threshold)) {
+  p <- ifelse(suit > threshold[i], 1, 0)
+  TP <- sum(p == 1 & d$occ == 1)
+  FP <- sum(p == 1 & d$occ == 0)
+  FN <- sum(p == 0 & d$occ == 1)
+  TN <- sum(p == 0 & d$occ == 0)
+  tss[i] <- TP / (TP + FN) + TN / (TN + FP) - 1
+}
+th <- threshold[which.max(tss)]  # best threshold
+sdm_bin <- ifel(sdm >= th, 1, 0) # binarize map
+```
+
+```{r sdm-binary-code, fig.width=4, fig.height=4, fig.align='center', echo=FALSE, eval=FALSE}
+d <- read.csv("../data/occurrences.csv")
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, enm_06_14, type = "response")
+
+# extract the values from the continuous map
+suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
+
+# generate a gradient of threshold values
+threshold <- seq(0.1, 0.9, by = 0.001)
+tss <- rep(NA, length(threshold)) # empty vector for storage
+
+# iterate over threshold values
+for (i in seq_along(threshold)) {
+  p <- ifelse(suit > threshold[i], 1, 0)
+  TP <- sum(p == 1 & d$occ == 1)
+  FP <- sum(p == 1 & d$occ == 0)
+  FN <- sum(p == 0 & d$occ == 1)
+  TN <- sum(p == 0 & d$occ == 0)
+  sens <- TP / (TP + FN)
+  spec <- TN / (TN + FP)
+  tss[i] <- sens + spec - 1
+}
+
+th <- threshold[which.max(tss)] # best threshold
+
+# binarize the continuous map
+sdm_bin <- ifel(sdm >= th, 1, 0)
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
+```
+
+## Binary projection
+
+```{r sdm-binary-fig, fig.width=3.5, fig.height=3.5, fig.align='center', echo=FALSE}
+d <- read.csv("../data/occurrences.csv")
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, enm_06_14, type = "response")
+
+# extract the values from the continuous map
+suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
+
+# generate a gradient of threshold values
+threshold <- seq(0.1, 0.9, by = 0.001)
+tss <- rep(NA, length(threshold)) # empty vector for storage
+
+# iterate over threshold values
+for (i in seq_along(threshold)) {
+  p <- ifelse(suit > threshold[i], 1, 0)
+  TP <- sum(p == 1 & d$occ == 1)
+  FP <- sum(p == 1 & d$occ == 0)
+  FN <- sum(p == 0 & d$occ == 1)
+  TN <- sum(p == 0 & d$occ == 0)
+  sens <- TP / (TP + FN)
+  spec <- TN / (TN + FP)
+  tss[i] <- sens + spec - 1
+}
+
+th <- threshold[which.max(tss)] # best threshold
+
+# binarize the continuous map
+sdm_bin <- ifel(sdm >= th, 1, 0)
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
+```
+
+## Binary projection
+
+Our map is quite incorrect for this species: <https://www.iucnredlist.org/species/61550/12514105>
+
+Why do we get such bad projections compared to the known range from IUCN?
+
+We will answer this in a next lecture.
+
+## Binary projection
+Plot the detection points.
+
+```{r sdm-issue, fig.width=3.5, fig.height=3.5, fig.align='center', echo=FALSE}
+ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
+r <- rast(file.path("..", "data", ff))
+roi <- ext(-13, 33, 33, 62) # roi of Europe
+r <- crop(r, roi) # crop to Europe
+sdm <- predict(r, enm_06_14, type = "response")
+th <- threshold[which.max(tss)] # best threshold
+sdm_bin <- ifel(sdm >= th, 1, 0)
+plot(sdm_bin, col = c("grey90", "dodgerblue"))
+points(d[d$occ == 1, c("x", "y")], pch = 20, cex = .3)
+```
+
+Geographic biases.
