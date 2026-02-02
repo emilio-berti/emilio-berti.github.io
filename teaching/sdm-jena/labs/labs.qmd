@@ -1,0 +1,8 @@
+---
+title: "Labs"
+listing:
+  contents: "*.qmd"
+  page-size: 0
+  sort: filename
+  fields: [title]
+---

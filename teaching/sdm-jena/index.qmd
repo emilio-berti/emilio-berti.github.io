@@ -29,17 +29,6 @@ SFU Jena also offers GIS courses: [MSc Environmental and Georesources Management
 - Apply ENM/SDM to real data.
 - Produce maps.
 
-## Course structure
-
-### Lectures
-- [01 – Introduction](lectures/01-background.html)
-
-### Labs
-- [Lab 1 – R & spatial data](labs/lab01.html)
-
-### Slides
-- [List all Slides](slides/slides.html)
-
 ## Software
 
 The only package that we will use is `terra`.

@@ -8,5 +8,11 @@
       "/lectures/05-preparing-data.html",
       "/lectures/06-first-sdm.html"
     ]
+  },
+  {
+    "listing": "/labs/labs.html",
+    "items": [
+      "/labs/01-lab.html"
+    ]
   }
 ]

@@ -9,13 +9,13 @@ format:
 
 We can now model the ecological niche and the distribution of the species _Podarcis muralis_.
 
-## Species niche
+## Species niche (ENM)
 
 We start by loading the species and climate data that we prepared in the previous section.
 
 ```{r load data}
 d <- read.csv("../data/occurrences.csv")
-head(d)
+head(d, n = 3)
 ```
 
 The column names `wc2.1_10m_bio_<id>` means that this is data from WorldClim (`wc`) at a resolution of 10 arc-minutes (`10m`) for bioclimatic variables (`<id>`).
@@ -52,38 +52,57 @@ AIC(enm_01_12, enm_06_14)
 
 The model with the second set of variables explain the distribution of the species better than the first model.
 
-### Statistical dredging (optional and dangerous)
+Looking at AIC or other statistical metrics provides, however, only a measure of goodness of fit.
+Because we have clear assumptions backed by theory on how the shape of species niches should look like, we can see if the inferred niches by the two models fit our assumptions.
+Specifically, our assumption of concave-down niches requires that all quadratic coefficients are negative.
+We thus inspect the quadratic terms for both ENMs.
 
-There are packages to run each possible model starting from a full model and rank them according to AIC.
-The most popular package is `MuMIn`, which contains the function `dredge()` to perform this steps.
-Start with the full model, i.e. the most complex model, and pass this to `dredge()`.
-```{r dredge}
-# full model
-full_enm <- glm(
-  occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_12, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_13, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_14, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_15, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_5, 2, raw = TRUE) + 
-   poly(wc2.1_10m_bio_6, 2, raw = TRUE),
-  data = d,
-  family = "binomial"
+```{r inspection}
+message("ENM-1")
+beta_01_12 <- coef(enm_01_12)
+beta2_01_12 <- beta_01_12[grepl(")2", names(beta_01_12))]
+names(beta2_01_12) <- gsub(
+  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
+  "",
+  names(beta2_01_12)
 )
+beta2_01_12
 
-# dredging
-options(na.action = "na.fail")   # required by MuMIn, don't think about it
-dr <- MuMIn::dredge(full_enm)
-head(dr)
+message("ENM-2")
+beta_06_14 <- coef(enm_06_14)
+beta2_06_14 <- beta_06_14[grepl(")2", names(beta_06_14))]
+names(beta2_06_14) <- gsub(
+  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
+  "",
+  names(beta2_06_14)
+)
+beta2_06_14
 ```
 
-This table contains all possible sub-models of `full_enm` (including also `full_enm`) as rows ranked by AICc.
-A model contains the variable if there is a `+` at that column.
-The column `weight` quantifies the support of that model.
-We see that the model in first row (lowest AICc) is strongly supported against all others and we can select only that as our ENM.
-This model is actually the full model as it contains all bioclimatic variables specified.
+Because of coefficients of ENM-2 are both negative, ENM-2 is both statistically supported and theoretically valid and we can use it for SDMs.
+Below is the inferred niche of ENM-2.
 
-## Species distribution
+```{r niche}
+newd <- expand.grid(
+  wc2.1_10m_bio_6 = seq(-20, 35, length.out = 3e2),
+  wc2.1_10m_bio_14 = seq(0, 200, length.out = 3e2)
+)
+z <- predict(enm_06_14, newdata = newd, type = "response")
+z <- matrix(
+  z,
+  nrow = length(unique(newd$wc2.1_10m_bio_6)),
+  ncol = length(unique(newd$wc2.1_10m_bio_14))
+)
+image(
+  x = sort(unique(newd$wc2.1_10m_bio_6)),
+  y = sort(unique(newd$wc2.1_10m_bio_14)),
+  z = z,
+  col = hcl.colors(100, "Spectral", rev = TRUE),
+  xlab = "BIO6", ylab = "BIO14"
+)
+```
+
+## Species distribution (SDM)
 
 When using `glm()`, `terra` makes it extremely easy to produce a SDM.
 We first need to load the raster layers of the bioclimatic variables.
@@ -100,7 +119,7 @@ r <- crop(r, roi) # crop to Europe
 The `terra` function `predict(<raster>, model)` is all we need.
 
 ```{r sdm-predict-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
-sdm <- predict(r, full_enm, type = "response")
+sdm <- predict(r, enm_06_14, type = "response")
 plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
 ```
 
@@ -109,7 +128,7 @@ ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
 r <- rast(file.path("..", "data", ff))
 roi <- ext(-13, 33, 33, 62) # roi of Europe
 r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, full_enm, type = "response")
+sdm <- predict(r, enm_06_14, type = "response")
 plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
 ```
 
@@ -172,7 +191,7 @@ ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
 r <- rast(file.path("..", "data", ff))
 roi <- ext(-13, 33, 33, 62) # roi of Europe
 r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, full_enm, type = "response")
+sdm <- predict(r, enm_06_14, type = "response")
 
 # extract the values from the continuous map
 suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
@@ -222,7 +241,7 @@ ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
 r <- rast(file.path("..", "data", ff))
 roi <- ext(-13, 33, 33, 62) # roi of Europe
 r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, full_enm, type = "response")
+sdm <- predict(r, enm_06_14, type = "response")
 th <- threshold[which.max(tss)] # best threshold
 sdm_bin <- ifel(sdm >= th, 1, 0)
 

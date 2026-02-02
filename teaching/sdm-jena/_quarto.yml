@@ -10,7 +10,7 @@ website:
       - text: Lectures
         href: lectures/lectures.qmd
       - text: Labs
-        href: labs/01-GIS-lab.qmd
+        href: labs/labs.qmd
       - text: Slides
         href: slides/slides.qmd
 
