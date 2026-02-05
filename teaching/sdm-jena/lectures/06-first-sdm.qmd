@@ -79,6 +79,12 @@ names(beta2_06_14) <- gsub(
 beta2_06_14
 ```
 
+Save the ENM as `.rds` object.
+
+```{r save}
+saveRDS(enm_06_14, "../data/podarcis_muralis-enm.rds")
+```
+
 Because of coefficients of ENM-2 are both negative, ENM-2 is both statistically supported and theoretically valid and we can use it for SDMs.
 Below is the inferred niche of ENM-2.
 
@@ -176,7 +182,8 @@ th <- threshold[which.max(tss)] # best threshold
 
 plot(
   threshold, tss,
-  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
+  type = "l", 
+  main = paste0("Highest TSS = ", round(max(tss), 2), "\nTreshold = ", round(th, 2)),
   xlab = "Threshold value", ylab = "TSS"
 )
 abline(v = th, lty = 2)
@@ -216,7 +223,8 @@ th <- threshold[which.max(tss)] # best threshold
 
 plot(
   threshold, tss,
-  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
+  type = "l", 
+  main = paste0("Highest TSS = ", round(max(tss), 2), "\nTreshold = ", round(th, 2)),
   xlab = "Threshold value", ylab = "TSS"
 )
 abline(v = th, lty = 2)

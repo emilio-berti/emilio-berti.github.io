@@ -8,92 +8,68 @@ format:
 ---
 
 The ENM for the species _Podarcis muralis_ from the previous lecture is trained on data obtained from Europe.
+
+```{r load-enm}
+library(terra)
+
+# load ENM
+enm <- readRDS("../data/podarcis_muralis-enm.rds")
+```
+
 One might be interested in projecting the potential distribution of this species outside the range of the training locations.
 This procedure is called _geographical extrapolation_.
 For example, we might want to extrapolated the ENM to North America, where an _invasive_ population was established after a boy brought this species back from a trip to Italy.
 In addition, one might be interested in projecting the distribution for future climate conditions.
 This procedure is called _temporal extrapolation_.
 For example, we might want to assess where the species will go extinct and where it will expand in the future.
+Although both types of extrapolations are practically performed in the same way, they have slightly different assumptions.
 
 ## Geographic extrapolation
 
-We start by loading the species and climate data that we prepared in the previous section.
+Geographic extrapolations are achieved simply by projecting to a new raster layer with the same type of data used for training the ENM.
+For example, we can project the distribution of _P. muralis_ in North America.
 
-```{r load data}
-d <- read.csv("../data/occurrences.csv")
-head(d, n = 3)
+```{r load bioclims}
+# load bioclims
+r <- rast(file.path("../data", c("wc2.1_10m_bio_6.tif", "wc2.1_10m_bio_14.tif")))
+e <- ext(-105, -65, 24, 45)  # North America
+r <- crop(r, e)
 ```
 
-The column names `wc2.1_10m_bio_<id>` means that this is data from WorldClim (`wc`) at a resolution of 10 arc-minutes (`10m`) for bioclimatic variables (`<id>`).
-Bioclimatic variables are generally highly correlated with each others and only a subset of them should be used for train an ecological niche model.
-Variable selection can be performed with the usual statistical tricks or, even better, can be informed by the biology of the species.
-Because I do not know the biology of the species, I build several competing ENMs and test which one is best using the Akaike information criterion (AIC).
+For the GLM ENM, use the `terra::predict()` functions.
 
-The first model considers only average temperature (`BIO01`) and total precipitation (`BIO12`) to train an ENM using `glm()`.
-
-```{r first-glm}
-enm_01_12 <- glm(
-  occ ~ poly(wc2.1_10m_bio_1, 2, raw = TRUE) + poly(wc2.1_10m_bio_12, 2, raw = TRUE),
-  data = d,
-  family = "binomial"
-)
+```{r geo-extrapolation, fig.width=5, fig.height=4, fig.align='center'}
+sdm <- predict(r, enm, type = "response")
+sdm_bin <- ifel(sdm >= 0.55, 1, 0) # from previous lecture
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+plot(sdm_bin, col = c("#00000080", "#FFFFFF00"), add = TRUE)
 ```
 
-We can test how well these variables explain the distribution of the species by building another ENM with different variables and comparing it with the model above.
-For example, we can use the minimum temperature of the coldest month (`BIO06`) and the precipitation of the driest month (`BIO14`) instead.
+This map show both the continous SDM (colors) and the binary SDM (black shade masks the areas outside the projected suitabile range).
 
-```{r second-glm}
-enm_06_14 <- glm(
-  occ ~ poly(wc2.1_10m_bio_6, 2, raw = TRUE) + poly(wc2.1_10m_bio_14, 2, raw = TRUE),
-  data = d,
-  family = "binomial"
-)
+If the climate layers are not cropped, the projection will be worldwide.
+
+```{r reload bioclims}
+# re-load bioclims
+r <- rast(file.path("../data", c("wc2.1_10m_bio_6.tif", "wc2.1_10m_bio_14.tif")))
+
+# re-project SDM
+sdm <- predict(r, enm, type = "response")
+sdm_bin <- ifel(sdm >= 0.55, 1, 0) # from previous lecture
+plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
+plot(sdm_bin, col = c("#00000080", "#FFFFFF00"), add = TRUE)
 ```
 
-We can compared the two models by AIC, with the best most having the lowest AIC.
+Geographic extrapolations have one potential issue: The environmental (climatic) conditions in the extrapolated area might be outside the range of the data used for training.
 
-```{r aic}
-AIC(enm_01_12, enm_06_14)
-```
+The easiest way to understand potential issues due to this _statistical_ extrapolation is to visualize again the inferred niche of the species.
 
-The model with the second set of variables explain the distribution of the species better than the first model.
-
-Looking at AIC or other statistical metrics provides, however, only a measure of goodness of fit.
-Because we have clear assumptions backed by theory on how the shape of species niches should look like, we can see if the inferred niches by the two models fit our assumptions.
-Specifically, our assumption of concave-down niches requires that all quadratic coefficients are negative.
-We thus inspect the quadratic terms for both ENMs.
-
-```{r inspection}
-message("ENM-1")
-beta_01_12 <- coef(enm_01_12)
-beta2_01_12 <- beta_01_12[grepl(")2", names(beta_01_12))]
-names(beta2_01_12) <- gsub(
-  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
-  "",
-  names(beta2_01_12)
-)
-beta2_01_12
-
-message("ENM-2")
-beta_06_14 <- coef(enm_06_14)
-beta2_06_14 <- beta_06_14[grepl(")2", names(beta_06_14))]
-names(beta2_06_14) <- gsub(
-  "poly\\(|\\)2|, 2, raw = TRUE|wc2[.]1_10m_",
-  "",
-  names(beta2_06_14)
-)
-beta2_06_14
-```
-
-Because of coefficients of ENM-2 are both negative, ENM-2 is both statistically supported and theoretically valid and we can use it for SDMs.
-Below is the inferred niche of ENM-2.
-
-```{r niche}
+```{r niche, fig.width=5, fig.height=4, fig.align='center'}
 newd <- expand.grid(
   wc2.1_10m_bio_6 = seq(-20, 35, length.out = 3e2),
   wc2.1_10m_bio_14 = seq(0, 200, length.out = 3e2)
 )
-z <- predict(enm_06_14, newdata = newd, type = "response")
+z <- predict(enm, newdata = newd, type = "response")
 z <- matrix(
   z,
   nrow = length(unique(newd$wc2.1_10m_bio_6)),
@@ -108,151 +84,53 @@ image(
 )
 ```
 
-## Species distribution (SDM)
+If we overlay on this image a mask highlighting the range of the training data, i.e. the range of the climatic variables at locations where the species was detected, we notice a subtle problem.
 
-When using `glm()`, `terra` makes it extremely easy to produce a SDM.
-We first need to load the raster layers of the bioclimatic variables.
-
-```{r sdm-load}
-library(terra)
-
-ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
-r <- rast(file.path("..", "data", ff))
-roi <- ext(-13, 33, 33, 62) # roi of Europe
-r <- crop(r, roi) # crop to Europe
-```
-
-The `terra` function `predict(<raster>, model)` is all we need.
-
-```{r sdm-predict-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
-sdm <- predict(r, enm_06_14, type = "response")
-plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
-```
-
-```{r sdm-predict, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
-ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
-r <- rast(file.path("..", "data", ff))
-roi <- ext(-13, 33, 33, 62) # roi of Europe
-r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, enm_06_14, type = "response")
-plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
-```
-
-### Binary projections
-
-And we obtained the projected suitability of the species for Europe.
-Note that this is a continuous value, in this case representing the probability of detecting the species given climate.
-If we are interested in a binary map, e.g. showing the climatic range of the species, we need to binarize this continuous value into `0/1`.
-There are several approaches to achieve this, but here we consider only the approach using the true skill statistics (TSS), which is one of the most widely used.
-
-The main idea of the TSS approach is to pick a threshold value and set the cells of the map above to `0` if their values if less than this threshold and to `1` otherwise.
-These `0/1` values are then compared to the known occurrence of the species to calculate
-
-  - The number of occurrences correctly predicted as presences (true positives, TP).
-  - The number of occurrences incorrectly predicted as absences (false negatives, FN).
-  - The number of occurrences correctly as absences (true negatives, TN).
-  - The number of occurrences incorrectly presences (false positives, FP).
-
-TSS is defined as $TSS = \frac{TP\,TN - FP\,FN}{(TP+FN)(TN+FP)}$, which is a statistic balancing how well the model performs in predicting both presences and absences.
-TSS ranges from 0, for a model not better than random, to 1, for a model with perfect predictions.
-
-If we pick several threshold and calculate the TSS for each of them, the best threshold is the one that has highest TSS, which is also the TSS of our model predictions.
-
-```{r sdm-binary-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
-# extract the values from the continuous map
-suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
-
-# generate a gradient of threshold values
-threshold <- seq(0.1, 0.9, by = 0.001)
-tss <- rep(NA, length(threshold)) # empty vector for storage
-
-# iterate over threshold values
-for (i in seq_along(threshold)) {
-  p <- ifelse(suit > threshold[i], 1, 0)
-  TP <- sum(p == 1 & d$occ == 1)
-  FP <- sum(p == 1 & d$occ == 0)
-  FN <- sum(p == 0 & d$occ == 1)
-  TN <- sum(p == 0 & d$occ == 0)
-  sens <- TP / (TP + FN)
-  spec <- TN / (TN + FP)
-  tss[i] <- sens + spec - 1
-}
-
-th <- threshold[which.max(tss)] # best threshold
-
-plot(
-  threshold, tss,
-  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
-  xlab = "Threshold value", ylab = "TSS"
+```{r mask niche, fig.width=5, fig.height=4, fig.align='center'}
+# load occurrence data
+d <- read.csv("../data/occurrences.csv")
+ranges <- apply(d[, c("wc2.1_10m_bio_6", "wc2.1_10m_bio_14")], MARGIN = 2, range)
+image(
+  x = sort(unique(newd$wc2.1_10m_bio_6)),
+  y = sort(unique(newd$wc2.1_10m_bio_14)),
+  z = z,
+  col = hcl.colors(100, "Spectral", rev = TRUE),
+  xlab = "BIO6", ylab = "BIO14"
 )
-abline(v = th, lty = 2)
-
-# binarize the continuous map
-sdm_bin <- ifel(sdm >= th, 1, 0)
-plot(sdm_bin, col = c("grey90", "dodgerblue"))
-```
-
-```{r sdm-binary, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
-ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
-r <- rast(file.path("..", "data", ff))
-roi <- ext(-13, 33, 33, 62) # roi of Europe
-r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, enm_06_14, type = "response")
-
-# extract the values from the continuous map
-suit <- extract(sdm, d[, c("x", "y")], ID = FALSE)[, 1]
-
-# generate a gradient of threshold values
-threshold <- seq(0.1, 0.9, by = 0.001)
-tss <- rep(NA, length(threshold)) # empty vector for storage
-
-# iterate over threshold values
-for (i in seq_along(threshold)) {
-  p <- ifelse(suit > threshold[i], 1, 0)
-  TP <- sum(p == 1 & d$occ == 1)
-  FP <- sum(p == 1 & d$occ == 0)
-  FN <- sum(p == 0 & d$occ == 1)
-  TN <- sum(p == 0 & d$occ == 0)
-  sens <- TP / (TP + FN)
-  spec <- TN / (TN + FP)
-  tss[i] <- sens + spec - 1
-}
-
-th <- threshold[which.max(tss)] # best threshold
-
-plot(
-  threshold, tss,
-  type = "l", main = paste0("Highest TSS = ", round(max(tss), 2)),
-  xlab = "Threshold value", ylab = "TSS"
+rect(
+  xleft = -30,
+  ybottom = 0,
+  xright = ranges[1, 1],
+  ytop = 200,
+  col = "#00000080",
+  lwd = 0
 )
-abline(v = th, lty = 2)
-
-# binarize the continuous map
-sdm_bin <- ifel(sdm >= th, 1, 0)
-plot(sdm_bin, col = c("grey90", "dodgerblue"))
+rect(
+  xleft = ranges[2, 1],
+  ybottom = 0,
+  xright = 50,
+  ytop = 200,
+  col = "#00000080",
+  lwd = 0
+)
+rect(
+  xleft = ranges[1, 1],
+  ybottom = 0,
+  xright = ranges[2, 1],
+  ytop = ranges[1, 2],
+  col = "#00000080",
+  lwd = 0
+)
+rect(
+  xleft = ranges[1, 1],
+  ybottom = ranges[2, 2],
+  xright = ranges[2, 1],
+  ytop = 300,
+  col = "#00000080",
+  lwd = 0
+)
 ```
 
-This binary map is quite incorrect for this species.
-According to the IUCN (<https://www.iucnredlist.org/species/61550/12514105>), this species is found also in most of Italy, all the Balkans, and part of Turkey, but is not found in the UK, the Low Countries, and most of Germany.
-Why do we get such bad projections compared to the known range from IUCN?
-We will answer this in a next lecture, but my general recommendation is to plot the detection points.
-
-```{r sdm-issue-dummy, fig.width=5, fig.height=4, fig.align='center', eval=FALSE}
-plot(sdm_bin, col = c("grey90", "dodgerblue"))
-points(d[d$occ == 1, c("x", "y")], pch = 20, cex = .3)
-```
-
-```{r sdm-issue, fig.width=5, fig.height=4, fig.align='center', echo=FALSE}
-ff <- list.files("../data", pattern = ".tif") # all files with .tif extension
-r <- rast(file.path("..", "data", ff))
-roi <- ext(-13, 33, 33, 62) # roi of Europe
-r <- crop(r, roi) # crop to Europe
-sdm <- predict(r, enm_06_14, type = "response")
-th <- threshold[which.max(tss)] # best threshold
-sdm_bin <- ifel(sdm >= th, 1, 0)
-
-plot(sdm_bin, col = c("grey90", "dodgerblue"))
-points(d[d$occ == 1, c("x", "y")], pch = 20, cex = .3)
-```
-
-The selected detection records are geographically biased and likely the environmental (climatic) space is not well represented.
+The black shades show where the occurrence data did not have any climatic data, i.e. regions of the environmental (climatic) space that were not explored and did not contribute in training our ENM.
+When we extrapolate outside of this training box, e.g. for values of BIO6 > 10 or of BIO14 > 120, the validity of our ENM is questionable and our projections become very uncertain.
+How much questionable and uncertain depends on the algorithm used for ENM and how far away extrapolations are from the training range.
