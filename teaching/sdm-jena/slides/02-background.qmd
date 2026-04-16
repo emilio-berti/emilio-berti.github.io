@@ -1,158 +1,121 @@
 ---
 title: "What are ENM/SDM and why do we use them?"
-author: "Emilio Berti"
+author: ""
 format:
   beamer:
     engine: tectonic
     colortheme: beaver
     incremental: false
-    aspectratio: 43
+    aspectratio: 169
 ---
-
-## The why SDMs
-
-Species Distribution Models (SDMs) are projections of species geographic ranges, i.e. where the species are found.
-
-Among other applications, SDMs are used for:
-
-  1. Understand what limits species' distribution.
-  2. Project how they will change under future climate.
-  3. Plan conservation and management, e.g. where to establish new protected areas.
 
 ## A brief history of SDMs
 
-  - 1807: Essay on the Geography of Plants (Humboldt).
-  - 1967: The theory of island biogeography (MacArthur & Wilson)
-  - 1990s: Infancy of quantitative SDMs.
-  - 2000s: SDMs as a recognized field.
-  - 2010s: Boom of SDMs.
-  - 2020s: Overflow of SDMs.
+  - 1807: Essay on the Geography of Plants (Humboldt)
+  - '10s-'20s: Grinnell & Elton
+  - '50s-'60s: Hutchinson, MacArthur, & Wilson
+  - '90s: Quantitative SDMs
+  - 2000s: SDMs as a recognized field
+  - 2010s: Boom of SDMs
+  - 2020s: Overflow of SDMs
 
-## The basic workflow
+## The why of SDMs
 
-Starting from data, to obtain the *projected* distribution of one species:
+ - Fundamental theory
+ - Large-scale patterns
+ - Project future changes
+ - Conservation
 
-  1. Ecological Niche Model (ENM): Model the ecological requirements of species.
-  2. SDM: Project these requirements into geographic space.
+## The why of SDMs -- Fundamental theory
+\begin{center}
+\includegraphics[height=4cm]{../figures/xsdm.png}
+\end{center}
 
-Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+Effect of climate instability (Berti et al., 2025)
 
-## The basic workflow
+## The why SDMs -- Large scale patterns
+\begin{center}
+\includegraphics[height=5cm]{../figures/large-scale.png}
+\end{center}
 
-Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+Vertebrate species richness (Biber et al., 2019)
 
-Given some data, ENM is a flexible module. 
+## The why SDMs -- Project future changes
+\begin{center}
+\includegraphics[height=6cm]{../figures/pinus-sabiniana.png}
+\end{center}
 
-SDM is usually much more constrained: Meta-population dynamics and other spatial processes.
+Change for \textit{Pinus Sabiniana} (Franklin, 2023)
 
-## The basic workflow
+## The why SDMs -- Conservation
+\begin{center}
+\includegraphics[height=6cm]{../figures/conservation.png}
+\end{center}
 
-Always Data $\rightarrow$ ENM $\rightarrow$ SDM.
+\textit{L. lynx} (Serva et al., 2025)
 
-ENM: Environmental processes.
-ENM is hard due to data limitations.
+# The only theory you really need to know
 
-SDM: Spatial processes
-SDM is hard due to complexity and lack of theory.
+## Duality of SDMs
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\textbf{Ecological niche model (ENM)}
 
-# Theory Primer
+\includegraphics[height=5cm]{../figures/niche-1d.pdf}
 
-## Ecological Niche Modeling (ENM)
+Ecological space
+\end{minipage}
+\pause
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\textbf{Species distribution model (SDM)}
 
-ENM try to reconstruct the ecological (climatic) niche of a species.
+\includegraphics[height=5cm]{../figures/niche-1d-sdm.png}
 
-Theory suggests the niche must be convex.
+Geographic space
+\end{minipage}
 
-```{r niche-symm, echo=FALSE, fig.width=4, fig.height=2.5, fig.align='center'}
-l <- function(x, mu, sigl, sigr) {
-  out <- rep(NA, length(x))
-  out[x < mu] <- exp(- ((x[x < mu] - mu) / sqrt(2) / sigl) ^ 2)
-  out[x >= mu] <- exp(- ((x[x >= mu] - mu) / sqrt(2) / sigr) ^ 2)
-  return(out)
-}
-x <- seq(-10, 40, length.out = 1e3)
-par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
-plot(
-  x, l(x, 10, 5, 5),
-  type = "l", lwd = 2, col = "dodgerblue3",
-  xlab = "Temperature", 
-  ylab = "Suitability"
-)
-```
+## The niche of species
 
-## Ecological Niche Modeling (ENM)
+\begin{itemize}
+  \item \textbf{Convex}\\If a species tolerates two environmental conditions $e_1$ and $e_2$, it should tolerate a third $e_3:\,e_1\leq e_3 \leq e_2$
+  \item \textbf{Multidimensional}\\Species generally respond to more than one environmental condition
+\end{itemize}
 
-Theory suggests the niche must be convex and not symmetrical
+\centering
+\includegraphics[height=4cm]{../figures/niche-1d.pdf}
+\includegraphics[height=4cm]{../figures/niche-2d.png}
 
-```{r niche-asymm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
-x <- seq(-10, 40, length.out = 1e3)
-par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
-plot(
-  x, l(x, 10, 5, 10),
-  type = "l", lwd = 2, col = "dodgerblue3",
-  xlab = "Temperature", 
-  ylab = "Suitability"
-)
-```
+## One of many niches
 
-## Ecological Niche Modeling (ENM)
+\centering
+Fundamental (Grinnellian) niche
 
-Example of non-symmetrical, convex 2D niche.
+$+$ 
 
-```{r niche-2d, echo=FALSE, fig.width=4, fig.height=4, fig.align='center'}
-x <- seq(-10, 40, length.out = 1e2)
-y <- seq(300, 5000, length.out = 1e2)
-z <- matrix(NA, nrow = length(unique(x)), ncol = length(unique(y)))
-for (X in unique(x)) {
-  for (Y in unique(y)) {
-    i <- which(unique(x) == X)
-    j <- which(unique(y) == Y)
-    z[i, j] <- l(X, 10, 5, 12) * l(Y, 2000, 500, 1e3)
-  }
-}
-image(z, axes = FALSE, col = hcl.colors(100, "Fall", rev = TRUE))
-contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
-axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
-axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
-title(xlab = "Temperature", ylab = "Precipitation")
-```
+Biotic (Eltonian) niche
 
-## Species Distribution Modeling (SDM)
+$+$
 
-SDMs project ENMs from an environmental space to a geographical area.
+Dispersal \& meta-population niche
 
-```{r sdm, echo=FALSE, fig.width=4, fig.height=3, fig.align='center'}
-w <- terra::vect("../data/ne_110m_land.shp")
-w <- terra::crop(w, terra::ext(-13, 33, 33, 62))
-p <- terra::vect(
-  matrix(c(
-    4.3226, 49.1915,
-    1.6996, 47.9762,
-    0.7767, 47.2537,
-    1.2625, 45.3487,
-    3.3025, 44.7575,
-    5.6341, 44.7903,
-    6.4598, 46.1698,
-    9.3742, 47.4179,
-    2.7744, 47.1551,
-    5.8345, 47.3522,
-    7.8260, 50.2754,
-    4.1769, 49.9798,
-    4.3226, 49.1915
-  ), ncol = 2, byrow = TRUE),
-  type = "points", crs = terra::crs(w)
-)
-p <- terra::convHull(p)
-p <- terra::densify(p, interval = 1e3)
-par(mfrow = c(1, 2), mar = c(4, 4, 2, 2))
-layout(matrix(c(1, 1, 2), ncol = 3))
-image(z, axes = FALSE, col = hcl.colors(100, "Fall", rev = TRUE))
-contour(z, add = TRUE, levels = seq(0.1, 1, by = 0.2))
-axis(1, at = seq(0, 1, length.out = 6), labels = seq(-10, 40, length.out = 6))
-axis(2, at = seq(0, 1, length.out = 6), labels = seq(300, 5000, length.out = 6))
-title(xlab = "Temperature", ylab = "Precipitation")
-terra::plot(
-  w, fun = \() terra::polys(p, col = "green3"),
-  mar = c(0, 0, 0, 0)
-)
-```
+=
+
+Realized niche
+
+## One of many niches
+
+\centering
+\textbf{Fundamental (Grinnellian) niche}
+
+$+$ 
+
+Biotic (Eltonian) niche
+
+$+$
+
+Dispersal \& meta-population niche
+
+=
+
+Realized niche

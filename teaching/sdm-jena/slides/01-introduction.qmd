@@ -1,51 +1,64 @@
 ---
-title: "Introduction to species distribution modeling"
+title: "Species Distribution Modeling"
 author: "Emilio Berti"
 format:
   beamer:
     engine: tectonic
     colortheme: beaver
     incremental: false
-    aspectratio: 43
+    aspectratio: 169
 ---
 
 ## Lecturers
 
- - Prof. Ulrich Brose
- - Dr. Emilio Berti
+\begin{columns}
 
-## Course overview
+\begin{column}{0.3\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../figures/Ulrich-Brose-Portrait.png}\\
+Prof. Ulrich Brose
+\end{column}
 
-Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language. This course assumes basic R knowledge.
+\begin{column}{0.3\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../figures/Emilio-Berti-Portrait.png}\\
+Emilio Berti
+\end{column}
+
+\begin{column}{0.3\textwidth}
+\centering
+Someone else?
+\end{column}
+
+\end{columns}
+
+## What you will learn
+
+ - Species distribution models (SDMs)
+ - R programming langauge (R)
+ - Geographic information systems (GIS)
+ - Generalized additive models (GAMs)
+
+## Course structure
 
 In the first \# days, etc.
 
-A basic knowledge of Geographic Information Systems is required for ENM/SDM.
-I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.
-
 ## Learning objectives
 
-- Understand the theory behind ENM/SDM.
-- Perform ENM/SDM in R.
-- Apply ENM/SDM to real data.
-- Produce maps.
+- Theory behind SDM
+- Run SDM independently
+- Apply SDMs to real problems
+- Maps
 
-## Material
+## Software needed
 
-The material of this course is hosted at [asd](https://emilio-berti.github.io/).
-It consists of:
-
-- Lectures.
-- Labs.
-- Slides.
-
-## Software
-
-The only package that we will use is `terra`.
-You might want to install also `codetools`, which performs checks on the C++ code of `terra`.
+ - R
+ - `codetools`
+ - `terra`
+ - `mgcv`
 
 ```{r, eval=FALSE}
-install.packages(c("codetools", "terra", "randomForest"))
+install.packages(c("codetools", "terra", "mgcv"))
 ```
 
 ::: {.callout-note}
