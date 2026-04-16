@@ -7,10 +7,6 @@ website:
     left:
       - text: Home
         href: index.qmd
-      - text: Lectures
-        href: lectures/lectures.qmd
-      - text: Labs
-        href: labs/labs.qmd
       - text: Slides
         href: slides/slides.qmd
 
