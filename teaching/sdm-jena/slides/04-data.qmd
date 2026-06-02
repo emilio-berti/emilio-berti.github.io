@@ -15,7 +15,6 @@ format:
   - Species' occurrence data
   - Environmental (climate) data
 
-
 # Species' occurrence data
 
 ## Species' occurrence data

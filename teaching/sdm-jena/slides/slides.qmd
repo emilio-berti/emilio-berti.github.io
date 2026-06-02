@@ -1,21 +1,23 @@
 ---
-title: "Slides"
+title: "Species Distribution Models"
+subtitle: "An introductory course at SFU Jena"
 author: "Emilio Berti"
-subtitle: "Spatial data analysis using sf, terra, and friends"
 ---
 
+### Introduction
 
-Below are all the lecture slides. Click to open each one:
+  1. [Introduction](01-introduction.qmd).
 
-- [Introduction](01-introduction.qmd).
+### Theory
 
----
+  2. [Background & Theory](02-background.qmd).
+  3. [Ecological Niche Modeling with GAMs](03-gams.qmd).
 
-- [Theory](02-background.qmd).
-- [Ecological Niche Modeling with GLM](03-glm.qmd).
-- [Ecological Niche Modeling with Random Forest](04-RF.qmd).
+### Data
 
----
+  4. [Data for ENM/SDM](04-data.qmd)
+  5. [Prepdaring data](05-preparing-data.qmd)
 
-- [Preparing data for ENM/SDM](06-preparing-data.qmd)
-- [Running the first ENM/SDM](07-first-sdm.qmd)
+### Fitting
+
+  6. [First SDM](06-first-sdm.qmd)
