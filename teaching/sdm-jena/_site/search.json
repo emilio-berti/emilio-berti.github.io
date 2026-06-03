@@ -32,6 +32,6 @@
     "href": "slides/slides.html",
     "title": "Species Distribution Models",
     "section": "",
-    "text": "Introduction\n\nIntroduction.\n\n\n\nTheory\n\nBackground & Theory.\nEcological Niche Modeling with GAMs.\n\n\n\nData\n\nData for ENM/SDM\nPrepdaring data\n\n\n\nFitting\n\nFirst SDM"
+    "text": "Introduction\n\nIntroduction.\n\n\n\nTheory\n\nBackground & Theory.\nEcological Niche Modeling with GAMs.\n\n\n\nData\n\nData for ENM/SDM\nPrepdaring data\n\n\n\nFitting\n\nFirst SDM\nModel selection"
   }
 ]

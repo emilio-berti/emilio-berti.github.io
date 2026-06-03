@@ -21,3 +21,4 @@ author: "Emilio Berti"
 ### Fitting
 
   6. [First SDM](06-first-sdm.qmd)
+  7. [Model selection](07-model-selection.qmd)
