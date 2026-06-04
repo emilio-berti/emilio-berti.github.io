@@ -39,6 +39,7 @@ gbif <- read.csv(
 )
 ```
 
+
 ::: {.callout-note}
 `sep = "\t"` specifies that the separator of the columns is a `TAB`, which is the standard used by GBIF.
 :::
@@ -224,6 +225,7 @@ ff <- list.files(
   pattern = "wc2.1", # wc = WorldClim
   full.names = TRUE  # full path
 )
+ff <- ff[!grepl("MPI", ff)]
 
 # load them into memory
 climate <- rast(ff)

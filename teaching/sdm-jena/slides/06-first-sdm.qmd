@@ -117,7 +117,7 @@ r <- crop(r, roi) # crop to Europe
 
 ```{r sdm-predict, fig.width=3.5, fig.height=3.5, fig.align='center'}
 sdm <- predict(r, enm, type = "response")
-
+writeRaster(sdm, "../data/hist-sdm.tif", overwrite = TRUE)
 plot(sdm, col = hcl.colors(100, "Spectral", rev = TRUE))
 ```
 

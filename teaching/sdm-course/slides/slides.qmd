@@ -23,3 +23,7 @@ author: "Emilio Berti"
   6. [First SDM](06-first-sdm.qmd)
   7. [Model selection](07-model-selection.qmd)
   8. [Reproducibility](08-reproducible-sdm.qmd)
+
+### Projections
+
+  9. [Future projections](09-future.qmd)

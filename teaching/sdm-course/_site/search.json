@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "slides/slides.html",
+    "href": "slides/slides.html",
+    "title": "Species Distribution Models",
+    "section": "",
+    "text": "Introduction\n\nIntroduction.\n\n\n\nTheory\n\nBackground & Theory.\nEcological Niche Modeling with GAMs.\n\n\n\nData\n\nData for ENM/SDM\nPrepdaring data\n\n\n\nFitting\n\nFirst SDM\nModel selection\nReproducibility\n\n\n\nProjections\n\nFuture projections"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Species Distribution Models",
@@ -26,12 +33,5 @@
     "title": "Species Distribution Models",
     "section": "Software",
     "text": "Software\nWe will use two extremely popular R package: terra and mgcv. For terra, you might want to install also codetools, which performs checks on the C++ code of terra.\n\ninstall.packages(c(\"codetools\", \"terra\"))\n\nFor mgcv, you might want to install also gratia, which provides functionality to plot and inspect the output of mgcv.\n\ninstall.packages(c(\"mgcv\", \"gratia\"))\n\n\n\n\n\n\n\nNote\n\n\n\nterra is still in active development and some functionalities change with newer releases."
-  },
-  {
-    "objectID": "slides/slides.html",
-    "href": "slides/slides.html",
-    "title": "Species Distribution Models",
-    "section": "",
-    "text": "Introduction\n\nIntroduction.\n\n\n\nTheory\n\nBackground & Theory.\nEcological Niche Modeling with GAMs.\n\n\n\nData\n\nData for ENM/SDM\nPrepdaring data\n\n\n\nFitting\n\nFirst SDM\nModel selection\nReproducibility"
   }
 ]

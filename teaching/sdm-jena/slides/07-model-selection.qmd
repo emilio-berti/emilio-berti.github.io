@@ -66,4 +66,6 @@ aic <- data.frame(
 aic$DeltaAIC <- aic$AIC - min(aic$AIC)
 head(aic[order(aic$AIC), c("AIC", "DeltaAIC")], n = 3)
 aic$formula[which.min(aic$AIC)]
+
+saveRDS(enm[[which.min(aic$AIC)]], "../data/enm.rds")
 ```
