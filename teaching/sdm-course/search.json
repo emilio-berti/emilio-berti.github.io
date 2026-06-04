@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "slides/slides.html",
+    "href": "slides/slides.html",
+    "title": "Species Distribution Models",
+    "section": "",
+    "text": "Introduction\n\nIntroduction.\n\n\n\nTheory\n\nBackground & Theory.\nEcological Niche Modeling with GAMs.\n\n\n\nData\n\nData for ENM/SDM\nPrepdaring data\n\n\n\nFitting\n\nFirst SDM\nModel selection\nReproducibility\n\n\n\nProjections\n\nFuture projections"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Species Distribution Models",
+    "section": "",
+    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nNote\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI lecture a GIS course every year at iDiv in Leipzig: GIS course. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
+  },
+  {
+    "objectID": "index.html#course-overview",
+    "href": "index.html#course-overview",
+    "title": "Species Distribution Models",
+    "section": "",
+    "text": "This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.\n\n\n\n\n\n\nImportant\n\n\n\nThis course assumes basic R knowledge.\n\n\nIn the first # days, etc.\n\n\n\n\n\n\nNote\n\n\n\nA basic knowledge of Geographic Information Systems is required for ENM/SDM. I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.\nI lecture a GIS course every year at iDiv in Leipzig: GIS course. SFU Jena also offers GIS courses: MSc Environmental and Georesources Management, MSc Geoinformatic, and BSc Geography."
+  },
+  {
+    "objectID": "index.html#learning-objectives",
+    "href": "index.html#learning-objectives",
+    "title": "Species Distribution Models",
+    "section": "Learning objectives",
+    "text": "Learning objectives\n\nUnderstand the theory behind ENM/SDM.\nPerform ENM/SDM in R.\nApply ENM/SDM to real data.\nProduce maps."
+  },
+  {
+    "objectID": "index.html#software",
+    "href": "index.html#software",
+    "title": "Species Distribution Models",
+    "section": "Software",
+    "text": "Software\nWe will use two extremely popular R package: terra and mgcv. For terra, you might want to install also codetools, which performs checks on the C++ code of terra.\n\ninstall.packages(c(\"codetools\", \"terra\"))\n\nFor mgcv, you might want to install also gratia, which provides functionality to plot and inspect the output of mgcv.\n\ninstall.packages(c(\"mgcv\", \"gratia\"))\n\n\n\n\n\n\n\nNote\n\n\n\nterra is still in active development and some functionalities change with newer releases."
+  }
+]
