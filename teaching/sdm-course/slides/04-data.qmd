@@ -1,0 +1,107 @@
+---
+title: "Data for ENMs/SDMs"
+subtitle: ""
+author: ""
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 169
+---
+
+## Two types of data
+
+  - Species' occurrence data
+  - Environmental (climate) data
+
+# Species' occurrence data
+
+## Species' occurrence data
+
+  - Where the species was observed (`1`) and where not (`0`)
+  - Typically, only where the species was observed
+
+  1. GBIF: \url{https://www.gbif.org/}
+  2. iNaturalist: \url{https://www.inaturalist.org/}
+  3. eBird: \url{https://ebird.org/}
+  4. \dots
+
+## Species' occurrence data
+
+Strong geographic and taxonomic biases
+
+::::{.columns}
+
+:::{.column width=60%}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+library(terra)
+r <- rast("../data/effort-mammalia.tif")
+r[r > 2e9] <- NA
+l <- vect("../data/coastline.shp")
+plot(
+  log10(r + 1),
+  col = hcl.colors(100, "Spectral", rev = TRUE),
+  maxcell = 1e5,
+  fun = \() lines(l),
+  frame = FALSE, axes = FALSE
+)
+```
+\centering
+Number of mammal records ($log_{10}$)
+:::
+
+:::{.column width=40%}
+ - Mostly animals
+ - Mostly vertebrates
+ - Mostly birds and mammals
+:::
+
+::::
+
+## GBIF
+
+ - Global Biodiversity Information Facility (GBIF)
+ - $\approx 3.5$ billion records
+ - Direct upload and pull from other databases
+
+Go to \url{https://www.gbif.org/} to download data
+
+# Climate data
+
+## Climate data
+
+ 1. WorldClim: https://www.worldclim.org/
+ 2. CHELSA: https://chelsa-climate.org/
+ 3. PRISM: https://www.prism.oregonstate.edu/
+ 4. \dots
+
+\pause
+
+Every climate data is different and you should use the one that is best for your case.
+
+In this course, we will use WorldClim, which is easy to use, very reliable, and often used in real applications.
+
+Go to \url{https://www.worldclim.org/} to download bioclimatic variables at 10 arc-minute resolution.
+
+## Bioclimatic variables
+
+  - Generated from temperature and precipitation
+  - Annual values, averaged over $\approx$ 30 years
+  - Usually, 19 variables, but sometimes more
+
+\pause
+
+For example:
+
+  1. Mean annual temperature (BIO01)
+  2. Maximum temperature of the warmest month (BIO05)
+  3. Total annual precipitation (BIO12)
+  4. Precipitation seasonality (BIO15)
+
+## BIO01
+
+```{r, echo=FALSE}
+r <- rast("../data/wc2.1_10m_bio_1.tif")
+plot(r, col = hcl.colors(100, "Spectral", rev = TRUE), frame = FALSE, axes = FALSE)
+```

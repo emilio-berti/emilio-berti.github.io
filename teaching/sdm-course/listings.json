@@ -1,0 +1,18 @@
+[
+  {
+    "listing": "/lectures/lectures.html",
+    "items": [
+      "/lectures/01-background.html",
+      "/lectures/02-theory.html",
+      "/lectures/03-data.html",
+      "/lectures/05-preparing-data.html",
+      "/lectures/06-first-sdm.html"
+    ]
+  },
+  {
+    "listing": "/labs/labs.html",
+    "items": [
+      "/labs/01-lab.html"
+    ]
+  }
+]

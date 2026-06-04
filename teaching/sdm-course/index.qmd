@@ -1,0 +1,49 @@
+---
+title: "Species Distribution Models"
+subtitle: "An introductory course at SFU Jena"
+author: "Emilio Berti"
+---
+
+## Course overview
+
+This course introduces Ecological Niche Modeling (ENM) and Species Distribution Modeling (SDM) using the R programming language.
+
+::: {.callout-important}
+This course assumes basic R knowledge.
+:::
+
+In the first \# days, etc.
+
+::: {.callout-note}
+A basic knowledge of Geographic Information Systems is required for ENM/SDM.
+I will introduce basic concepts and operations of of GIS, but this is not a course about GIS.
+
+I lecture a GIS course every year at iDiv in Leipzig: [GIS course](https://emilio-berti.github.io/teaching/gis-ydiv/main.html).
+SFU Jena also offers GIS courses: [MSc Environmental and Georesources Management ](https://www.chemgeo.uni-jena.de/en/56067/teaching), [MSc Geoinformatic](https://www.uni-jena.de/6655/m-sc-geoinformatik), and [BSc Geography](https://www.uni-jena.de/7195/b-sc-geographie).
+:::
+
+## Learning objectives
+
+- Understand the theory behind ENM/SDM.
+- Perform ENM/SDM in R.
+- Apply ENM/SDM to real data.
+- Produce maps.
+
+## Software
+
+We will use two extremely popular R package: `terra` and `mgcv`.
+For `terra`, you might want to install also `codetools`, which performs checks on the C++ code of `terra`.
+
+```{r, eval=FALSE}
+install.packages(c("codetools", "terra"))
+```
+
+For `mgcv`, you might want to install also `gratia`, which provides functionality to plot and inspect the output of `mgcv`.
+
+```{r, eval=FALSE}
+install.packages(c("mgcv", "gratia"))
+```
+
+::: {.callout-note}
+`terra` is still in active development and some functionalities change with newer releases.
+:::

@@ -1,0 +1,66 @@
+---
+title: "Species Distribution Modeling"
+author: "Emilio Berti"
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 169
+---
+
+## Lecturers
+
+\begin{columns}
+
+\begin{column}{0.3\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../figures/Ulrich-Brose-Portrait.png}\\
+Prof. Ulrich Brose
+\end{column}
+
+\begin{column}{0.3\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../figures/Emilio-Berti-Portrait.png}\\
+Emilio Berti
+\end{column}
+
+\begin{column}{0.3\textwidth}
+\centering
+Someone else?
+\end{column}
+
+\end{columns}
+
+## What you will learn
+
+ - Species distribution models (SDMs)
+ - R programming langauge (R)
+ - Geographic information systems (GIS)
+ - Generalized additive models (GAMs)
+
+## Course structure
+
+In the first \# days, etc.
+
+## Learning objectives
+
+- Theory behind SDM
+- Run SDM independently
+- Apply SDMs to real problems
+- Maps
+
+## Software needed
+
+ - R
+ - `codetools`
+ - `terra`
+ - `mgcv`
+
+```{r, eval=FALSE}
+install.packages(c("codetools", "terra", "mgcv"))
+```
+
+::: {.callout-note}
+`terra` is still in active development and some functionalities change with newer releases.
+:::
