@@ -1,0 +1,28 @@
+---
+title: "A tale of three niches"
+author: ""
+format:
+  beamer:
+    engine: tectonic
+    colortheme: beaver
+    incremental: false
+    aspectratio: 169
+---
+
+## What are we modelling with SDMs?
+
+![](../figures/niche-concept.pdf){height=6cm fig-align="left"}
+\pause
+![](../figures/niche-concept-2.pdf){height=5cm fig-align="right"}
+
+## What are we modelling with SDMs?
+
+  1. What are we actually modelling?
+  \pause
+  2. When is this a potential issue?
+  \pause
+  3. How to know if this is an issue?
+  \pause
+  4. How to fix the issue?
+  \pause
+  5. Are SDMs done?

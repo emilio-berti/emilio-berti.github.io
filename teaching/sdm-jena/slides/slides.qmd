@@ -27,3 +27,7 @@ author: "Emilio Berti"
 ### Projections
 
   9. [Future projections](09-future.qmd)
+
+### Group discussions
+
+  10. [What niche are we modelling?](10-theory-advanced.qmd)
