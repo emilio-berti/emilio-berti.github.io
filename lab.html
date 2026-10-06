@@ -43,6 +43,15 @@
         }
 
     </style>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
@@ -71,7 +80,6 @@
         </ul>
 
         <img src="lab/camera-field-of-view.png" alt="Field of View" width="100%">
-
 
         <h2>Lab GitHub</h2>
 
@@ -125,6 +133,39 @@
             <li><b>November 15th</b>: end of Joanna's experiments</li>
             <li><b>November</b>: start of Anika's experiments</li>
         </ul>
+
+        <h2>Vibration primer</h2>
+        <img src="lab/wave.png" alt="Wave" width="100%">
+
+        <p>\[ Avg = \frac{2}{\pi} Peak \]</p>
+        <p>\[ RMS = \frac{Peak}{\sqrt{2}} \]</p>
+        <p>\[ \text{Crest factor} = \frac{Peak}{RMS} \]</p>
+        <p>\[ \text{Form factor} = \frac{RMS}{Avg} \]</p>
+
+        <p>
+            The <b>displacement</b> \(x(t)\) (\(m\)) at time \(t\) (\(s\)) is given by:
+            \[ x(t) = X \sin{2 \pi f t} \]
+            where \(X\) is the peak displacement and \(f\) the frequency (\(Hz\)).
+        </p>
+
+        <p>
+            The <b>acceleration</b> \(a(t)\) (\(m / s^2\)) is given by:
+            \[ a(t) = -(2 \pi f)^2 x(t) = - (2 \pi f)^2 X \sin{2 \pi f t} \]
+        </p>
+
+        <p>
+            Therefore, the <b>peak displacement</b> is given by:
+            \[ X = \frac{A}{(2 \pi f)^2} \]
+            where \(A\) is peak acceleration
+        </p>
+
+        <p>
+            From the above, two different frequencies \(f_1\) and \(f_2\) give the same peak displacement if and only if:
+            \[ \frac{A_1}{A_2} = \left( \frac{f_1}{f_2}\right)^2 \]
+        </p>
+        <img src="lab/peak-displacement.png" alt="Peak Displacement" width="100%">
+
+
 
         <h2>Anika's set up</h2>
 
