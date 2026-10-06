@@ -42,6 +42,41 @@
             font-size: 14px;
         }
 
+        /* Table of Contents */
+        .toc {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100vh;
+            padding: 20px;
+            background: #eee;
+            border-right: 1px solid #ccc;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .toc a {
+            display: block;
+            padding: 6px 0;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        /* Make room for the sidebar */
+        .container {
+            margin-left: 220px;
+        }
+
     </style>
     <script>
         MathJax = {
@@ -56,11 +91,21 @@
 
 <body>
 
+    <nav class="toc">
+        <h2>Contents</h2>
+
+        <a href="#network">Computer Network</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#gitHub">Lab Github</a>
+        <a href="#timeplan">Time Plan</a>
+        <a href="#vibration">Vibration Primer</a>
+    </nav>
+
     <div class="page">
 
         <h1>Lab Notes</h1>
 
-        <h2>Computer Network</h2>
+        <h2 id="network">Computer Network</h2>
         <ul>
             <li>Lab terminal <b>172.18.205.141</b>
                 <pre><code>
@@ -69,7 +114,7 @@
             </li>
         </ul>
 
-        <h2>Hardware</h2>
+        <h2 id="hardware">Hardware</h2>
 
         <h3>Cameras Alvium G1-240c</h3>
 
@@ -81,7 +126,7 @@
 
         <img src="lab/camera-field-of-view.png" alt="Field of View" width="100%">
 
-        <h2>Lab GitHub</h2>
+        <h2 id="github">Lab GitHub</h2>
 
         <p>
           Create an organization account on GitHub, e.g. EcoNetLab
@@ -127,14 +172,14 @@
           Ask IT to store it in a long-term storage option with DOI
         </p>
         
-        <h2>Time Plan</h2>
+        <h2 id="timeplan">Time Plan</h2>
 
         <ul>
             <li><b>November 15th</b>: end of Joanna's experiments</li>
             <li><b>November</b>: start of Anika's experiments</li>
         </ul>
 
-        <h2>Vibration primer</h2>
+        <h2 id="vibration">Vibration primer</h2>
         <img src="lab/wave.png" alt="Wave" width="100%">
 
         <p>\[ Avg = \frac{2}{\pi} Peak \]</p>
@@ -162,9 +207,8 @@
         <p>
             From the above, two different frequencies \(f_1\) and \(f_2\) give the same peak displacement if and only if:
             \[ \frac{A_1}{A_2} = \left( \frac{f_1}{f_2}\right)^2 \]
+            <img src="lab/peak-displacement.png" alt="Peak Displacement" width="100%">
         </p>
-        <img src="lab/peak-displacement.png" alt="Peak Displacement" width="100%">
-
 
 
         <h2>Anika's set up</h2>
