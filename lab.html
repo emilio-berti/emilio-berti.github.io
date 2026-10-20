@@ -29,6 +29,12 @@
             line-height: 1.6;
         }
 
+        hr {
+            height: 4px;
+            border: none;
+            background: linear-gradient(to right, #222222, #aaaaaa);
+        }
+
         pre {
             background: #EEEEEE;
             color: #222222;
@@ -40,6 +46,12 @@
 
         code {
             font-size: 14px;
+        }
+
+        .center{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* Table of Contents */
@@ -116,7 +128,7 @@
 
         <a href="#network">Computer Network</a>
         <a href="#hardware">Hardware</a>
-        <a href="#gitHub">Lab Github</a>
+        <a href="#github">Lab Github</a>
         <a href="#timeplan">Time Plan</a>
         <a href="#vibration">Vibration Primer</a>
         <a href="#vibrocamtrom">VibroCamTron</a>
@@ -126,14 +138,26 @@
 
         <h1>Lab Notes</h1>
 
+        <hr>
+
         <h2 id="network">Computer Network</h2>
+
+        The computer network consists of three main nodes:
         <ul>
-            <li>Lab terminal <b>172.18.205.141</b>
-                <pre><code>
-                    ssh ...
-                </code></pre>
-            </li>
+            <li>Lab workstation <b>idivws35</b>.usr.idiv.de (172.18.227.216)</li>
+            <li>GPU server <b>idivlinuxts03</b>.usr.idiv.de (172.18.224.110)</li>
+            <li>IDIV file server (//usr.idiv.de/public), mounted in <b>/mnt/camflow/</b> and <b>/mnt/data/</b> on the workstation</li>
         </ul>
+        <p>
+            The workstation is the access point for all users of the lab and is the only machine locate in the lab room.
+            The GPU server processes the images from cameras and runs the API to interface with the cameras (port 3000).
+            The images are stored on the IDIV file server.
+            The diagram below shows the main connections and functions of the machines in the network.
+        </p>
+
+        <img src="lab/network.svg" alt="Lab network" width="80%" class="center">
+
+        <hr>
 
         <h2 id="hardware">Hardware</h2>
 
@@ -147,13 +171,19 @@
 
         <img src="lab/camera-field-of-view.png" alt="Field of View" width="100%">
 
+        <hr>
+
         <h2 id="github">Lab GitHub</h2>
 
         <p>
-          Create an organization account on GitHub, e.g. EcoNetLab
+            The EcoNetLab has an organization GitHub: <a href="https://github.com/EcoNetLab">https://github.com/EcoNetLab</a>.
+            Please write to <a href="mailto:emilio.berti@idiv.de">emilio.berti@idiv.de</a> if you want access to the repositories of the organization account.
         </p>
 
+        <hr>
+
         <h2>Joanna's comments</h2>
+        
         <ul>
             <li>Remove dubious segments from the CSV</li>
             <ol>
@@ -171,6 +201,8 @@
                 <li></li>
             </ol>
         </ul>
+
+        <hr>
 
         <h2>Thomas' code</h2>
         
@@ -193,6 +225,8 @@
           Ask IT to store it in a long-term storage option with DOI
         </p>
         
+        <hr>
+
         <h2 id="timeplan">Time Plan</h2>
 
         <ul>
@@ -200,7 +234,10 @@
             <li><b>November</b>: start of Anika's experiments</li>
         </ul>
 
+        <hr>
+
         <h2 id="vibration">Vibration primer</h2>
+        
         <img src="lab/wave.png" alt="Wave" width="100%">
 
         <p>\[ Avg = \frac{2}{\pi} Peak \]</p>
@@ -231,7 +268,8 @@
             <img src="lab/peak-displacement.png" alt="Peak Displacement" width="100%">
         </p>
 
-        <!-- Vibration system -->
+        <hr>
+
         <h2 id="vibrocamtrom">VibroCamTrom</h2>
 
         <h3>Frames</h3>
