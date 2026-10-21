@@ -5,8 +5,8 @@ BACKGROUND <- 4 * 1e-3 # mm
 MASS <- 5 # kg
 
 shakers <- data.frame(
-  model = c("4810", "4809"),
-  force = c(10, 45)
+  model = c("4810", "4809", "4808"),
+  force = c(10, 45, 112)
 )
 
 # Peak displacement in mm
@@ -45,10 +45,11 @@ d |>
     geom_point(shape = 21) +
     scale_x_continuous("Frequency (Hz)", breaks = seq(0, 200, by = 10)) +
     scale_y_log10("Peak displacement (mm)") +
-    scale_color_manual("Model", values = c("dodgerblue3", "indianred")) +
-    scale_fill_manual("Model", values = c("dodgerblue3", "indianred")) +
+    scale_color_manual("Model", values = c("dodgerblue3", "indianred", "goldenrod")) +
+    scale_fill_manual("Model", values = c("dodgerblue3", "indianred", "goldenrod")) +
     ggtitle(sprintf("Peak displacement for a weight of %d kg", MASS)) +
     theme_bw() +
     theme(
       panel.grid.minor = element_blank()
     )
+ggsave("hbk.svg", width = 5, height = 3)
