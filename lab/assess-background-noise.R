@@ -1,7 +1,7 @@
 library(ggplot2)
 library(tidyr)
 
-BACKGROUND <- 4 * 1e-3 # mm
+BACKGROUND <- 0.03442129 # mm
 MASS <- 5 # kg
 
 shakers <- data.frame(
@@ -52,4 +52,4 @@ d |>
     theme(
       panel.grid.minor = element_blank()
     )
-ggsave("hbk.svg", width = 5, height = 3)
+ggsave("hbk.pdf", width = 5, height = 3)
