@@ -6,6 +6,7 @@
     <title>Lab Notes</title>
 
     <style>
+        
         body {
             margin: 0;
             padding: 40px;
@@ -21,14 +22,47 @@
             box-shadow: 0 2px 8px #ccc;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 30px;
+        }
+
         h1 {
-            margin-top: 0;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.045em;
+            color: #171923;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-weight: 750;
+            line-height: 1.2;
+            letter-spacing: -0.035em;
+            color: #202334;
+            margin-bottom: 1.25rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+                         'Segoe UI', sans-serif;
+            color: #45495a;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
         p {
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #626779;
+            margin-bottom: 1.25rem;
         }
 
+        a {
+            color: #635bff;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
         hr {
             height: 4px;
             border: none;
@@ -59,55 +93,97 @@
             position: fixed;
             left: 0;
             top: 0;
-            width: 200px;
+            width: 260px;
             height: 100vh;
-            padding: 20px;
-            background: #eee;
-            border-right: 1px solid #ccc;
+            padding: 30px 22px;
+            background: #fafbff;
+            border-right: 1px solid #e8eaf0;
             box-sizing: border-box;
             overflow-y: auto;
+            font-family: 'Inter', sans-serif;
         }
 
+        /* TOC Heading */
         .toc h2 {
-            margin-top: 0;
-            font-size: 18px;
+            margin: 0 0 22px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9298a8;
         }
 
+        /* TOC Links */
         .toc a {
             display: block;
-            padding: 6px 0;
-            color: #333;
+            padding: 10px 14px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: #555d70;
+            font-size: 14px;
+            font-weight: 500;
             text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
         }
 
+        /* Hover */
         .toc a:hover {
-            text-decoration: underline;
+            background: #f0efff;
+            color: #635bff;
+            border-left-color: #635bff;
+            padding-left: 18px;
         }
 
-        /* Make room for the sidebar */
+        /* Active Link */
+        .toc a.active {
+            background: #eeedff;
+            color: #635bff;
+            font-weight: 650;
+            border-left-color: #635bff;
+        }
+
+        /* Main Content */
         .container {
-            margin-left: 220px;
+            margin-left: 280px;
+            padding: 40px;
+            max-width: 1100px;
         }
 
-        @media (max-width: 600px) {
-        .toc {
-            position: static;
-            width: 100%;
-            height: auto;
-            border-right: none;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 20px;
+        /* Scrollbar */
+        .toc::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .container {
-            margin-left: 0;
+        .toc::-webkit-scrollbar-thumb {
+            background: #d5d7e2;
+            border-radius: 10px;
         }
 
-        .toc a {
-            display: inline-block;
-            margin-right: 12px;
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .toc {
+                position: static;
+                width: 100%;
+                height: auto;
+                max-height: 250px;
+                padding: 20px;
+                border-right: none;
+                border-bottom: 1px solid #e8eaf0;
+                margin-bottom: 20px;
+            }
+
+            .container {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .toc a {
+                display: inline-block;
+                margin-right: 6px;
+                padding: 8px 12px;
+            }
         }
-    }
 
     </style>
     <script>
@@ -127,6 +203,7 @@
         <h2>Contents</h2>
 
         <a href="#network">Computer Network</a>
+        <a href="#depz">DEPZ Accelerometer</a>
         <a href="#hardware">Hardware</a>
         <a href="#github">Lab Github</a>
         <a href="#timeplan">Time Plan</a>
@@ -142,21 +219,42 @@
 
         <h2 id="network">Computer Network</h2>
 
-        The computer network consists of three main nodes:
+        The computer network consists of the following nodes:
         <ul>
             <li>Lab workstation <b>idivws35</b>.usr.idiv.de (172.18.227.216)</li>
             <li>GPU server <b>idivlinuxts03</b>.usr.idiv.de (172.18.224.110)</li>
             <li>IDIV file server (//usr.idiv.de/public), mounted in <b>/mnt/camflow/</b> and <b>/mnt/data/</b> on the workstation</li>
+            <li>Raspberry sensor system <b>raspct02</b> (raspberrypi.local)</li>
         </ul>
         <p>
             The workstation is the access point for all users of the lab and is the only machine locate in the lab room.
             The GPU server processes the images from cameras and runs the API to interface with the cameras (port 3000).
             The images are stored on the IDIV file server.
+            The raspberry manages the DEPZ accelerometer sensor mounted on the experimental plate.
             The diagram below shows the main connections and functions of the machines in the network.
         </p>
 
         <img src="lab/network.svg" alt="Lab network" width="80%" class="center">
 
+        <hr>
+
+        <h2 id="depz">DEPZ Accelerometer</h2>
+            
+            <img src="lab/depz.png" alt="DEPZ accelerometer" width="100%">
+            
+            <p> The accelerometer is the DEPZ <a href="https://depz.ai/eu/product/imu-sensor-icm-45686-usb">IMU ICM-45686 USB Sensor</a>
+                <ul>
+                    <li>3 axes accelerometer</li>
+                    <li>±32 g up to 6400 Hz</li>
+                    <li>Noise density 70 µg/√Hz</li>
+                    <li>FIFO 8 kb</li>
+                </ul>
+            </p>
+            <p>
+                The DEPZ accelerometer communicates with the raspberry <i>raspct02</i>.
+                Data can be viewed, saved and downloaded connecting to <i>raspct02</i> through HTML (:8080).
+                Code for acquiring data and HTML connection is hosted at <a href="https://github.com/EcoNetLab/DEPZ">https://github.com/EcoNetLab/DEPZ</a>.
+            </p>
         <hr>
 
         <h2 id="hardware">Hardware</h2>
